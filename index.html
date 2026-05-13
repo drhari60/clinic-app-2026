@@ -15,27 +15,34 @@
         .btn-pay { background: #e65100; color: white; border: none; font-weight: bold; cursor: pointer; padding: 12px; }
         .header { background: var(--primary); color: white; padding: 20px 15px; text-align: center; border-radius: 0 0 25px 25px; }
         .social-bar { display: flex; justify-content: center; gap: 15px; margin-top: 12px; flex-wrap: wrap; }
-        .social-bar a { color: white; font-size: 18px; text-decoration: none; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
-        .social-bar a:hover { background: var(--accent); transform: translateY(-3px); }
+        .social-bar a { color: white; font-size: 18px; text-decoration: none; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; }
         .tabs { display: flex; background: white; margin-top: -20px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .tab-btn { flex: 1; padding: 15px; border: none; background: white; cursor: pointer; color: #666; font-weight: bold; }
         .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); background: #e0f2f1; }
         #qrModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; text-align: center; color: white; padding-top: 40px; }
-        .qr-img { width: 85%; max-width: 320px; border-radius: 15px; border: 5px solid white; margin-bottom: 15px; }
+        .qr-img { width: 85%; max-width: 320px; border-radius: 15px; border: 5px solid white; }
         #searchBox { border: 2px solid var(--primary); padding-left: 45px; height: 55px; font-size: 16px; }
+        
+        /* Print Styling */
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; padding: 40px; border: 2px solid #000; }
+            body { background: white; }
+        }
+        .print-only { display: none; }
     </style>
 </head>
 <body>
 
-<div id="qrModal">
+<div id="qrModal" class="no-print">
     <div style="padding: 20px;">
         <h3>স্কেন কৰি পেমেন্ট কৰক</h3>
         <img src="https://raw.githubusercontent.com/DrHarisClinic/assets/main/qr.jpeg" class="qr-img" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=upi://pay?pa=9954340102@okbizaxis%26pn=Haris%20Homoeo%20Hall%26am=100'">
-        <br><button onclick="closeQR()" style="background:white; color:black; padding:12px 25px; border-radius:10px; border:none; font-weight:bold; cursor:pointer;">বন্ধ কৰক</button>
+        <br><button onclick="closeQR()" style="margin-top:10px;">বন্ধ কৰক</button>
     </div>
 </div>
 
-<div id="mainApp">
+<div id="mainApp" class="no-print">
     <div class="header">
         <h1 style="margin:0;">Dr. Haris Clinic</h1>
         <div class="social-bar">
@@ -63,19 +70,20 @@
                 <h3>New Patient Entry</h3>
                 <input type="text" id="pName" placeholder="ৰোগীৰ নাম">
                 <div style="display:flex; gap:10px;">
-                    <input type="text" id="pAgeSex" placeholder="বয়স/লিংগ">
+                    <input type="text" id="pAgeSex" placeholder="বয়স/লিংগ">
                     <input type="text" id="pBP" placeholder="BP">
                 </div>
                 <input type="text" id="pPhone" placeholder="মোবাইল নম্বৰ">
                 <textarea id="pHistory" placeholder="History"></textarea>
                 <textarea id="pMedicine" placeholder="Prescription (Rx)"></textarea>
-                <input type="number" id="pFees" placeholder="Fees (₹)"> <button class="btn-primary" onclick="addPatient()">SAVE & SYNC</button>
+                <input type="number" id="pFees" placeholder="Fees (₹)">
+                <button class="btn-primary" onclick="addPatient()">SAVE & SYNC</button>
             </div>
             <div id="listPatients"></div>
         </div>
 
         <div id="section-public-book" style="display:none;">
-            <div class="card" style="margin-top:20px; border: 2px solid var(--primary);">
+            <div class="card">
                 <h3>অনলাইন বুকিং ফৰ্ম</h3>
                 <input type="text" id="bName" placeholder="ৰোগীৰ নাম">
                 <input type="text" id="bPhone" placeholder="মোবাইল নম্বৰ">
@@ -102,6 +110,8 @@
     </div>
 </div>
 
+<div id="printArea" class="print-only"></div>
+
 <script>
     const supabaseUrl = 'https://oblvgjnyecvvnnnesegl.supabase.co';
     const supabaseKey = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9';
@@ -127,7 +137,6 @@
         const name = document.getElementById('pName').value;
         const fees = parseInt(document.getElementById('pFees').value) || 0;
         const d = { name: name, age: document.getElementById('pAgeSex').value, bp: document.getElementById('pBP').value, phone: document.getElementById('pPhone').value, history: document.getElementById('pHistory').value, medicine: document.getElementById('pMedicine').value, fees: fees };
-        
         const { error } = await _supabase.from('clinic_data').insert([d]);
         if(!error) {
             if(fees > 0) await _supabase.from('clinic_accounts').insert([{ type: 'Income', amount: fees, note: 'Rx: ' + name }]);
@@ -135,10 +144,35 @@
         }
     }
 
-    // WhatsApp-ত পঠাওঁতে Fees বাদ দিয়া হৈছে
     function sendWhatsApp(name, phone, medicine) {
-        const msg = `*Dr. Haris Clinic*%0A------------------%0A*Patient:* ${name}%0A*Rx:* ${medicine}%0A------------------%0A_পৰামৰ্শৰ বাবে ধন্যবাদ।_`;
+        const msg = `*Dr. Haris Clinic*%0A*Patient:* ${name}%0A*Rx:* ${medicine}`;
         window.open(`https://wa.me/91${phone}?text=${msg}`);
+    }
+
+    function printPrescription(p) {
+        const area = document.getElementById('printArea');
+        area.innerHTML = `
+            <div style="text-align:center;">
+                <h1 style="margin:0;">DR. HARIS CLINIC</h1>
+                <p>Gogamukh, Dhemaji, Assam | Phone: 9954340102</p>
+                <hr>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin: 20px 0;">
+                <div><b>Name:</b> ${p.name}</div>
+                <div><b>Age/Sex:</b> ${p.age || 'N/A'}</div>
+                <div><b>BP:</b> ${p.bp || 'N/A'}</div>
+            </div>
+            <p><b>History:</b> ${p.history || 'None'}</p>
+            <hr>
+            <h3 style="text-decoration:underline;">Rx:</h3>
+            <div style="min-height: 300px; font-size: 1.2em;">${p.medicine.replace(/\n/g, '<br>')}</div>
+            <hr>
+            <div style="text-align:right; margin-top: 30px;">
+                <p>___________________</p>
+                <p>Doctor's Signature</p>
+            </div>
+        `;
+        window.print();
     }
 
     async function loadPatients() {
@@ -146,10 +180,10 @@
         document.getElementById('listPatients').innerHTML = data.map(p => `
             <div class="card">
                 <b>${p.name}</b> (${p.age || ''})<br>
-                <p>Rx: ${p.medicine}</p>
-                <button onclick="sendWhatsApp('${p.name}', '${p.phone}', '${p.medicine}')" style="background:#25D366; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">
-                    <i class="fab fa-whatsapp"></i> WhatsApp-ত পঠাওক
-                </button>
+                <div style="margin:10px 0;">
+                    <button onclick='printPrescription(${JSON.stringify(p)})' style="width:auto; background:#555; color:white; padding:5px 10px; border-radius:5px; cursor:pointer;"><i class="fas fa-print"></i> Print</button>
+                    <button onclick="sendWhatsApp('${p.name}', '${p.phone}', '${p.medicine}')" style="width:auto; background:#25D366; color:white; padding:5px 10px; border-radius:5px; cursor:pointer;"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                </div>
             </div>`).join('');
     }
 
