@@ -3,68 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dr. Haris Smart Clinic & Accounts</title>
+    <title>Dr. Haris Smart Clinic v2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;700&display=swap');
-        body { font-family: 'Hind Siliguri', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: #f1f5f9; }
     </style>
 </head>
 <body class="p-2 sm:p-6 pb-20">
     <div class="max-w-2xl mx-auto">
-        <header class="bg-slate-800 text-white p-6 rounded-2xl shadow-lg mb-6 text-center">
-            <h1 class="text-3xl font-bold">DR. HARI'S CLINIC</h1>
-            <p class="opacity-75">Patient Records & Expense Management</p>
+        <header class="bg-blue-900 text-white p-6 rounded-2xl shadow-lg mb-6 text-center">
+            <h1 class="text-3xl font-bold">DR. HARIS CLINIC</h1>
+            <p class="opacity-75">Professional Management System</p>
         </header>
 
-        <div class="flex mb-6 bg-white rounded-xl shadow-sm p-1 border">
-            <button onclick="showTab('patients')" id="tabPat" class="flex-1 py-2 px-4 rounded-lg font-bold text-indigo-700 bg-indigo-50">ৰোগীৰ তথ্য</button>
-            <button onclick="showTab('expenses')" id="tabExp" class="flex-1 py-2 px-4 rounded-lg font-bold text-gray-500">খৰচৰ খতিয়ান</button>
+        <div class="flex mb-6 bg-white rounded-xl shadow-sm p-1 border overflow-x-auto">
+            <button onclick="showTab('checkup')" id="tabCheck" class="flex-1 py-2 px-4 rounded-lg font-bold text-blue-700 bg-blue-50 whitespace-nowrap">১. ৰোগী পৰীক্ষা (Entry)</button>
+            <button onclick="showTab('pharmacy')" id="tabPharma" class="flex-1 py-2 px-4 rounded-lg font-bold text-gray-500 whitespace-nowrap">২. ঔষধ আৰু বিল</button>
+            <button onclick="showTab('accounts')" id="tabAcc" class="flex-1 py-2 px-4 rounded-lg font-bold text-gray-500 whitespace-nowrap">৩. জমা-খৰচ</button>
         </div>
 
-        <div id="patientsSection" class="block">
-            <div class="bg-white p-6 rounded-2xl shadow-md mb-6 border-t-4 border-indigo-600">
-                <h2 class="text-lg font-bold mb-4 flex items-center">নতুন ৰোগী যোগ কৰক</h2>
+        <div id="checkupSection" class="block">
+            <div class="bg-white p-6 rounded-2xl shadow-md mb-6 border-t-4 border-blue-600">
+                <h2 class="text-lg font-bold mb-4">ৰোগীৰ নাম আৰু ইতিহাস লিখক</h2>
                 <div class="grid grid-cols-1 gap-3">
-                    <input type="text" id="pName" placeholder="ৰোগীৰ নাম" class="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-indigo-400">
-                    <textarea id="pHistory" placeholder="বেমাৰৰ ইতিহাস (History)" class="border p-3 rounded-lg h-20 outline-none focus:ring-2 focus:ring-indigo-400"></textarea>
-                    <input type="text" id="pMed" placeholder="দৰৱৰ নাম (Medicine)" class="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-indigo-400">
-                    <input type="number" id="pFee" placeholder="মাচুল (₹)" class="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-indigo-400">
-                    <button onclick="addEntry()" class="bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition">Patient Entry কৰক</button>
+                    <input type="text" id="pName" placeholder="ৰোগীৰ সম্পূৰ্ণ নাম" class="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-400">
+                    <textarea id="pHistory" placeholder="বেমাৰৰ ইতিহাস / লক্ষণ (Symptoms)" class="border p-3 rounded-lg h-24 outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+                    <button onclick="addPatient()" class="bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition">ৰোগী যোগ কৰক (Save History)</button>
                 </div>
             </div>
         </div>
 
-        <div id="expensesSection" class="hidden">
-            <div class="bg-white p-6 rounded-2xl shadow-md mb-6 border-t-4 border-red-500">
-                <h2 class="text-lg font-bold mb-4">ক্লিনিকৰ খৰচ (Salary, Bill, Rent etc.)</h2>
+        <div id="pharmacySection" class="hidden">
+            <div class="bg-white p-6 rounded-2xl shadow-md mb-6 border-t-4 border-green-500">
+                <h2 class="text-lg font-bold mb-4">ঔষধ আৰু মাচুলৰ এন্ট্ৰি</h2>
                 <div class="grid grid-cols-1 gap-3">
-                    <select id="eCategory" class="border p-3 rounded-lg outline-none">
-                        <option value="দৰমহা (Salary)">দৰমহা (Salary)</option>
-                        <option value="বিজুলী বিল (Light Bill)">বিজুলী বিল (Light Bill)</option>
-                        <option value="ঘৰ ভাৰা (Rent)">ঘৰ ভাৰা (Rent)</option>
-                        <option value="গ্যাছ বিল (Gas Bill)">গ্যাছ বিল (Gas Bill)</option>
-                        <option value="অন্যান্য (Others)">অন্যান্য (Others)</option>
+                    <select id="selectPatient" class="border p-3 rounded-lg outline-none bg-gray-50 font-bold text-blue-800">
+                        <option value="">ৰোগী বাচি লওক (Select Patient)</option>
                     </select>
-                    <input type="number" id="eAmount" placeholder="খৰচৰ পৰিমাণ (₹)" class="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-red-400">
-                    <input type="text" id="eNote" placeholder="টোকা (Note)" class="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-red-400">
-                    <button onclick="addExpense()" class="bg-red-500 text-white font-bold py-3 rounded-xl hover:bg-red-600 transition">খৰচ যোগ কৰক</button>
+                    <input type="text" id="pMed" placeholder="কি ঔষধ দিলে? (Medicines)" class="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-green-400">
+                    <input type="number" id="pFee" placeholder="মুঠ মাচুল (Amount ₹)" class="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-green-400">
+                    <button onclick="finalizeBill()" class="bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 transition">বিল সম্পূৰ্ণ কৰক</button>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-            <div class="bg-green-100 p-4 rounded-xl border border-green-200">
-                <p class="text-xs text-green-700 font-bold uppercase">উপাৰ্জন (মাহেকীয়া)</p>
-                <p id="monthlyIncome" class="text-xl font-black text-green-800">₹ 0</p>
+        <div id="accountsSection" class="hidden">
+            <div class="grid grid-cols-2 gap-4 mb-6 text-center">
+                <div class="bg-green-100 p-4 rounded-xl border border-green-200">
+                    <p class="text-xs text-green-700 font-bold uppercase">মাহেকীয়া উপাৰ্জন</p>
+                    <p id="monthlyIncome" class="text-2xl font-black text-green-800">₹ 0</p>
+                </div>
+                <div class="bg-red-100 p-4 rounded-xl border border-red-200">
+                    <p class="text-xs text-red-700 font-bold uppercase">মাহেকীয়া খৰচ</p>
+                    <p id="monthlyExp" class="text-2xl font-black text-red-800">₹ 0</p>
+                </div>
             </div>
-            <div class="bg-red-100 p-4 rounded-xl border border-red-200">
-                <p class="text-xs text-red-700 font-bold uppercase">খৰচ (মাহেকীয়া)</p>
-                <p id="monthlyExp" class="text-xl font-black text-red-800">₹ 0</p>
-            </div>
-            <div class="bg-blue-100 p-4 rounded-xl border border-blue-200">
-                <p class="text-xs text-blue-700 font-bold uppercase">নিট লাভ (Profit)</p>
-                <p id="netProfit" class="text-xl font-black text-blue-800">₹ 0</p>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-md mb-6 border-t-4 border-red-400">
+                <h3 class="font-bold mb-4">ক্লিনিকৰ খৰচ যোগ কৰক (Rent/Bill/Salary)</h3>
+                <div class="flex flex-col gap-3">
+                    <input type="text" id="expNote" placeholder="খৰচৰ ধৰণ (উদা: লাইট বিল)" class="border p-2 rounded-lg">
+                    <input type="number" id="expAmount" placeholder="পৰিমাণ ₹" class="border p-2 rounded-lg">
+                    <button onclick="addExpense()" class="bg-red-500 text-white font-bold py-2 rounded-lg">খৰচ যোগ কৰক</button>
+                </div>
             </div>
         </div>
 
@@ -73,96 +75,96 @@
     </div>
 
     <script>
-        let records = JSON.parse(localStorage.getItem('dr_hari_db')) || [];
-        let expenses = JSON.parse(localStorage.getItem('dr_hari_exp')) || [];
-        let currentTab = 'patients';
+        let db = JSON.parse(localStorage.getItem('dr_hari_v2')) || { patients: [], expenses: [] };
 
         function showTab(tab) {
-            currentTab = tab;
-            document.getElementById('patientsSection').className = tab === 'patients' ? 'block' : 'hidden';
-            document.getElementById('expensesSection').className = tab === 'expenses' ? 'block' : 'hidden';
+            document.getElementById('checkupSection').className = tab === 'checkup' ? 'block' : 'hidden';
+            document.getElementById('pharmacySection').className = tab === 'pharmacy' ? 'block' : 'hidden';
+            document.getElementById('accountsSection').className = tab === 'accounts' ? 'block' : 'hidden';
             
-            // Tab styling
-            document.getElementById('tabPat').className = `flex-1 py-2 px-4 rounded-lg font-bold ${tab === 'patients' ? 'text-indigo-700 bg-indigo-50 shadow-sm' : 'text-gray-500'}`;
-            document.getElementById('tabExp').className = `flex-1 py-2 px-4 rounded-lg font-bold ${tab === 'expenses' ? 'text-red-700 bg-red-50 shadow-sm' : 'text-gray-500'}`;
+            // Tab visual update
+            const tabs = { checkup: 'tabCheck', pharmacy: 'tabPharma', accounts: 'tabAcc' };
+            Object.keys(tabs).forEach(k => {
+                document.getElementById(tabs[k]).className = `flex-1 py-2 px-4 rounded-lg font-bold ${k === tab ? 'text-blue-700 bg-blue-50 shadow-sm' : 'text-gray-500'}`;
+            });
             
-            updateUI();
+            if(tab === 'pharmacy') loadPatientDropdown();
+            updateUI(tab);
         }
 
-        function updateUI() {
-            const list = document.getElementById('mainDisplayList');
-            list.innerHTML = '';
-            let totalIncome = 0;
-            let totalExp = 0;
-            const currentMonth = new Date().getMonth();
-
-            // Calculate Income
-            records.forEach((r, i) => {
-                const recDate = new Date(r.timestamp);
-                if(recDate.getMonth() === currentMonth) totalIncome += parseInt(r.fee);
-                if(currentTab === 'patients') {
-                    list.innerHTML += `<div class="bg-white p-5 rounded-2xl shadow border-l-8 border-indigo-500 relative">
-                        <h3 class="font-bold text-gray-800">${r.name} <span class="text-xs font-normal text-gray-400 ml-2">${r.date}</span></h3>
-                        <p class="text-sm text-red-600 mt-1"><strong>History:</strong> ${r.history}</p>
-                        <p class="text-sm text-green-700"><strong>Medicine:</strong> ${r.medicine}</p>
-                        <p class="mt-2 font-bold text-indigo-700">₹${r.fee}</p>
-                        <button onclick="deleteItem('patients', ${i})" class="absolute top-4 right-4 text-gray-300 hover:text-red-500 text-xs">Delete</button>
-                    </div>`;
-                }
-            });
-
-            // Calculate Expenses
-            expenses.forEach((e, i) => {
-                const expDate = new Date(e.timestamp);
-                if(expDate.getMonth() === currentMonth) totalExp += parseInt(e.amount);
-                if(currentTab === 'expenses') {
-                    list.innerHTML += `<div class="bg-white p-5 rounded-2xl shadow border-l-8 border-red-500 relative">
-                        <h3 class="font-bold text-gray-800">${e.category}</h3>
-                        <p class="text-sm text-gray-500">${e.note || ''}</p>
-                        <p class="text-xs text-gray-400">${e.date}</p>
-                        <p class="mt-2 font-bold text-red-600">₹${e.amount}</p>
-                        <button onclick="deleteItem('expenses', ${i})" class="absolute top-4 right-4 text-gray-300 hover:text-red-500 text-xs">Delete</button>
-                    </div>`;
-                }
-            });
-
-            document.getElementById('monthlyIncome').innerText = '₹ ' + totalIncome;
-            document.getElementById('monthlyExp').innerText = '₹ ' + totalExp;
-            document.getElementById('netProfit').innerText = '₹ ' + (totalIncome - totalExp);
-            
-            localStorage.setItem('dr_hari_db', JSON.stringify(records));
-            localStorage.setItem('dr_hari_exp', JSON.stringify(expenses));
-        }
-
-        function addEntry() {
+        function addPatient() {
             const name = document.getElementById('pName').value;
             const history = document.getElementById('pHistory').value;
-            const medicine = document.getElementById('pMed').value;
+            if(!name) return alert('ৰোগীৰ নাম লিখক');
+            db.patients.unshift({ name, history, medicine: '', fee: 0, date: new Date().toLocaleDateString('as-IN'), timestamp: new Date().getTime(), billed: false });
+            document.getElementById('pName').value = ''; document.getElementById('pHistory').value = '';
+            save(); updateUI('checkup');
+        }
+
+        function loadPatientDropdown() {
+            const select = document.getElementById('selectPatient');
+            select.innerHTML = '<option value="">ৰোগী বাচি লওক</option>';
+            db.patients.filter(p => !p.billed).forEach((p, i) => {
+                select.innerHTML += `<option value="${p.timestamp}">${p.name} (${p.date})</option>`;
+            });
+        }
+
+        function finalizeBill() {
+            const ts = document.getElementById('selectPatient').value;
+            const med = document.getElementById('pMed').value;
             const fee = document.getElementById('pFee').value;
-            if(!name || !fee) return alert('নাম আৰু মাচুল দিয়ক');
-            records.unshift({ name, history, medicine, fee, date: new Date().toLocaleDateString('as-IN'), timestamp: new Date().getTime() });
-            document.getElementById('pName').value = ''; document.getElementById('pHistory').value = ''; document.getElementById('pMed').value = ''; document.getElementById('pFee').value = '';
-            updateUI();
+            if(!ts || !fee) return alert('ৰোগী আৰু মাচুল দুয়োটাই প্ৰয়োজন');
+            
+            const pIndex = db.patients.findIndex(p => p.timestamp == ts);
+            db.patients[pIndex].medicine = med;
+            db.patients[pIndex].fee = parseInt(fee);
+            db.patients[pIndex].billed = true;
+            
+            document.getElementById('pMed').value = ''; document.getElementById('pFee').value = '';
+            save(); showTab('pharmacy');
         }
 
         function addExpense() {
-            const amount = document.getElementById('eAmount').value;
-            const category = document.getElementById('eCategory').value;
-            const note = document.getElementById('eNote').value;
-            if(!amount) return alert('পৰিমাণ দিয়ক');
-            expenses.unshift({ amount, category, note, date: new Date().toLocaleDateString('as-IN'), timestamp: new Date().getTime() });
-            document.getElementById('eAmount').value = ''; document.getElementById('eNote').value = '';
-            updateUI();
+            const note = document.getElementById('expNote').value;
+            const amt = document.getElementById('expAmount').value;
+            if(!amt) return alert('পৰিমাণ দিয়ক');
+            db.expenses.unshift({ note, amount: parseInt(amt), date: new Date().toLocaleDateString('as-IN'), month: new Date().getMonth() });
+            document.getElementById('expNote').value = ''; document.getElementById('expAmount').value = '';
+            save(); updateUI('accounts');
         }
 
-        function deleteItem(type, i) {
-            if(!confirm('মচি দিব খুজিছে নেকি?')) return;
-            if(type === 'patients') records.splice(i, 1);
-            else expenses.splice(i, 1);
-            updateUI();
+        function updateUI(tab) {
+            const list = document.getElementById('mainDisplayList');
+            list.innerHTML = '';
+            let inc = 0; let exp = 0;
+            const currM = new Date().getMonth();
+
+            if(tab === 'checkup') {
+                db.patients.forEach((p, i) => {
+                    list.innerHTML += `<div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-400">
+                        <div class="flex justify-between font-bold"><span>${p.name}</span><span class="text-xs text-gray-400">${p.date}</span></div>
+                        <p class="text-sm text-gray-600 mt-1"><strong>History:</strong> ${p.history}</p>
+                        ${p.billed ? `<p class="text-xs text-green-600 font-bold mt-2">✓ Bill Done: ₹${p.fee}</p>` : `<p class="text-xs text-orange-500 font-bold mt-2">! Pending Medicine/Bill</p>`}
+                    </div>`;
+                });
+            } else if(tab === 'pharmacy') {
+                db.patients.filter(p => p.billed).forEach(p => {
+                    list.innerHTML += `<div class="bg-green-50 p-4 rounded-xl border border-green-100">
+                        <div class="font-bold text-green-800">${p.name}</div>
+                        <p class="text-sm text-gray-600">Med: ${p.medicine}</p>
+                        <p class="font-bold text-green-700">Fee: ₹${p.fee}</p>
+                    </div>`;
+                });
+            }
+
+            db.patients.forEach(p => { if(new Date(p.timestamp).getMonth() === currM) inc += (p.fee || 0); });
+            db.expenses.forEach(e => { if(e.month === currM) exp += e.amount; });
+            document.getElementById('monthlyIncome').innerText = '₹ ' + inc;
+            document.getElementById('monthlyExp').innerText = '₹ ' + exp;
         }
 
-        updateUI();
+        function save() { localStorage.setItem('dr_hari_v2', JSON.stringify(db)); }
+        updateUI('checkup');
     </script>
 </body>
 </html>
