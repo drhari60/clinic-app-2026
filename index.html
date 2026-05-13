@@ -3,87 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dr. Haris Clinic | Pro Management</title>
+    <title>Dr. Haris Clinic | Pro Suite</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --primary: #004d40; --accent: #00c853; --text: #333; --light: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; color: var(--text); padding-bottom: 50px; }
-        .no-print { display: block; }
-        
-        /* Professional Header */
-        .header { background: var(--primary); color: white; padding: 25px 15px; text-align: center; border-radius: 0 0 30px 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-        .container { max-width: 900px; margin: -20px auto 0; padding: 0 15px; }
-        
-        /* Tabs & Search */
-        .tabs { display: flex; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 15px; border: none; background: white; font-weight: bold; cursor: pointer; color: #666; }
+        :root { --primary: #004d40; --accent: #00c853; --light: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding-bottom: 50px; }
+        .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #eee; }
+        input, textarea, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; }
+        .btn-primary { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; padding: 15px; }
+        .header { background: var(--primary); color: white; padding: 25px 15px; text-align: center; border-radius: 0 0 25px 25px; }
+        .tabs { display: flex; background: white; margin-top: -20px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .tab-btn { flex: 1; padding: 15px; border: none; background: white; cursor: pointer; color: #666; font-weight: bold; }
         .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); background: #e0f2f1; }
-        
-        .search-box { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 15px; box-sizing: border-box; }
-
-        /* Cards */
-        .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; border: 1.5px solid #eee; border-radius: 10px; box-sizing: border-box; }
-        
-        .btn-save { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .btn-print { background: #555; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-
-        /* Prescription Print Style */
-        @media print {
-            .no-print { display: none !important; }
-            .print-only { display: block !important; }
-            body { background: white; }
-            .card { box-shadow: none; border: 1px solid #000; margin: 0; padding: 20px; }
-        }
+        .no-print { display: block; }
+        @media print { .no-print { display: none; } .print-only { display: block !important; } }
         .print-only { display: none; }
-        
-        .record { border-left: 6px solid var(--accent); padding: 15px; background: #fff; margin-bottom: 15px; border-radius: 8px; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .stat-item { padding: 15px; border-radius: 12px; text-align: center; color: white; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="header no-print">
-    <h1>DR. HARIS HOMEOPATHIC</h1>
-    <p>Smart Management System | Gogamukh</p>
-</div>
-
-<div class="container">
-    <div class="tabs no-print">
-        <button id="t-patients" class="tab-btn active" onclick="switchTab('patients')"><i class="fas fa-users"></i> ৰোগী</button>
-        <button id="t-accounts" class="tab-btn" onclick="switchTab('accounts')"><i class="fas fa-chart-line"></i> হিচাপ</button>
+<div id="mainApp" class="no-print">
+    <div class="header">
+        <h1 id="headerTitle">Dr. Haris Clinic</h1>
+        <p id="headerSub">Smart Management System</p>
     </div>
 
-    <div id="section-patients" class="no-print">
-        <div class="card">
-            <h3><i class="fas fa-plus"></i> New Entry</h3>
-            <input type="text" id="pName" placeholder="ৰোগীৰ নাম">
-            <input type="text" id="pAge" placeholder="বয়স/লিংগ">
-            <input type="text" id="pBP" placeholder="Blood Pressure">
-            <textarea id="pHistory" placeholder="ৰোগীৰ হিষ্ট্ৰী"></textarea>
-            <textarea id="pMedicine" rows="3" placeholder="প্ৰেছক্ৰিপশ্যন (Rx)"></textarea>
-            <input type="number" id="pFees" placeholder="Fees (₹)">
-            <button class="btn-save" onclick="addPatient()">SAVE DATA</button>
-        </div>
+    <div class="container" style="max-width: 800px; margin: auto; padding: 0 15px;">
         
-        <input type="text" id="searchBar" class="search-box" placeholder="বিচাৰক (নাম বা ৰোগ)..." onkeyup="filterPatients()">
-        <div id="listPatients"></div>
-    </div>
-
-    <div id="section-accounts" class="no-print" style="display:none;">
-        <div class="stats-grid">
-            <div class="stat-item" style="background:#2e7d32;">উপাৰ্জন<br><span id="totalInc">₹0</span></div>
-            <div class="stat-item" style="background:#c62828;">খৰচ<br><span id="totalExp">₹0</span></div>
-            <div class="stat-item" style="background:#1565c0;">লাভ<br><span id="totalNet">₹0</span></div>
+        <div id="adminTabs" class="tabs" style="display:none; margin-bottom: 20px;">
+            <button id="btn-rx" class="tab-btn active" onclick="switchTab('rx')">Rx/ৰোগী</button>
+            <button id="btn-book" class="tab-btn" onclick="switchTab('book')">বুকিং লিষ্ট</button>
+            <button id="btn-acc" class="tab-btn" onclick="switchTab('acc')">হিচাপ</button>
         </div>
-        <div class="card">
-            <h3>Daily Entry</h3>
-            <select id="accType"><option value="Income">Income</option><option value="Expense">Expense</option></select>
-            <input type="number" id="accAmount" placeholder="টকাৰ পৰিমাণ">
-            <input type="text" id="accNote" placeholder="বিৱৰণ">
-            <button class="btn-save" style="background:#333;" onclick="addAccount()">SAVE ENTRY</button>
+
+        <div id="section-public-book" style="display:none;">
+            <div class="card" style="margin-top:20px;">
+                <h3><i class="fas fa-calendar-check"></i> Appointment বুক কৰক</h3>
+                <input type="text" id="bName" placeholder="আপোনাৰ সম্পূৰ্ণ নাম">
+                <input type="text" id="bPhone" placeholder="মোবাইল নম্বৰ">
+                <textarea id="bProblem" placeholder="আপোনাৰ সমস্যাটো লিখক..."></textarea>
+                <button class="btn-primary" onclick="submitBooking()">বুকিং কনফৰ্ম কৰক</button>
+            </div>
+        </div>
+
+        <div id="section-rx" style="display:none;">
+            <div class="card">
+                <h3><i class="fas fa-plus"></i> New Consultation</h3>
+                <input type="text" id="pName" placeholder="ৰোগীৰ নাম">
+                <input type="text" id="pAge" placeholder="বয়স/লিংগ">
+                <input type="text" id="pBP" placeholder="BP">
+                <textarea id="pHistory" placeholder="History"></textarea>
+                <textarea id="pMedicine" rows="3" placeholder="Prescription (Rx)"></textarea>
+                <input type="number" id="pFees" placeholder="Fees (₹)">
+                <button class="btn-primary" onclick="addPatient()">SAVE & SYNC</button>
+            </div>
+            <input type="text" id="searchBar" placeholder="বিচাৰক..." onkeyup="filterPatients()" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd;">
+            <div id="listPatients"></div>
+        </div>
+
+        <div id="section-book-list" style="display:none;">
+            <div class="card"><h3>নতুন অনলাইন বুকিং</h3><div id="bookingData"></div></div>
+        </div>
+
+        <div id="section-acc" style="display:none;">
+            <div class="card" style="display:flex; justify-content:space-between; text-align:center;">
+                <div style="color:green">উপাৰ্জন<br><b id="totalInc">0</b></div>
+                <div style="color:red">খৰচ<br><b id="totalExp">0</b></div>
+                <div>লাভ<br><b id="totalNet">0</b></div>
+            </div>
+            <div class="card">
+                <select id="accType"><option value="Income">Income</option><option value="Expense">Expense</option></select>
+                <input type="number" id="accAmount" placeholder="টকা">
+                <input type="text" id="accNote" placeholder="বিৱৰণ">
+                <button class="btn-primary" style="background:#333" onclick="addAccount()">SAVE</button>
+            </div>
         </div>
     </div>
 </div>
@@ -95,96 +89,78 @@
     const supabaseKey = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9';
     const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-    const branding = `🏥 *Dr. Haris Homeopathic & Physiotherapy*\n📍 Gogamukh, Dhemaji\n--------------------\n📺 YouTube: https://www.youtube.com/@drhari\n🔵 FB: https://www.facebook.com/drhari365\n🌐 Web: https://drhariswellfuture.com/`;
+    const socialLinks = `\n\n📺 YouTube: https://www.youtube.com/@drhari\n🔵 FB: https://www.facebook.com/drhari365\n📸 Insta: https://www.instagram.com/drharikanta/\n🌐 Web: https://drhariswellfuture.com/`;
 
-    let allPatients = [];
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+
+    window.onload = () => {
+        if (mode === 'book') {
+            document.getElementById('section-public-book').style.display = 'block';
+            document.getElementById('headerTitle').innerText = "Patient Booking";
+        } else {
+            document.getElementById('adminTabs').style.display = 'flex';
+            document.getElementById('section-rx').style.display = 'block';
+            loadPatients();
+            loadAppointments();
+        }
+    };
 
     function switchTab(t) {
-        document.getElementById('section-patients').style.display = t === 'patients' ? 'block' : 'none';
-        document.getElementById('section-accounts').style.display = t === 'accounts' ? 'block' : 'none';
-        document.getElementById('t-patients').classList.toggle('active', t === 'patients');
-        document.getElementById('t-accounts').classList.toggle('active', t === 'accounts');
-        if(t === 'accounts') loadAccounts();
+        const sections = ['rx', 'book', 'acc'];
+        sections.forEach(s => document.getElementById('section-' + (s==='book'?'book-list':s)).style.display = s===t?'block':'none');
+        sections.forEach(s => document.getElementById('btn-' + s).classList.toggle('active', s===t));
+        if(t==='acc') loadAccounts();
+    }
+
+    async function submitBooking() {
+        const name = document.getElementById('bName').value;
+        const phone = document.getElementById('bPhone').value;
+        if(!name || !phone) return alert("প্ৰয়োজনীয় তথ্য দিয়ক");
+        await _supabase.from('appointments').insert([{ patient_name: name, phone: phone, problem: document.getElementById('bProblem').value }]);
+        alert("বুকিং সফল হ'ল!"); location.reload();
     }
 
     async function addPatient() {
-        const data = {
-            name: document.getElementById('pName').value,
-            age: document.getElementById('pAge').value,
-            bp: document.getElementById('pBP').value,
-            history: document.getElementById('pHistory').value,
-            medicine: document.getElementById('pMedicine').value,
-            fees: parseInt(document.getElementById('pFees').value) || 0
-        };
-        if(!data.name) return alert("নাম লিখক");
-        const { error } = await _supabase.from('clinic_data').insert([data]);
+        const d = { name: document.getElementById('pName').value, age: document.getElementById('pAge').value, bp: document.getElementById('pBP').value, history: document.getElementById('pHistory').value, medicine: document.getElementById('pMedicine').value, fees: parseInt(document.getElementById('pFees').value) || 0 };
+        const { error } = await _supabase.from('clinic_data').insert([d]);
         if(!error) {
-            if(data.fees > 0) await _supabase.from('clinic_accounts').insert([{type:'Income', amount:data.fees, note:'Fee: '+data.name}]);
+            if(d.fees > 0) await _supabase.from('clinic_accounts').insert([{type:'Income', amount:d.fees, note:'Consultation: '+d.name}]);
             location.reload();
         }
     }
 
     async function loadPatients() {
         const { data } = await _supabase.from('clinic_data').select('*').order('created_at', { ascending: false });
-        allPatients = data;
-        renderList(allPatients);
-    }
-
-    function renderList(list) {
-        const div = document.getElementById('listPatients');
-        div.innerHTML = "";
-        list.forEach(p => {
-            const waMsg = `*PRESCRIPTION REPORT*\n${branding}\n\n*PATIENT:* ${p.name}\n*BP:* ${p.bp}\n*Rx:* ${p.medicine}\n\n_Get Well Soon!_`;
-            div.innerHTML += `
-                <div class="card record">
-                    <strong>${p.name}</strong> (${p.age}) <br>
-                    <small>History: ${p.history}</small>
-                    <div style="background:#f1f8e9; padding:10px; margin:10px 0; border-radius:8px;"><b>Rx:</b> ${p.medicine}</div>
-                    <button class="btn-print" onclick="printRx('${p.name}', '${p.age}', '${p.bp}', '${p.medicine}', '${p.history}')">🖨️ Print Rx</button>
-                    <a href="https://wa.me/?text=${encodeURIComponent(waMsg)}" target="_blank" style="text-decoration:none; color:green; margin-left:10px; font-weight:bold;">🟢 WhatsApp</a>
-                </div>`;
+        const list = document.getElementById('listPatients');
+        list.innerHTML = "";
+        data.forEach(p => {
+            const waMsg = `*Dr. Haris Clinic Report*\nPatient: ${p.name}\nRx: ${p.medicine}${socialLinks}`;
+            list.innerHTML += `<div class="card"><b>${p.name}</b><br><small>${p.medicine}</small><br>
+            <button onclick="window.printRx('${p.name}','${p.medicine}')" style="width:auto; padding:5px; margin-top:5px;">Print</button>
+            <a href="https://wa.me/?text=${encodeURIComponent(waMsg)}" target="_blank" style="margin-left:10px; color:green; font-weight:bold;">WhatsApp</a></div>`;
         });
     }
 
-    function filterPatients() {
-        const term = document.getElementById('searchBar').value.toLowerCase();
-        const filtered = allPatients.filter(p => p.name.toLowerCase().includes(term) || p.medicine.toLowerCase().includes(term));
-        renderList(filtered);
-    }
-
-    function printRx(name, age, bp, rx, history) {
-        const printDiv = document.getElementById('printArea');
-        printDiv.innerHTML = `
-            <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:10px;">
-                <h2>DR. HARIS HOMEOPATHIC & PHYSIOTHERAPY</h2>
-                <p>Gogamukh, Dhemaji, Assam | Web: drhariswellfuture.com</p>
-            </div>
-            <div style="margin-top:20px;">
-                <p><b>Patient:</b> ${name} (${age}) &nbsp;&nbsp;&nbsp; <b>BP:</b> ${bp}</p>
-                <p><b>Date:</b> ${new Date().toLocaleDateString()}</p>
-                <hr>
-                <h4>History:</h4> <p>${history}</p>
-                <h4>Prescription (Rx):</h4>
-                <p style="font-size:18px; line-height:1.6;">${rx}</p>
-            </div>
-            <div style="margin-top:100px; text-align:right;">
-                <p>___________________</p>
-                <p>Doctor's Signature</p>
-            </div>
-        `;
-        window.print();
+    async function loadAppointments() {
+        const { data } = await _supabase.from('appointments').select('*').order('created_at', { ascending: false });
+        const div = document.getElementById('bookingData');
+        div.innerHTML = data.length ? "" : "একো নাই";
+        data.forEach(a => div.innerHTML += `<div style="border-bottom:1px solid #eee; padding:10px;"><b>${a.patient_name}</b> - ${a.phone}<br><small>${a.problem}</small></div>`);
     }
 
     async function loadAccounts() {
         const { data } = await _supabase.from('clinic_accounts').select('*');
-        let inc = 0, exp = 0;
-        data.forEach(d => d.type === 'Income' ? inc += d.amount : exp += d.amount);
-        document.getElementById('totalInc').innerText = '₹' + inc;
-        document.getElementById('totalExp').innerText = '₹' + exp;
-        document.getElementById('totalNet').innerText = '₹' + (inc - exp);
+        let i=0, e=0; data.forEach(d => d.type==='Income'?i+=d.amount:e+=d.amount);
+        document.getElementById('totalInc').innerText = '₹'+i;
+        document.getElementById('totalExp').innerText = '₹'+e;
+        document.getElementById('totalNet').innerText = '₹'+(i-e);
     }
 
-    window.onload = loadPatients;
+    window.printRx = (name, rx) => {
+        document.getElementById('printArea').innerHTML = `<h2>Dr. Haris Clinic</h2><hr><p>Patient: ${name}</p><p>Rx: ${rx}</p><br><br><p align="right">Signature</p>`;
+        window.print();
+    }
 </script>
 </body>
 </html>
