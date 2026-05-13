@@ -1,32 +1,42 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+// ১. সংযোগ স্থাপন (Connection)
 const supabaseUrl = 'https://oblvgjnyecvvnnnesegl.supabase.co';
 const supabaseKey = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9';
-const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-// ডাটাবেছৰ পৰা ডাটা টানি অনা (Sync)
+// ২. ডাটাবেছৰ পৰা ডাটা টানি অনা (Sync)
 async function getPatients() {
-    const { data, error } = await supabaseClient
-        .from('clinic_data')
-        .select('*')
-        .order('created_at', { ascending: false });
-    
-    if (!error) {
-        patients = data;
-        renderPatients(); // এইটোৱে লিষ্টখন দেখুৱাব
+    try {
+        const { data, error } = await _supabase
+            .from('clinic_data')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        patients = data || [];
+        renderPatients(); // আপোনাৰ যিটো পুৰণা ফাংচন আছিল, সেইটো ইয়াত কল হ'ব
+    } catch (err) {
+        console.error("Error loading patients:", err);
     }
 }
 
-// নতুন ৰোগী সেভ কৰা
+// ৩. নতুন ৰোগী সেভ কৰা
 async function addPatient(p) {
-    const { error } = await supabaseClient
-        .from('clinic_data')
-        .insert([p]);
-    
-    if (!error) getPatients();
+    try {
+        const { error } = await _supabase
+            .from('clinic_data')
+            .insert([p]);
+        
+        if (error) throw error;
+        getPatients(); // সেভ হোৱাৰ লগে লগে আকৌ নতুন লিষ্টখন আনিব
+    } catch (err) {
+        alert("ডাটা সেভ কৰিব পৰা নগ'ল!");
+    }
 }
 
-// এপটো খোল খালে আপোনা-আপুনি ডাটা আহিব
+// ৪. এপটো খোল খালে আপোনা-আপুনি চলিব
 window.onload = getPatients;
 </script>
