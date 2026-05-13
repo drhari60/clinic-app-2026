@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dr. Haris Clinic v5 - WhatsApp Ready</title>
+    <title>Dr. Haris Smart Clinic v6 - Social Linked</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;700&display=swap');
@@ -17,114 +17,88 @@
     <div class="max-w-2xl mx-auto no-print">
         <header class="bg-blue-900 text-white p-6 rounded-2xl shadow-lg mb-6 text-center border-b-4 border-orange-500">
             <h1 class="text-3xl font-black uppercase tracking-tighter">DR. HARIS CLINIC</h1>
-            <p class="text-[10px] opacity-80 mt-1 uppercase font-bold tracking-widest">Smart Digital Prescription System</p>
+            <p class="text-[10px] opacity-80 mt-1 uppercase font-bold tracking-widest">Digital Health & Social Branding</p>
         </header>
 
         <div class="flex mb-6 bg-white rounded-xl shadow-sm p-1 border overflow-x-auto gap-1">
-            <button onclick="showTab('checkup')" id="tabCheck" class="flex-1 py-2 px-4 rounded-lg font-bold text-blue-700 bg-blue-50 text-sm whitespace-nowrap transition">১. ৰোগী পৰীক্ষা</button>
-            <button onclick="showTab('pharmacy')" id="tabPharma" class="flex-1 py-2 px-4 rounded-lg font-bold text-gray-500 text-sm whitespace-nowrap transition">২. ঔষধ আৰু বিল</button>
-            <button onclick="showTab('accounts')" id="tabAcc" class="flex-1 py-2 px-4 rounded-lg font-bold text-gray-500 text-sm whitespace-nowrap transition">৩. হিচাপ-পত্ৰ</button>
+            <button onclick="showTab('checkup')" id="tabCheck" class="flex-1 py-2 px-4 rounded-lg font-bold text-blue-700 bg-blue-50 text-sm whitespace-nowrap">১. ৰোগী পৰীক্ষা</button>
+            <button onclick="showTab('pharmacy')" id="tabPharma" class="flex-1 py-2 px-4 rounded-lg font-bold text-gray-500 text-sm whitespace-nowrap">২. ঔষধ আৰু বিল</button>
+            <button onclick="showTab('accounts')" id="tabAcc" class="flex-1 py-2 px-4 rounded-lg font-bold text-gray-500 text-sm whitespace-nowrap">৩. উপাৰ্জন</button>
         </div>
 
         <div id="checkupSection" class="block">
             <div class="bg-white p-6 rounded-2xl shadow-md mb-6 border-t-4 border-blue-600">
                 <div class="grid grid-cols-1 gap-4">
-                    <input type="text" id="pName" placeholder="ৰোগীৰ সম্পূৰ্ণ নাম" class="border-2 p-3 rounded-lg font-bold outline-none focus:border-blue-500 transition">
-                    
+                    <input type="text" id="pName" placeholder="ৰোগীৰ সম্পূৰ্ণ নাম" class="border-2 p-3 rounded-lg font-bold outline-none focus:border-blue-500">
                     <div class="grid grid-cols-2 gap-3">
                         <div class="flex items-center justify-around border-2 p-3 rounded-lg bg-gray-50 text-sm font-bold">
                             <span class="text-gray-500">লিংগ:</span>
                             <label><input type="radio" name="pSex" value="Male" checked> M</label>
                             <label><input type="radio" name="pSex" value="Female"> F</label>
                         </div>
-                        <input type="number" id="pAge" placeholder="বয়স (Age)" class="border-2 p-3 rounded-lg outline-none focus:border-blue-500">
+                        <input type="number" id="pAge" placeholder="বয়স" class="border-2 p-3 rounded-lg outline-none">
                     </div>
-
-                    <input type="text" id="pBP" placeholder="বি.পি. (উদা: ১২০/৮০)" class="border-2 p-3 rounded-lg outline-none focus:border-blue-500">
-                    <textarea id="pHistory" placeholder="বেমাৰৰ ইতিহাস আৰু লক্ষণসমূহ (History & Symptoms)" class="border-2 p-3 rounded-lg h-24 outline-none focus:border-blue-500"></textarea>
-                    
-                    <button onclick="addPatient()" class="bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-800 active:scale-95 transition">ৰোগীৰ তথ্য ছেভ কৰক</button>
+                    <input type="text" id="pBP" placeholder="বি.পি. (BP)" class="border-2 p-3 rounded-lg outline-none">
+                    <textarea id="pHistory" placeholder="বেমাৰৰ ইতিহাস আৰু লক্ষণসমূহ" class="border-2 p-3 rounded-lg h-24 outline-none"></textarea>
+                    <button onclick="addPatient()" class="bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-800 transition active:scale-95">ৰোগীৰ তথ্য ছেভ কৰক</button>
                 </div>
             </div>
         </div>
 
         <div id="pharmacySection" class="hidden">
             <div class="bg-white p-6 rounded-2xl shadow-md mb-6 border-t-4 border-green-500">
-                <label class="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-widest">ৰোগী বাছি লওক</label>
                 <select id="selectPatient" class="w-full border-2 p-3 rounded-lg mb-4 font-bold bg-gray-50 outline-none"></select>
-                
-                <label class="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-widest">ঔষধৰ নাম</label>
                 <textarea id="pMed" placeholder="ঔষধৰ তালিকা ইয়াত লিখক..." class="w-full border-2 p-3 rounded-lg mb-4 h-24 outline-none focus:border-green-500"></textarea>
-                
-                <label class="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-widest">মাচুল (Fees)</label>
-                <input type="number" id="pFee" placeholder="উদা: ৫০০" class="w-full border-2 p-3 rounded-lg mb-4 outline-none focus:border-green-500">
-                
-                <button onclick="finalizeBill()" class="w-full bg-green-600 text-white font-bold py-4 rounded-xl hover:bg-green-700 active:scale-95 transition shadow-lg">প্ৰেছক্ৰিপচন ফাইনেল কৰক</button>
+                <input type="number" id="pFee" placeholder="মাচুল (₹)" class="w-full border-2 p-3 rounded-lg mb-4 outline-none">
+                <button onclick="finalizeBill()" class="w-full bg-green-600 text-white font-bold py-4 rounded-xl hover:bg-green-700 transition shadow-lg">প্ৰেছক্ৰিপচন ফাইনেল কৰক</button>
             </div>
         </div>
 
-        <div id="accountsSection" class="hidden text-center">
-            <div class="bg-white p-8 rounded-2xl shadow-md">
-                <h3 class="font-bold text-gray-400 uppercase text-xs tracking-widest mb-2">এই মাহৰ মুঠ উপাৰ্জন</h3>
-                <p id="monthlyIncome" class="text-5xl font-black text-green-600">₹ 0</p>
-                <p class="text-xs text-gray-400 mt-4 italic">*অকল বিল কৰা ৰোগীৰ হিচাপ ইয়াত দেখুৱাব</p>
-            </div>
+        <div id="accountsSection" class="hidden text-center text-green-600 font-black p-10 bg-white rounded-2xl shadow-md">
+            <h3 class="text-gray-400 uppercase text-xs mb-2">এই মাহৰ মুঠ উপাৰ্জন</h3>
+            <p id="monthlyIncome" class="text-5xl font-black">₹ 0</p>
         </div>
 
-        <div id="mainDisplayList" class="space-y-4">
-            </div>
+        <div id="mainDisplayList" class="space-y-4"></div>
     </div>
 
-    <div id="printArea" class="print-only p-12">
-        <div class="text-center border-b-4 border-black pb-6 mb-8">
+    <div id="printArea" class="print-only p-12 text-black bg-white">
+        <div class="text-center border-b-4 border-black pb-4 mb-6">
             <h1 class="text-4xl font-bold uppercase">Dr. Harikanta Das</h1>
             <p class="text-lg font-bold">Homeopathic Physician & Physiotherapist</p>
-            <p class="text-sm">Gogamukh, Dhemaji, Assam | Reg No: [Your Reg No]</p>
+            <p class="text-xs">Gogamukh, Dhemaji, Assam | drhariswellfuture.com</p>
         </div>
-        <div id="printContent" class="text-lg"></div>
-        <div class="mt-32 flex justify-between">
-            <p class="text-sm italic">Generated by Clinic Smart App</p>
-            <p class="border-t-2 border-black pt-2 px-8 font-bold">Signature</p>
-        </div>
+        <div id="printContent"></div>
     </div>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('dr_hari_v5')) || { patients: [], expenses: [] };
+        let db = JSON.parse(localStorage.getItem('dr_hari_v6')) || { patients: [], expenses: [] };
 
         function showTab(tab) {
             document.getElementById('checkupSection').className = tab === 'checkup' ? 'block' : 'hidden';
             document.getElementById('pharmacySection').className = tab === 'pharmacy' ? 'block' : 'hidden';
             document.getElementById('accountsSection').className = tab === 'accounts' ? 'block' : 'hidden';
-            
             const tabs = { checkup: 'tabCheck', pharmacy: 'tabPharma', accounts: 'tabAcc' };
             Object.keys(tabs).forEach(k => {
                 document.getElementById(tabs[k]).className = `flex-1 py-2 px-4 rounded-lg font-bold text-sm ${k === tab ? 'text-blue-700 bg-blue-100 shadow-sm' : 'text-gray-500 bg-white'}`;
             });
-            
             if(tab === 'pharmacy') loadPatientDropdown();
             updateUI(tab);
         }
 
         function addPatient() {
             const name = document.getElementById('pName').value.trim();
-            if(!name) return alert('ৰোগীৰ নামটো লিখক');
-            
+            if(!name) return alert('ৰোগীৰ নাম লিখক');
             db.patients.unshift({
-                name,
-                age: document.getElementById('pAge').value || 'N/A',
+                name, age: document.getElementById('pAge').value || 'N/A',
                 sex: document.querySelector('input[name="pSex"]:checked').value,
                 bp: document.getElementById('pBP').value || 'N/A',
-                history: document.getElementById('pHistory').value || 'No specific history recorded.',
-                medicine: '',
-                fee: 0,
-                billed: false,
-                date: new Date().toLocaleDateString('as-IN'),
-                timestamp: new Date().getTime()
+                history: document.getElementById('pHistory').value || 'No recorded history',
+                medicine: '', fee: 0, billed: false,
+                date: new Date().toLocaleDateString('as-IN'), timestamp: new Date().getTime()
             });
-            
             ['pName','pAge','pBP','pHistory'].forEach(id => document.getElementById(id).value = '');
             save(); updateUI('checkup');
-            alert('ৰোগীৰ তথ্য ছেভ কৰা হৈছে।');
         }
 
         function loadPatientDropdown() {
@@ -138,24 +112,25 @@
         function finalizeBill() {
             const ts = document.getElementById('selectPatient').value;
             const pIdx = db.patients.findIndex(p => p.timestamp == ts);
-            if(pIdx === -1) return alert('ৰোগী বাছি লওক');
-            
+            if(pIdx === -1) return alert('ৰোগী বাছক');
             db.patients[pIdx].medicine = document.getElementById('pMed').value;
             db.patients[pIdx].fee = parseInt(document.getElementById('pFee').value) || 0;
             db.patients[pIdx].billed = true;
-            
-            document.getElementById('pMed').value = ''; 
-            document.getElementById('pFee').value = '';
+            document.getElementById('pMed').value = ''; document.getElementById('pFee').value = '';
             save(); showTab('checkup');
-            alert('প্ৰেছক্ৰিপচন ফাইনেল কৰা হ’ল।');
         }
 
         function shareWhatsApp(idx) {
             const p = db.patients[idx];
             const phone = prompt("ৰোগীৰ WhatsApp নম্বৰ দিয়ক (১০ টা সংখ্যা):", "");
-            if(!phone || phone.length < 10) return alert("সঠিক নম্বৰ এটা দিয়ক।");
+            if(!phone || phone.length < 10) return alert("সঠিক নম্বৰ দিয়ক।");
 
-            const text = `*DR. HARIKANTA DAS CLINIC*%0A*Gogamukh, Dhemaji, Assam*%0A---------------------------%0A*PATIENT REPORT*%0A*Name:* ${p.name}%0A*Date:* ${p.date}%0A*Age:* ${p.age} | *Sex:* ${p.sex}%0A*BP:* ${p.bp}%0A---------------------------%0A*HISTORY/SYMPTOMS:*%0A${p.history}%0A---------------------------%0A*PRESCRIPTION (Rx):*%0A${p.medicine || 'Not prescribed yet'}%0A---------------------------%0A_Generated Digitally by Dr. Haris Clinic App_`;
+            const yt = "https://www.youtube.com/@drhari";
+            const fb = "https://www.facebook.com/drhari365";
+            const ig = "https://www.instagram.com/drharikanta/";
+            const ws = "https://drhariswellfuture.com/";
+
+            const text = `*DR. HARIKANTA DAS CLINIC*%0A*Gogamukh, Dhemaji, Assam*%0A---------------------------%0A*PATIENT REPORT*%0A*Name:* ${p.name}%0A*Date:* ${p.date}%0A*Age:* ${p.age} | *Sex:* ${p.sex}%0A*BP:* ${p.bp}%0A---------------------------%0A*HISTORY/SYMPTOMS:*%0A${p.history}%0A---------------------------%0A*PRESCRIPTION (Rx):*%0A${p.medicine || 'Not prescribed yet'}%0A---------------------------%0A*CONNECT WITH DR. HARI:*%0A🌐 *Website:* ${ws}%0A📺 *YouTube:* ${yt}%0A🔵 *Facebook:* ${fb}%0A📸 *Instagram:* ${ig}%0A---------------------------%0A_Smart Digital Prescription_`;
             
             window.open(`https://wa.me/91${phone}?text=${text}`, '_blank');
         }
@@ -163,24 +138,11 @@
         function printPatient(idx) {
             const p = db.patients[idx];
             document.getElementById('printContent').innerHTML = `
-                <div class="flex justify-between border-b pb-2 mb-6">
-                    <span><strong>PATIENT:</strong> ${p.name}</span>
-                    <span><strong>DATE:</strong> ${p.date}</span>
-                </div>
-                <div class="grid grid-cols-3 gap-4 mb-8 bg-gray-50 p-4 rounded-lg">
-                    <p><strong>AGE:</strong> ${p.age}</p>
-                    <p><strong>SEX:</strong> ${p.sex}</p>
-                    <p><strong>BP:</strong> ${p.bp}</p>
-                </div>
-                <div class="mb-8">
-                    <h3 class="font-bold border-b-2 w-32 mb-2">HISTORY:</h3>
-                    <p class="italic text-gray-700">${p.history}</p>
-                </div>
-                <div class="mb-8">
-                    <h3 class="font-bold text-2xl mb-4">Rx:</h3>
-                    <p class="text-xl whitespace-pre-wrap font-bold pl-6 border-l-4 border-black">${p.medicine || 'N/A'}</p>
-                </div>
-                <div class="mt-10 text-right font-black text-2xl">FEES PAID: ₹${p.fee}</div>
+                <div class="flex justify-between border-b pb-2 mb-6"><span><strong>PATIENT:</strong> ${p.name}</span><span><strong>DATE:</strong> ${p.date}</span></div>
+                <p><strong>AGE:</strong> ${p.age} | <strong>SEX:</strong> ${p.sex} | <strong>BP:</strong> ${p.bp}</p>
+                <div class="mt-6 border p-4"><strong>HISTORY:</strong><br>${p.history}</div>
+                <div class="mt-6"><strong>PRESCRIPTION (Rx):</strong><br><p class="text-xl font-bold pt-2">${p.medicine || 'N/A'}</p></div>
+                <div class="mt-10 text-right font-bold text-xl uppercase">Fee: ₹${p.fee}</div>
             `;
             window.print();
         }
@@ -192,23 +154,16 @@
 
             db.patients.forEach((p, i) => {
                 if(new Date(p.timestamp).getMonth() === currM) inc += (p.fee || 0);
-                
                 if(tab === 'checkup') {
                     list.innerHTML += `
                     <div class="bg-white p-5 rounded-2xl shadow-sm border-l-8 ${p.billed ? 'border-green-500' : 'border-blue-600'}">
-                        <div class="flex justify-between items-start">
-                            <h3 class="text-xl font-bold text-gray-800">${p.name}</h3>
-                            <span class="text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-500">${p.date}</span>
-                        </div>
-                        <div class="flex gap-4 my-2 text-[10px] font-bold text-blue-700 uppercase tracking-tighter">
-                            <span>AGE: ${p.age}</span><span>SEX: ${p.sex}</span><span>BP: ${p.bp}</span>
-                        </div>
-                        <p class="text-xs text-gray-500 border-t pt-2 mt-2"><strong>History:</strong> ${p.history.substring(0, 80)}...</p>
-                        
+                        <div class="flex justify-between font-bold"><span>${p.name}</span><span class="text-[10px] text-gray-400">${p.date}</span></div>
+                        <div class="text-[10px] font-bold text-blue-700 uppercase mt-1">Age: ${p.age} | Sex: ${p.sex} | BP: ${p.bp}</div>
+                        <p class="text-xs text-gray-500 mt-2 border-t pt-2 italic line-clamp-2">${p.history}</p>
                         <div class="flex gap-2 mt-4">
-                            <button onclick="shareWhatsApp(${i})" class="flex-1 bg-green-500 text-white text-[10px] font-black py-3 rounded-lg shadow-sm">WHATSAPP 📲</button>
-                            <button onclick="printPatient(${i})" class="flex-1 bg-slate-800 text-white text-[10px] font-black py-3 rounded-lg shadow-sm">PRINT 🖨️</button>
-                            <button onclick="if(confirm('মচি দিব নেকি?')){db.patients.splice(${i},1);save();updateUI('checkup');}" class="bg-red-50 p-2 rounded-lg text-red-400">🗑️</button>
+                            <button onclick="shareWhatsApp(${i})" class="flex-1 bg-green-500 text-white text-[10px] font-black py-3 rounded-lg">WhatsApp 📲</button>
+                            <button onclick="printPatient(${i})" class="flex-1 bg-slate-800 text-white text-[10px] font-black py-3 rounded-lg">Print 🖨️</button>
+                            <button onclick="if(confirm('Delete?')){db.patients.splice(${i},1);save();updateUI('checkup');}" class="p-2 text-red-300">🗑️</button>
                         </div>
                     </div>`;
                 }
@@ -216,9 +171,7 @@
             document.getElementById('monthlyIncome').innerText = '₹ ' + inc;
         }
 
-        function save() { localStorage.setItem('dr_hari_v5', JSON.stringify(db)); }
-        
-        // Start on Checkup Tab
+        function save() { localStorage.setItem('dr_hari_v6', JSON.stringify(db)); }
         showTab('checkup');
     </script>
 </body>
