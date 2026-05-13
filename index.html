@@ -158,10 +158,19 @@
         window.print();
     }
 
-    function sendWhatsApp(p) {
-        const text = `*Dr. Haris Clinic Prescription*%0A%0A*Patient:* ${p.name}%0A*History:* ${p.history || 'N/A'}%0A*Rx:*%0A${p.medicine}`;
-        window.open(`https://wa.me/91${p.phone}?text=${text}`);
-    }
+   function sendWhatsApp(p) {
+    // আপোনাৰ চোচিয়েল মিডিয়া লিংকসমূহ
+    const clinicLinks = `---
+🔗 *Follow us for Health Tips:*
+📘 Facebook: https://www.facebook.com/drhari365
+📺 YouTube: https://www.youtube.com/@drhari
+🌐 Website: https://drhariswellfuture.com/`;
+
+    // মেছেজটো তৈয়াৰ কৰা হৈছে (ঔষধ + হিষ্ট্ৰী + লিংক)
+    const text = `*Dr. Haris Clinic Prescription*%0A%0A*Patient:* ${p.name}%0A*History:* ${p.history || 'N/A'}%0A*Rx (Medicines):*%0A${p.medicine}%0A%0A${encodeURIComponent(clinicLinks)}`;
+    
+    window.open(`https://wa.me/91${p.phone}?text=${text}`);
+}
 
     async function addAccount(type) {
         const amt = parseInt(document.getElementById('accAmount').value);
