@@ -1,42 +1,93 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!DOCTYPE html>
+<html lang="as">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Haris Clinic</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        input, button { width: 100%; padding: 10px; margin: 5px 0; box-sizing: border-box; }
+        button { background: #28a745; color: white; border: none; cursor: pointer; font-weight: bold; }
+        .patient-card { border-bottom: 1px solid #ddd; padding: 10px 0; }
+        h2 { color: #333; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Dr. Haris Clinic</h2>
+    <input type="text" id="pName" placeholder="ৰোগীৰ নাম">
+    <input type="text" id="pAge" placeholder="বয়স">
+    <input type="text" id="pMedicine" placeholder="ঔষধ">
+    <button onclick="submitData()">Add Patient (সেভ কৰক)</button>
+
+    <div id="patientList">
+        <p style="text-align:center;">ডাটা লোড হৈ আছে...</p>
+    </div>
+</div>
 
 <script>
-// ১. সংযোগ স্থাপন (Connection)
-const supabaseUrl = 'https://oblvgjnyecvvnnnesegl.supabase.co';
-const supabaseKey = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9';
-const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    // ১. সংযোগ
+    const supabaseUrl = 'https://oblvgjnyecvvnnnesegl.supabase.co';
+    const supabaseKey = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9';
+    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-// ২. ডাটাবেছৰ পৰা ডাটা টানি অনা (Sync)
-async function getPatients() {
-    try {
+    let patients = [];
+
+    // ২. ডাটাবেছৰ পৰা ডাটা অনা
+    async function getPatients() {
         const { data, error } = await _supabase
             .from('clinic_data')
             .select('*')
             .order('created_at', { ascending: false });
         
-        if (error) throw error;
-        
-        patients = data || [];
-        renderPatients(); // আপোনাৰ যিটো পুৰণা ফাংচন আছিল, সেইটো ইয়াত কল হ'ব
-    } catch (err) {
-        console.error("Error loading patients:", err);
+        if (!error) {
+            patients = data || [];
+            renderPatients();
+        }
     }
-}
 
-// ৩. নতুন ৰোগী সেভ কৰা
-async function addPatient(p) {
-    try {
+    // ৩. স্ক্ৰীনত দেখুওৱা
+    function renderPatients() {
+        const listDiv = document.getElementById('patientList');
+        listDiv.innerHTML = "<h3>ৰোগীৰ তালিকা:</h3>";
+        patients.forEach(p => {
+            listDiv.innerHTML += `
+                <div class="patient-card">
+                    <strong>${p.name}</strong> (${p.age} বছৰ)<br>
+                    ঔষধ: ${p.medicine || 'নাই'}<br>
+                    <small>${new Date(p.created_at).toLocaleString()}</small>
+                </div>`;
+        });
+        if(patients.length === 0) listDiv.innerHTML += "<p>কোনো ডাটা পোৱা নগ'ল।</p>";
+    }
+
+    // ৪. নতুন ডাটা এন্ট্ৰি
+    async function submitData() {
+        const name = document.getElementById('pName').value;
+        const age = document.getElementById('pAge').value;
+        const medicine = document.getElementById('pMedicine').value;
+
+        if(!name) { alert("নাম লিখক!"); return; }
+
         const { error } = await _supabase
             .from('clinic_data')
-            .insert([p]);
-        
-        if (error) throw error;
-        getPatients(); // সেভ হোৱাৰ লগে লগে আকৌ নতুন লিষ্টখন আনিব
-    } catch (err) {
-        alert("ডাটা সেভ কৰিব পৰা নগ'ল!");
-    }
-}
+            .insert([{ name, age, medicine }]);
 
-// ৪. এপটো খোল খালে আপোনা-আপুনি চলিব
-window.onload = getPatients;
+        if (error) {
+            alert("ভুল হৈছে!");
+        } else {
+            document.getElementById('pName').value = '';
+            document.getElementById('pAge').value = '';
+            document.getElementById('pMedicine').value = '';
+            getPatients();
+        }
+    }
+
+    window.onload = getPatients;
 </script>
+
+</body>
+</html>
