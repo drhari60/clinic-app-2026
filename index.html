@@ -3,91 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dr. Haris Clinic</title>
+    <title>Dr. Haris Smart Clinic</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        input, button { width: 100%; padding: 10px; margin: 5px 0; box-sizing: border-box; }
-        button { background: #28a745; color: white; border: none; cursor: pointer; font-weight: bold; }
-        .patient-card { border-bottom: 1px solid #ddd; padding: 10px 0; }
-        h2 { color: #333; text-align: center; }
+        :root { --primary: #075E54; --secondary: #128C7E; --bg: #f0f2f5; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
+        .header { background: var(--primary); color: white; text-align: center; padding: 15px; border-radius: 0 0 20px 20px; margin-bottom: 20px; }
+        .card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 15px; border-top: 4px solid var(--secondary); }
+        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        .btn { background: var(--secondary); color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; }
+        .wa-btn { background: #25D366; color: white; padding: 8px 12px; text-decoration: none; border-radius: 6px; font-size: 13px; display: inline-block; margin-top: 10px; font-weight: bold; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 5px 0; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: #fff; cursor: pointer; border-radius: 10px; font-weight: bold; color: #555; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .active-tab { background: var(--primary); color: white; }
+        .patient-card { border-left: 5px solid var(--secondary); margin-top: 10px; padding-left: 10px; background: #f9f9f9; padding: 10px; border-radius: 8px; }
+        .summary-box { display: flex; justify-content: space-between; text-align: center; }
+        .income { color: #28a745; } .expense { color: #dc3545; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Dr. Haris Clinic</h2>
-    <input type="text" id="pName" placeholder="ৰোগীৰ নাম">
-    <input type="text" id="pAge" placeholder="বয়স">
-    <input type="text" id="pMedicine" placeholder="ঔষধ">
-    <button onclick="submitData()">Add Patient (সেভ কৰক)</button>
+<div class="header">
+    <h2 style="margin:0;">Dr. Haris Homeopathic & Physiotherapy</h2>
+    <p style="margin:5px 0 0 0; font-size: 12px; opacity: 0.8;">Smart Clinic Management System</p>
+</div>
 
-    <div id="patientList">
-        <p style="text-align:center;">ডাটা লোড হৈ আছে...</p>
+<div style="max-width: 600px; margin: auto;">
+    
+    <div class="tabs">
+        <button id="btn-patients" class="tab-btn active-tab" onclick="showTab('patients')">ৰোগীৰ তথ্য</button>
+        <button id="btn-accounts" class="tab-btn" onclick="showTab('accounts')">হিচাপ-পত্ৰ</button>
+    </div>
+
+    <div id="tab-patients">
+        <div class="card">
+            <h3 style="margin-top:0; color:var(--primary);">নতুন ৰোগী এন্ট্ৰি</h3>
+            <input type="text" id="pName" placeholder="ৰোগীৰ সম্পূৰ্ণ নাম">
+            <input type="text" id="pAge" placeholder="বয়স আৰু লিংগ (যেনে: 45/Male)">
+            <input type="text" id="pBP" placeholder="BP (যেনে: 130/90)">
+            <textarea id="pHistory" rows="2" placeholder="ৰোগীৰ ইতিহাস (History)"></textarea>
+            <textarea id="pMedicine" rows="3" placeholder="প্ৰেছক্ৰিপশ্যন (Prescription/Medicine)"></textarea>
+            <input type="number" id="pFees" placeholder="Fees (টকা)">
+            <button class="btn" onclick="addPatient()">Save & Cloud Sync</button>
+        </div>
+        <div id="patientList"></div>
+    </div>
+
+    <div id="tab-accounts" style="display:none;">
+        <div class="card">
+            <h3 style="margin-top:0; color:var(--primary);">দৈনিক লেনদেন (Daily Cash)</h3>
+            <select id="accType">
+                <option value="Income">Income (উপাৰ্জন)</option>
+                <option value="Expense">Expense (খৰচ)</option>
+            </select>
+            <input type="number" id="accAmount" placeholder="টকাৰ পৰিমাণ (Amount)">
+            <input type="text" id="accNote" placeholder="কিহৰ বাবদ? (যেনে: ৰোগীৰ ফীজ, ঔষধ ক্ৰয়)">
+            <button class="btn" onclick="addAccount()" style="background:#000;">Entry কৰক</button>
+        </div>
+        <div id="accountSummary" class="card"></div>
     </div>
 </div>
 
 <script>
-    // ১. সংযোগ
     const supabaseUrl = 'https://oblvgjnyecvvnnnesegl.supabase.co';
     const supabaseKey = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9';
     const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-    let patients = [];
+    // TAB SWITCHING
+    function showTab(tab) {
+        document.getElementById('tab-patients').style.display = tab === 'patients' ? 'block' : 'none';
+        document.getElementById('tab-accounts').style.display = tab === 'accounts' ? 'block' : 'none';
+        document.getElementById('btn-patients').classList.toggle('active-tab', tab === 'patients');
+        document.getElementById('btn-accounts').classList.toggle('active-tab', tab === 'accounts');
+        if(tab === 'accounts') loadAccounts();
+    }
 
-    // ২. ডাটাবেছৰ পৰা ডাটা অনা
-    async function getPatients() {
-        const { data, error } = await _supabase
-            .from('clinic_data')
-            .select('*')
-            .order('created_at', { ascending: false });
+    // ADD PATIENT
+    async function addPatient() {
+        const name = document.getElementById('pName').value;
+        if(!name) return alert("নাম লিখাটো জৰুৰী!");
         
-        if (!error) {
-            patients = data || [];
-            renderPatients();
+        const patientData = {
+            name: name,
+            age: document.getElementById('pAge').value,
+            bp: document.getElementById('pBP').value,
+            history: document.getElementById('pHistory').value,
+            medicine: document.getElementById('pMedicine').value,
+            fees: parseInt(document.getElementById('pFees').value) || 0
+        };
+
+        const { error } = await _supabase.from('clinic_data').insert([patientData]);
+        if(!error) {
+            alert("ডাটা সুৰক্ষিতভাৱে সেভ হ'ল!");
+            // লগতে ইনকাম টেবুলতো ফীজটো যোগ কৰি দিওঁ আহক
+            if(patientData.fees > 0) {
+                await _supabase.from('clinic_accounts').insert([{type: 'Income', amount: patientData.fees, note: 'Patient Fee: ' + name}]);
+            }
+            location.reload();
         }
     }
 
-    // ৩. স্ক্ৰীনত দেখুওৱা
-    function renderPatients() {
-        const listDiv = document.getElementById('patientList');
-        listDiv.innerHTML = "<h3>ৰোগীৰ তালিকা:</h3>";
-        patients.forEach(p => {
-            listDiv.innerHTML += `
-                <div class="patient-card">
-                    <strong>${p.name}</strong> (${p.age} বছৰ)<br>
-                    ঔষধ: ${p.medicine || 'নাই'}<br>
-                    <small>${new Date(p.created_at).toLocaleString()}</small>
+    // LOAD PATIENTS
+    async function loadPatients() {
+        const { data } = await _supabase.from('clinic_data').select('*').order('created_at', { ascending: false });
+        const list = document.getElementById('patientList');
+        list.innerHTML = "<h3>Patient History:</h3>";
+        data.forEach(p => {
+            const waMsg = `*Dr. Haris Clinic Report*\n--------------------\n*Patient:* ${p.name}\n*Age/Sex:* ${p.age}\n*BP:* ${p.bp}\n*History:* ${p.history}\n*Rx:* ${p.medicine}\n*Fees:* ₹${p.fees}\n--------------------\nGet Well Soon.`;
+            const waLink = `https://wa.me/?text=${encodeURIComponent(waMsg)}`;
+            list.innerHTML += `
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between;">
+                        <strong>${p.name}</strong>
+                        <span style="color:var(--primary); font-size:12px;">${p.age}</span>
+                    </div>
+                    <div class="patient-card">
+                        <small>BP: ${p.bp || 'N/A'}</small><br>
+                        <small>History: ${p.history || 'None'}</small><br>
+                        <p style="margin:5px 0; color:#444;"><strong>Rx:</strong> ${p.medicine}</p>
+                        <p style="margin:0; font-weight:bold; color:var(--primary);">Fees: ₹${p.fees}</p>
+                    </div>
+                    <a href="${waLink}" target="_blank" class="wa-btn">WhatsApp Prescription</a>
                 </div>`;
         });
-        if(patients.length === 0) listDiv.innerHTML += "<p>কোনো ডাটা পোৱা নগ'ল।</p>";
     }
 
-    // ৪. নতুন ডাটা এন্ট্ৰি
-    async function submitData() {
-        const name = document.getElementById('pName').value;
-        const age = document.getElementById('pAge').value;
-        const medicine = document.getElementById('pMedicine').value;
-
-        if(!name) { alert("নাম লিখক!"); return; }
-
-        const { error } = await _supabase
-            .from('clinic_data')
-            .insert([{ name, age, medicine }]);
-
-        if (error) {
-            alert("ভুল হৈছে!");
-        } else {
-            document.getElementById('pName').value = '';
-            document.getElementById('pAge').value = '';
-            document.getElementById('pMedicine').value = '';
-            getPatients();
-        }
+    // ACCOUNTS LOGIC
+    async function addAccount() {
+        const amt = document.getElementById('accAmount').value;
+        if(!amt) return;
+        const { error } = await _supabase.from('clinic_accounts').insert([{
+            type: document.getElementById('accType').value,
+            amount: parseInt(amt),
+            note: document.getElementById('accNote').value
+        }]);
+        if(!error) { alert("হিচাপ সেভ হ'ল!"); loadAccounts(); }
     }
 
-    window.onload = getPatients;
+    async function loadAccounts() {
+        const { data } = await _supabase.from('clinic_accounts').select('*').order('created_at', { ascending: false });
+        let inc = 0, exp = 0;
+        let historyHTML = "<h4>শেহতীয়া লেনদেন:</h4>";
+        data.forEach(d => {
+            if(d.type === 'Income') inc += d.amount; else exp += d.amount;
+            historyHTML += `<div style="font-size:12px; border-bottom:1px solid #eee; padding:5px 0;">
+                <span class="${d.type.toLowerCase()}">${d.type}</span>: ₹${d.amount} - ${d.note}
+            </div>`;
+        });
+        document.getElementById('accountSummary').innerHTML = `
+            <div class="summary-box">
+                <div><h4 class="income">উপাৰ্জন</h4>₹${inc}</div>
+                <div><h4 class="expense">খৰচ</h4>₹${exp}</div>
+                <div><h4>মুঠ লাভ</h4>₹${inc - exp}</div>
+            </div>
+            <hr>${historyHTML}`;
+    }
+
+    window.onload = loadPatients;
 </script>
-
 </body>
 </html>
