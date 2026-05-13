@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dr. Haris Clinic | Pro Suite</title>
+    <title>Dr. Haris Clinic | Pro Booking</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -12,6 +12,7 @@
         .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #eee; }
         input, textarea, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; }
         .btn-primary { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; padding: 15px; }
+        .btn-upi { background: #e65100; color: white; border: none; font-weight: bold; cursor: pointer; padding: 12px; margin-top: 5px; }
         .header { background: var(--primary); color: white; padding: 25px 15px; text-align: center; border-radius: 0 0 25px 25px; }
         .tabs { display: flex; background: white; margin-top: -20px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .tab-btn { flex: 1; padding: 15px; border: none; background: white; cursor: pointer; color: #666; font-weight: bold; }
@@ -25,11 +26,12 @@
 
 <div id="mainApp" class="no-print">
     <div class="header">
-        <h1 id="headerTitle">Dr. Haris Clinic</h1>
-        <p id="headerSub">Smart Management System</p>
+        <h1>Dr. Haris Clinic</h1>
+        <p>Smart Booking System</p>
     </div>
 
     <div class="container" style="max-width: 800px; margin: auto; padding: 0 15px;">
+        
         <div id="adminTabs" class="tabs" style="display:none; margin-bottom: 20px;">
             <button id="btn-rx" class="tab-btn active" onclick="switchTab('rx')">Rx/ৰোগী</button>
             <button id="btn-book" class="tab-btn" onclick="switchTab('book')">বুকিং লিষ্ট</button>
@@ -37,12 +39,20 @@
         </div>
 
         <div id="section-public-book" style="display:none;">
-            <div class="card" style="margin-top:20px;">
-                <h3><i class="fas fa-calendar-check"></i> Appointment বুক কৰক</h3>
+            <div class="card" style="margin-top:20px; border: 2px solid var(--primary);">
+                <h3><i class="fas fa-calendar-alt"></i> Appointment বুক কৰক</h3>
                 <input type="text" id="bName" placeholder="আপোনাৰ সম্পূৰ্ণ নাম">
                 <input type="text" id="bPhone" placeholder="মোবাইল নম্বৰ">
-                <textarea id="bProblem" placeholder="আপোনাৰ সমস্যাটো লিখক..."></textarea>
-                <button class="btn-primary" onclick="submitBooking()">বুকিং কনফৰ্ম কৰক</button>
+                <textarea id="bProblem" placeholder="আপোনাৰ সমস্যাটো চমুকৈ লিখক..."></textarea>
+                
+                <div style="background:#fff3e0; padding:15px; border-radius:10px; border:1px dashed #e65100; margin:10px 0; text-align: center;">
+                    <p style="margin:0; font-weight:bold; color:#e65100;">বুকিং ফী: ₹100</p>
+                    <small>তলৰ বুটামটো টিপি Google Pay/PhonePe-ৰ জৰিয়তে পেমেন্ট কৰক।</small>
+                    <button class="btn-upi" onclick="payNow()"><i class="fas fa-wallet"></i> Pay Now (₹100)</button>
+                </div>
+                
+                <input type="text" id="bTxn" placeholder="পেমেন্টৰ Transaction ID বা UTR নং লিখক">
+                <button class="btn-primary" onclick="submitBooking()">CONFIRM BOOKING</button>
             </div>
         </div>
 
@@ -60,7 +70,7 @@
                 <input type="number" id="pFees" placeholder="Fees (₹)">
                 <button class="btn-primary" onclick="addPatient()">SAVE & SYNC</button>
             </div>
-            <input type="text" id="searchBar" placeholder="নাম বা নম্বৰেৰে বিচাৰক..." onkeyup="filterPatients()" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd; margin-bottom:15px;">
+            <input type="text" id="searchBar" placeholder="বিচাৰক..." onkeyup="filterPatients()" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd; margin-bottom:15px;">
             <div id="listPatients"></div>
         </div>
 
@@ -91,7 +101,8 @@
     const supabaseKey = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9';
     const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-    const socialLinks = `\n\n📺 YouTube: https://www.youtube.com/@drhari\n🔵 FB: https://www.facebook.com/drhari365\n📸 Insta: https://www.instagram.com/drharikanta/\n🌐 Web: https://drhariswellfuture.com/`;
+    const MY_UPI_ID = "das.harikanta60-1@okhdfcbank"; 
+    const BOOKING_FEE = 100;
 
     const urlParams = new URLSearchParams(window.location.search);
     const mode = urlParams.get('mode');
@@ -99,7 +110,6 @@
     window.onload = () => {
         if (mode === 'book') {
             document.getElementById('section-public-book').style.display = 'block';
-            document.getElementById('headerTitle').innerText = "Patient Booking";
         } else {
             document.getElementById('adminTabs').style.display = 'flex';
             document.getElementById('section-rx').style.display = 'block';
@@ -108,6 +118,31 @@
         }
     };
 
+    function payNow() {
+        const name = document.getElementById('bName').value || "Patient";
+        const upiUrl = `upi://pay?pa=${MY_UPI_ID}&pn=DrHarisClinic&am=${BOOKING_FEE}&cu=INR&tn=ClinicBooking-${name.replace(/\s/g, '')}`;
+        window.location.href = upiUrl;
+    }
+
+    async function submitBooking() {
+        const name = document.getElementById('bName').value;
+        const phone = document.getElementById('bPhone').value;
+        const txn = document.getElementById('bTxn').value;
+        if(!name || !phone || !txn) return alert("অনুগ্ৰহ কৰি সকলো তথ্য আৰু Transaction ID দিয়ক।");
+        
+        const { error } = await _supabase.from('appointments').insert([{ 
+            patient_name: name, 
+            phone: phone, 
+            problem: document.getElementById('bProblem').value,
+            transaction_id: txn 
+        }]);
+        
+        if(!error) {
+            alert("বুকিং সফল হ'ল! ধন্যবাদ।");
+            location.href = location.pathname + "?mode=book";
+        }
+    }
+
     function switchTab(t) {
         const sections = ['rx', 'book', 'acc'];
         sections.forEach(s => document.getElementById('section-' + (s==='book'?'book-list':s)).style.display = s===t?'block':'none');
@@ -115,27 +150,11 @@
         if(t==='acc') loadAccounts();
     }
 
-    async function submitBooking() {
-        const name = document.getElementById('bName').value;
-        const phone = document.getElementById('bPhone').value;
-        if(!name || !phone) return alert("তথ্য দিয়ক");
-        await _supabase.from('appointments').insert([{ patient_name: name, phone: phone, problem: document.getElementById('bProblem').value }]);
-        alert("বুকিং সফল হ'ল!"); location.reload();
-    }
-
     async function addPatient() {
-        const d = { 
-            name: document.getElementById('pName').value, 
-            age: document.getElementById('pAge').value, 
-            phone: document.getElementById('pPhone').value,
-            bp: document.getElementById('pBP').value, 
-            history: document.getElementById('pHistory').value, 
-            medicine: document.getElementById('pMedicine').value, 
-            fees: parseInt(document.getElementById('pFees').value) || 0 
-        };
+        const d = { name: document.getElementById('pName').value, age: document.getElementById('pAge').value, phone: document.getElementById('pPhone').value, bp: document.getElementById('pBP').value, history: document.getElementById('pHistory').value, medicine: document.getElementById('pMedicine').value, fees: parseInt(document.getElementById('pFees').value) || 0 };
         const { error } = await _supabase.from('clinic_data').insert([d]);
         if(!error) {
-            if(d.fees > 0) await _supabase.from('clinic_accounts').insert([{type:'Income', amount:d.fees, note:'Fee: '+d.name}]);
+            if(d.fees > 0) await _supabase.from('clinic_accounts').insert([{type:'Income', amount:d.fees, note:'Consultation: '+d.name}]);
             location.reload();
         }
     }
@@ -145,18 +164,25 @@
         const list = document.getElementById('listPatients');
         list.innerHTML = "";
         data.forEach(p => {
-            const waMsg = `*Dr. Haris Clinic Report*\nPatient: ${p.name}\nPhone: ${p.phone || 'N/A'}\nRx: ${p.medicine}${socialLinks}`;
-            list.innerHTML += `<div class="card"><b>${p.name}</b> (${p.phone || 'No Num'})<br><small>${p.medicine}</small><br>
-            <button onclick="window.printRx('${p.name}','${p.medicine}')" style="width:auto; padding:5px; margin-top:5px;">Print</button>
-            <a href="https://wa.me/?text=${encodeURIComponent(waMsg)}" target="_blank" style="margin-left:10px; color:green; font-weight:bold;">WhatsApp</a></div>`;
+            list.innerHTML += `<div class="card"><b>${p.name}</b> (${p.phone || 'N/A'})<br><small>${p.medicine}</small><br>
+            <button onclick="window.printRx('${p.name}','${p.medicine}')" style="width:auto; padding:5px; margin-top:5px; background:#555; color:white; border:none; border-radius:5px;">Print</button></div>`;
         });
     }
 
     async function loadAppointments() {
         const { data } = await _supabase.from('appointments').select('*').order('created_at', { ascending: false });
         const div = document.getElementById('bookingData');
-        div.innerHTML = data.length ? "" : "কোনো বুকিং নাই";
-        data.forEach(a => div.innerHTML += `<div style="border-bottom:1px solid #eee; padding:10px;"><b>${a.patient_name}</b> - ${a.phone}<br><small>${a.problem}</small></div>`);
+        div.innerHTML = data.length ? "" : "একো নাই";
+        data.forEach(a => {
+            div.innerHTML += `
+            <div style="border-bottom:1px solid #eee; padding:10px;">
+                <div style="display:flex; justify-content:space-between;">
+                    <b>${a.patient_name}</b> <span>${a.phone}</span>
+                </div>
+                <small>সমস্যা: ${a.problem}</small><br>
+                <small style="color:red; font-weight:bold;">TXN: ${a.transaction_id}</small>
+            </div>`;
+        });
     }
 
     async function loadAccounts() {
