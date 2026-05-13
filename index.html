@@ -3,114 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dr. Haris Clinic | Pro System</title>
+    <title>Dr. Haris Clinic | Pro Management</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root { --primary: #004d40; --accent: #00c853; --text: #333; --light: #f4f7f6; }
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--light); margin: 0; color: var(--text); padding-bottom: 50px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; color: var(--text); padding-bottom: 50px; }
+        .no-print { display: block; }
         
-        /* Header & Brand */
+        /* Professional Header */
         .header { background: var(--primary); color: white; padding: 25px 15px; text-align: center; border-radius: 0 0 30px 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-        .header h1 { margin: 0; font-size: 22px; letter-spacing: 1px; }
-        .header p { margin: 5px 0 0; font-size: 13px; opacity: 0.9; }
-
-        .container { max-width: 800px; margin: -20px auto 0; padding: 0 15px; }
+        .container { max-width: 900px; margin: -20px auto 0; padding: 0 15px; }
         
-        /* Modern Tabs */
-        .tabs { display: flex; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 15px; border: none; background: white; font-weight: bold; cursor: pointer; transition: 0.3s; color: #666; border-bottom: 3px solid transparent; }
+        /* Tabs & Search */
+        .tabs { display: flex; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 15px; border: none; background: white; font-weight: bold; cursor: pointer; color: #666; }
         .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); background: #e0f2f1; }
-
-        /* Professional Cards */
-        .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #eee; }
-        h3 { color: var(--primary); margin-top: 0; display: flex; align-items: center; gap: 10px; }
-
-        input, textarea, select { width: 100%; padding: 14px; margin: 10px 0; border: 1.5px solid #e0e0e0; border-radius: 12px; font-size: 15px; transition: 0.3s; box-sizing: border-box; }
-        input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 8px rgba(0,77,64,0.1); }
-
-        .btn-save { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,77,64,0.3); }
         
-        /* Patient Record Styling */
-        .record { border-left: 6px solid var(--accent); padding: 15px; background: #fff; margin-bottom: 15px; position: relative; }
-        .record-header { display: flex; justify-content: space-between; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; margin-bottom: 10px; }
-        .rx-box { background: #f1f8e9; padding: 12px; border-radius: 10px; font-style: italic; color: #2e7d32; border: 1px dashed #a5d6a7; }
-        
-        .wa-link { display: flex; align-items: center; justify-content: center; gap: 8px; background: #25D366; color: white; text-decoration: none; padding: 12px; border-radius: 10px; font-weight: bold; margin-top: 10px; transition: 0.3s; }
-        .wa-link:hover { background: #128C7E; }
+        .search-box { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 15px; box-sizing: border-box; }
 
-        /* Stats Bar */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .stat-item { padding: 15px; border-radius: 15px; text-align: center; color: white; }
+        /* Cards */
+        .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; border: 1.5px solid #eee; border-radius: 10px; box-sizing: border-box; }
+        
+        .btn-save { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .btn-print { background: #555; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+
+        /* Prescription Print Style */
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; }
+            .card { box-shadow: none; border: 1px solid #000; margin: 0; padding: 20px; }
+        }
+        .print-only { display: none; }
+        
+        .record { border-left: 6px solid var(--accent); padding: 15px; background: #fff; margin-bottom: 15px; border-radius: 8px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .stat-item { padding: 15px; border-radius: 12px; text-align: center; color: white; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="header">
+<div class="header no-print">
     <h1>DR. HARIS HOMEOPATHIC</h1>
-    <p><i class="fas fa-map-marker-alt"></i> Gogamukh, Dhemaji, Assam</p>
+    <p>Smart Management System | Gogamukh</p>
 </div>
 
 <div class="container">
-    <div class="tabs">
-        <button id="t-patients" class="tab-btn active" onclick="switchTab('patients')"><i class="fas fa-user-md"></i> ৰোগী</button>
-        <button id="t-accounts" class="tab-btn" onclick="switchTab('accounts')"><i class="fas fa-wallet"></i> হিচাপ</button>
+    <div class="tabs no-print">
+        <button id="t-patients" class="tab-btn active" onclick="switchTab('patients')"><i class="fas fa-users"></i> ৰোগী</button>
+        <button id="t-accounts" class="tab-btn" onclick="switchTab('accounts')"><i class="fas fa-chart-line"></i> হিচাপ</button>
     </div>
 
-    <div id="section-patients">
+    <div id="section-patients" class="no-print">
         <div class="card">
-            <h3><i class="fas fa-plus-circle"></i> New Consultation</h3>
-            <input type="text" id="pName" placeholder="ৰোগীৰ সম্পূৰ্ণ নাম">
-            <div style="display:flex; gap:10px;">
-                <input type="text" id="pAge" placeholder="বয়স/লিংগ">
-                <input type="text" id="pBP" placeholder="BP">
-            </div>
-            <textarea id="pHistory" placeholder="Chief Complaints / History"></textarea>
-            <textarea id="pMedicine" rows="4" placeholder="Prescription (Rx)"></textarea>
-            <input type="number" id="pFees" placeholder="Fees Collected (₹)">
-            <button class="btn-save" onclick="addPatient()">SAVE TO CLOUD</button>
+            <h3><i class="fas fa-plus"></i> New Entry</h3>
+            <input type="text" id="pName" placeholder="ৰোগীৰ নাম">
+            <input type="text" id="pAge" placeholder="বয়স/লিংগ">
+            <input type="text" id="pBP" placeholder="Blood Pressure">
+            <textarea id="pHistory" placeholder="ৰোগীৰ হিষ্ট্ৰী"></textarea>
+            <textarea id="pMedicine" rows="3" placeholder="প্ৰেছক্ৰিপশ্যন (Rx)"></textarea>
+            <input type="number" id="pFees" placeholder="Fees (₹)">
+            <button class="btn-save" onclick="addPatient()">SAVE DATA</button>
         </div>
+        
+        <input type="text" id="searchBar" class="search-box" placeholder="বিচাৰক (নাম বা ৰোগ)..." onkeyup="filterPatients()">
         <div id="listPatients"></div>
     </div>
 
-    <div id="section-accounts" style="display:none;">
-        <div class="card stats-grid">
-            <div class="stat-item" style="background:#2e7d32;">
-                <small>Income</small><br><strong id="totalInc">₹0</strong>
-            </div>
-            <div class="stat-item" style="background:#c62828;">
-                <small>Expense</small><br><strong id="totalExp">₹0</strong>
-            </div>
-            <div class="stat-item" style="background:#1565c0;">
-                <small>Net</small><br><strong id="totalNet">₹0</strong>
-            </div>
+    <div id="section-accounts" class="no-print" style="display:none;">
+        <div class="stats-grid">
+            <div class="stat-item" style="background:#2e7d32;">উপাৰ্জন<br><span id="totalInc">₹0</span></div>
+            <div class="stat-item" style="background:#c62828;">খৰচ<br><span id="totalExp">₹0</span></div>
+            <div class="stat-item" style="background:#1565c0;">লাভ<br><span id="totalNet">₹0</span></div>
         </div>
         <div class="card">
-            <h3><i class="fas fa-file-invoice-dollar"></i> Add Expense/Other Income</h3>
-            <select id="accType">
-                <option value="Income">Income (+)</option>
-                <option value="Expense">Expense (-)</option>
-            </select>
-            <input type="number" id="accAmount" placeholder="Amount">
-            <input type="text" id="accNote" placeholder="Note (Rent, Staff, Medicine Buy)">
-            <button class="btn-save" style="background:#333;" onclick="addAccount()">LOG ENTRY</button>
+            <h3>Daily Entry</h3>
+            <select id="accType"><option value="Income">Income</option><option value="Expense">Expense</option></select>
+            <input type="number" id="accAmount" placeholder="টকাৰ পৰিমাণ">
+            <input type="text" id="accNote" placeholder="বিৱৰণ">
+            <button class="btn-save" style="background:#333;" onclick="addAccount()">SAVE ENTRY</button>
         </div>
     </div>
 </div>
+
+<div id="printArea" class="print-only"></div>
 
 <script>
     const supabaseUrl = 'https://oblvgjnyecvvnnnesegl.supabase.co';
     const supabaseKey = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9';
     const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-    const branding = `
-🏥 *Dr. Haris Homeopathic & Physiotherapy Clinic*
-📍 Gogamukh, Dhemaji, Assam
-📞 Helpline: +91 [আপোনাৰ নম্বৰ]
------------------------------------
-📺 *Subscribe:* https://www.youtube.com/@drhari
-🔵 *FB:* https://www.facebook.com/drhari365
-🌐 *Web:* https://drhariswellfuture.com/`;
+    const branding = `🏥 *Dr. Haris Homeopathic & Physiotherapy*\n📍 Gogamukh, Dhemaji\n--------------------\n📺 YouTube: https://www.youtube.com/@drhari\n🔵 FB: https://www.facebook.com/drhari365\n🌐 Web: https://drhariswellfuture.com/`;
+
+    let allPatients = [];
 
     function switchTab(t) {
         document.getElementById('section-patients').style.display = t === 'patients' ? 'block' : 'none';
@@ -121,50 +108,71 @@
     }
 
     async function addPatient() {
-        const name = document.getElementById('pName').value;
-        if(!name) return alert("Please enter Name");
         const data = {
-            name: name, age: document.getElementById('pAge').value,
-            bp: document.getElementById('pBP').value, history: document.getElementById('pHistory').value,
-            medicine: document.getElementById('pMedicine').value, fees: parseInt(document.getElementById('pFees').value) || 0
+            name: document.getElementById('pName').value,
+            age: document.getElementById('pAge').value,
+            bp: document.getElementById('pBP').value,
+            history: document.getElementById('pHistory').value,
+            medicine: document.getElementById('pMedicine').value,
+            fees: parseInt(document.getElementById('pFees').value) || 0
         };
+        if(!data.name) return alert("নাম লিখক");
         const { error } = await _supabase.from('clinic_data').insert([data]);
         if(!error) {
-            if(data.fees > 0) await _supabase.from('clinic_accounts').insert([{type:'Income', amount:data.fees, note:'Consultation: '+name}]);
-            alert("Record Synced!");
+            if(data.fees > 0) await _supabase.from('clinic_accounts').insert([{type:'Income', amount:data.fees, note:'Fee: '+data.name}]);
             location.reload();
         }
     }
 
     async function loadPatients() {
         const { data } = await _supabase.from('clinic_data').select('*').order('created_at', { ascending: false });
-        const list = document.getElementById('listPatients');
-        list.innerHTML = "";
-        data.forEach(p => {
-            const waMsg = `*PRESCRIPTION REPORT*\n${branding}\n\n*PATIENT:* ${p.name}\n*AGE/SEX:* ${p.age}\n*BP:* ${p.bp}\n\n*Rx (Prescription):*\n${p.medicine}\n\n*History:* ${p.history}\n-----------------------------------\n_Get well soon!_`;
-            const waLink = `https://wa.me/?text=${encodeURIComponent(waMsg)}`;
-            list.innerHTML += `
+        allPatients = data;
+        renderList(allPatients);
+    }
+
+    function renderList(list) {
+        const div = document.getElementById('listPatients');
+        div.innerHTML = "";
+        list.forEach(p => {
+            const waMsg = `*PRESCRIPTION REPORT*\n${branding}\n\n*PATIENT:* ${p.name}\n*BP:* ${p.bp}\n*Rx:* ${p.medicine}\n\n_Get Well Soon!_`;
+            div.innerHTML += `
                 <div class="card record">
-                    <div class="record-header">
-                        <strong><i class="fas fa-user"></i> ${p.name}</strong>
-                        <span style="color:#666; font-size:12px;">${new Date(p.created_at).toLocaleDateString()}</span>
-                    </div>
-                    <p style="margin:5px 0; font-size:13px;"><b>Details:</b> ${p.age} | BP: ${p.bp}</p>
-                    <div class="rx-box"><b>Rx:</b> ${p.medicine}</div>
-                    <div style="margin-top:10px; font-size:12px; color:red;"><b>Private Record:</b> Fee Paid ₹${p.fees}</div>
-                    <a href="${waLink}" target="_blank" class="wa-link"><i class="fab fa-whatsapp"></i> Send Digital Rx</a>
+                    <strong>${p.name}</strong> (${p.age}) <br>
+                    <small>History: ${p.history}</small>
+                    <div style="background:#f1f8e9; padding:10px; margin:10px 0; border-radius:8px;"><b>Rx:</b> ${p.medicine}</div>
+                    <button class="btn-print" onclick="printRx('${p.name}', '${p.age}', '${p.bp}', '${p.medicine}', '${p.history}')">🖨️ Print Rx</button>
+                    <a href="https://wa.me/?text=${encodeURIComponent(waMsg)}" target="_blank" style="text-decoration:none; color:green; margin-left:10px; font-weight:bold;">🟢 WhatsApp</a>
                 </div>`;
         });
     }
 
-    async function addAccount() {
-        const amt = document.getElementById('accAmount').value;
-        if(!amt) return;
-        await _supabase.from('clinic_accounts').insert([{
-            type: document.getElementById('accType').value,
-            amount: parseInt(amt), note: document.getElementById('accNote').value
-        }]);
-        loadAccounts();
+    function filterPatients() {
+        const term = document.getElementById('searchBar').value.toLowerCase();
+        const filtered = allPatients.filter(p => p.name.toLowerCase().includes(term) || p.medicine.toLowerCase().includes(term));
+        renderList(filtered);
+    }
+
+    function printRx(name, age, bp, rx, history) {
+        const printDiv = document.getElementById('printArea');
+        printDiv.innerHTML = `
+            <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:10px;">
+                <h2>DR. HARIS HOMEOPATHIC & PHYSIOTHERAPY</h2>
+                <p>Gogamukh, Dhemaji, Assam | Web: drhariswellfuture.com</p>
+            </div>
+            <div style="margin-top:20px;">
+                <p><b>Patient:</b> ${name} (${age}) &nbsp;&nbsp;&nbsp; <b>BP:</b> ${bp}</p>
+                <p><b>Date:</b> ${new Date().toLocaleDateString()}</p>
+                <hr>
+                <h4>History:</h4> <p>${history}</p>
+                <h4>Prescription (Rx):</h4>
+                <p style="font-size:18px; line-height:1.6;">${rx}</p>
+            </div>
+            <div style="margin-top:100px; text-align:right;">
+                <p>___________________</p>
+                <p>Doctor's Signature</p>
+            </div>
+        `;
+        window.print();
     }
 
     async function loadAccounts() {
