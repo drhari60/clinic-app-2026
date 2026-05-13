@@ -30,7 +30,6 @@
     </div>
 
     <div class="container" style="max-width: 800px; margin: auto; padding: 0 15px;">
-        
         <div id="adminTabs" class="tabs" style="display:none; margin-bottom: 20px;">
             <button id="btn-rx" class="tab-btn active" onclick="switchTab('rx')">Rx/ৰোগী</button>
             <button id="btn-book" class="tab-btn" onclick="switchTab('book')">বুকিং লিষ্ট</button>
@@ -51,14 +50,17 @@
             <div class="card">
                 <h3><i class="fas fa-plus"></i> New Consultation</h3>
                 <input type="text" id="pName" placeholder="ৰোগীৰ নাম">
-                <input type="text" id="pAge" placeholder="বয়স/লিংগ">
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="pAge" placeholder="বয়স/লিংগ">
+                    <input type="text" id="pPhone" placeholder="ফোন নম্বৰ">
+                </div>
                 <input type="text" id="pBP" placeholder="BP">
                 <textarea id="pHistory" placeholder="History"></textarea>
                 <textarea id="pMedicine" rows="3" placeholder="Prescription (Rx)"></textarea>
                 <input type="number" id="pFees" placeholder="Fees (₹)">
                 <button class="btn-primary" onclick="addPatient()">SAVE & SYNC</button>
             </div>
-            <input type="text" id="searchBar" placeholder="বিচাৰক..." onkeyup="filterPatients()" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd;">
+            <input type="text" id="searchBar" placeholder="নাম বা নম্বৰেৰে বিচাৰক..." onkeyup="filterPatients()" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd; margin-bottom:15px;">
             <div id="listPatients"></div>
         </div>
 
@@ -116,16 +118,24 @@
     async function submitBooking() {
         const name = document.getElementById('bName').value;
         const phone = document.getElementById('bPhone').value;
-        if(!name || !phone) return alert("প্ৰয়োজনীয় তথ্য দিয়ক");
+        if(!name || !phone) return alert("তথ্য দিয়ক");
         await _supabase.from('appointments').insert([{ patient_name: name, phone: phone, problem: document.getElementById('bProblem').value }]);
         alert("বুকিং সফল হ'ল!"); location.reload();
     }
 
     async function addPatient() {
-        const d = { name: document.getElementById('pName').value, age: document.getElementById('pAge').value, bp: document.getElementById('pBP').value, history: document.getElementById('pHistory').value, medicine: document.getElementById('pMedicine').value, fees: parseInt(document.getElementById('pFees').value) || 0 };
+        const d = { 
+            name: document.getElementById('pName').value, 
+            age: document.getElementById('pAge').value, 
+            phone: document.getElementById('pPhone').value,
+            bp: document.getElementById('pBP').value, 
+            history: document.getElementById('pHistory').value, 
+            medicine: document.getElementById('pMedicine').value, 
+            fees: parseInt(document.getElementById('pFees').value) || 0 
+        };
         const { error } = await _supabase.from('clinic_data').insert([d]);
         if(!error) {
-            if(d.fees > 0) await _supabase.from('clinic_accounts').insert([{type:'Income', amount:d.fees, note:'Consultation: '+d.name}]);
+            if(d.fees > 0) await _supabase.from('clinic_accounts').insert([{type:'Income', amount:d.fees, note:'Fee: '+d.name}]);
             location.reload();
         }
     }
@@ -135,8 +145,8 @@
         const list = document.getElementById('listPatients');
         list.innerHTML = "";
         data.forEach(p => {
-            const waMsg = `*Dr. Haris Clinic Report*\nPatient: ${p.name}\nRx: ${p.medicine}${socialLinks}`;
-            list.innerHTML += `<div class="card"><b>${p.name}</b><br><small>${p.medicine}</small><br>
+            const waMsg = `*Dr. Haris Clinic Report*\nPatient: ${p.name}\nPhone: ${p.phone || 'N/A'}\nRx: ${p.medicine}${socialLinks}`;
+            list.innerHTML += `<div class="card"><b>${p.name}</b> (${p.phone || 'No Num'})<br><small>${p.medicine}</small><br>
             <button onclick="window.printRx('${p.name}','${p.medicine}')" style="width:auto; padding:5px; margin-top:5px;">Print</button>
             <a href="https://wa.me/?text=${encodeURIComponent(waMsg)}" target="_blank" style="margin-left:10px; color:green; font-weight:bold;">WhatsApp</a></div>`;
         });
@@ -145,7 +155,7 @@
     async function loadAppointments() {
         const { data } = await _supabase.from('appointments').select('*').order('created_at', { ascending: false });
         const div = document.getElementById('bookingData');
-        div.innerHTML = data.length ? "" : "একো নাই";
+        div.innerHTML = data.length ? "" : "কোনো বুকিং নাই";
         data.forEach(a => div.innerHTML += `<div style="border-bottom:1px solid #eee; padding:10px;"><b>${a.patient_name}</b> - ${a.phone}<br><small>${a.problem}</small></div>`);
     }
 
@@ -158,7 +168,7 @@
     }
 
     window.printRx = (name, rx) => {
-        document.getElementById('printArea').innerHTML = `<h2>Dr. Haris Clinic</h2><hr><p>Patient: ${name}</p><p>Rx: ${rx}</p><br><br><p align="right">Signature</p>`;
+        document.getElementById('printArea').innerHTML = `<h2>Dr. Haris Clinic</h2><hr><p>Patient: ${name}</p><p>Rx: ${rx}</p><br><p align="right">Signature</p>`;
         window.print();
     }
 </script>
