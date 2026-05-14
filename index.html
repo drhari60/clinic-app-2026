@@ -220,30 +220,67 @@
         document.getElementById('btn-' + t).classList.add('active');
     }
 
-    async function loadPatients() {
-        const { data } = await _supabase.from('clinic_data').select('*').order('created_at', { ascending: false });
-        if(data) document.getElementById('listPatients').innerHTML = data.map(p => `
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: start;">
-                    <div>
-                        <b style="font-size: 1.1em; color: var(--primary);">${p.name}</b><br>
-                        <small style="color: #666;">📞 ${p.phone}</small>
-                    </div>
-                </div>
-                <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
-                    <button onclick='printPrescription(${JSON.stringify(p)})' style="flex:1; background:#555; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
-                        <i class="fas fa-print"></i> Print
-                    </button>
-                    <button onclick='sendWhatsApp(${JSON.stringify(p)})' style="flex:1; background:#25d366; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
-                        <i class="fab fa-whatsapp"></i> Rx
-                    </button>
-                    <button onclick='sendReminder(${JSON.stringify(p)})' style="flex:1; background:#ff9800; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
-                        <i class="fas fa-bell"></i> Remind
-                    </button>
-                </div>
-            </div>`).join('');
-    }
+    let currentEditPatientId = null; // কোনটো ৰোগী এডিট হৈছে মনত ৰাখিবলৈ
 
+async function loadPatients() {
+    const { data } = await _supabase.from('clinic_data').select('*').order('created_at', { ascending: false });
+    if(data) document.getElementById('listPatients').innerHTML = data.map(p => `
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                    <b style="font-size: 1.1em; color: var(--primary);">${p.name}</b><br>
+                    <small style="color: #666;">📞 ${p.phone}</small>
+                </div>
+                <div style="display:flex; gap:12px;">
+                    <button onclick='editPatientInline(${JSON.stringify(p)})' style="background:none; border:none; color:#3498db; font-size:18px; cursor:pointer;"><i class="fas fa-edit"></i></button>
+                    <button onclick="deletePatient(${p.id})" style="background:none; border:none; color:#e74c3c; font-size:18px; cursor:pointer;"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            </div>
+            <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+                <button onclick='printPrescription(${JSON.stringify(p)})' style="flex:1; background:#555; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
+                    <i class="fas fa-print"></i> Print
+                </button>
+                <button onclick='sendWhatsApp(${JSON.stringify(p)})' style="flex:1; background:#25d366; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
+                    <i class="fab fa-whatsapp"></i> Rx
+                </button>
+                <button onclick='sendReminder(${JSON.stringify(p)})' style="flex:1; background:#ff9800; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
+                    <i class="fas fa-bell"></i> Remind
+                </button>
+            </div>
+        </div>`).join('');
+}
+
+// এডিট বুটাম টিপিলে ৰোগীৰ পুৰণা ডাটা নিউ এন্ট্ৰি ফৰ্মত গৈ বহিব
+function editPatientInline(p) {
+    currentEditPatientId = p.id;
+    
+    document.getElementById('pName').value = p.name;
+    document.getElementById('pAgeSex').value = p.age || '';
+    document.getElementById('pBP').value = p.bp || '';
+    document.getElementById('pPhone').value = p.phone;
+    document.getElementById('pHistory').value = p.history || '';
+    document.getElementById('pMedicine').value = p.medicine || '';
+    document.getElementById('pFees').value = p.fees || 0;
+    
+    // ফৰ্মৰ বুটামৰ নাম আৰু ৰং সলনি হ'b
+    const btn = document.querySelector("#newEntryForm .btn-primary");
+    if(btn) {
+        btn.innerText = "UPDATE Rx";
+        btn.style.background = "#e67e22";
+    }
+    
+    // স্ক্ৰীনখন নিউ এন্ট্ৰি ফৰ্মলৈ লৈ যাব
+    document.getElementById('newEntryForm').scrollIntoView({behavior: 'smooth'});
+}
+
+// এইটো ৰোগীৰ ডাটা মচিবলৈ নতুন ফাংচন
+async function deletePatient(id) {
+    if(confirm("আপুনি এই ৰোগীৰ সম্পূৰ্ণ ৰেকৰ্ড মচি দিব খোজে নেকি?")) {
+        const { error } = await _supabase.from('clinic_data').delete().eq('id', id);
+        if(!error) { alert("ৰোগীৰ ৰেকৰ্ড মচি দিয়া হ’ল!"); location.reload(); }
+        else { alert("ভুল হৈছে, আকৌ চেষ্টা কৰক।"); }
+    }
+}
     async function loadBookings() {
         const { data } = await _supabase.from('clinic_bookings').select('*').order('created_at', { ascending: false });
         if(data) document.getElementById('listBookings').innerHTML = data.map(b => `<div class="card"><b>${b.name}</b> (${b.phone})<br>Txn ID: ${b.txn_id}</div>`).join('');
