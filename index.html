@@ -151,21 +151,41 @@
         } else { alert("ভুল পাছৱৰ্ড!"); }
     }
 
-    async function addPatient() {
-        const fees = parseInt(document.getElementById('pFees').value) || 0;
-        const name = document.getElementById('pName').value;
-        const d = { 
-            name: name, age: document.getElementById('pAgeSex').value, 
-            bp: document.getElementById('pBP').value, phone: document.getElementById('pPhone').value, 
-            history: document.getElementById('pHistory').value, medicine: document.getElementById('pMedicine').value, fees: fees 
-        };
+async function addPatient() {
+    const fees = parseInt(document.getElementById('pFees').value) || 0;
+    const name = document.getElementById('pName').value;
+    if(!name) { alert("অনুগ্ৰহ কৰি ৰোগীৰ নাম লিখক!"); return; }
+
+    const d = { 
+        name: name, age: document.getElementById('pAgeSex').value, 
+        bp: document.getElementById('pBP').value, phone: document.getElementById('pPhone').value, 
+        history: document.getElementById('pHistory').value, medicine: document.getElementById('pMedicine').value, fees: fees 
+    };
+
+    if(currentEditPatientId) {
+        // যদি এডিট কৰা হৈছে, তেন্তে পুৰণা ডাটা আপডেট হ'ব
+        const { error } = await _supabase.from('clinic_data').update(d).eq('id', currentEditPatientId);
+        if(!error) {
+            alert("ৰোগীৰ তথ্য সফলতাৰে শুধৰোৱা হ’ল!");
+            currentEditPatientId = null; // আইডিটো খালী কৰা হ'ল
+            location.reload();
+        } else {
+            alert("আপডেট কৰোঁতে কিবা ভুল হৈছে।");
+        }
+    } else {
+        // নহলে স্বাভাৱিক দৰেই নতুন ৰোগীৰ এন্ট্ৰি হ'ব
         const { error } = await _supabase.from('clinic_data').insert([d]);
         if(!error) {
             if(fees > 0) await _supabase.from('clinic_accounts').insert([{ type: 'Income', amount: fees, note: 'ৰোগী: ' + name }]);
-            alert("Saved!"); location.reload();
+            alert("Saved!"); 
+            location.reload();
+        } else {
+            alert("চেভ কৰোঁতে কিবা বিজুতি ঘটিছে।");
         }
     }
+}
 
+    
     function printPrescription(p) {
         document.getElementById('printArea').innerHTML = `
             <div style="text-align:center;"><h2>DR. HARIS HOMEOPATHIC CLINIC</h2><p>গোগামুখ, ধেমাজি | ফোন: 9707722511</p><hr></div>
