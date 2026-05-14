@@ -210,7 +210,7 @@ function sendReminder(p) {
     async function loadPatients() {
     const { data } = await _supabase.from('clinic_data').select('*').order('created_at', { ascending: false });
     if(data) document.getElementById('listPatients').innerHTML = data.map(p => `
-        <div class="card">
+        <div class="card" id="newEntryForm">
             <div style="display: flex; justify-content: space-between; align-items: start;">
                 <div>
                     <b style="font-size: 1.1em; color: var(--primary);">${p.name}</b><br>
