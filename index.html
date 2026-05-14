@@ -253,30 +253,38 @@
     function showBookingForm() { document.getElementById('loginArea').style.display = 'none'; document.getElementById('bookingForm').style.display = 'block'; }
     
     async function submitBooking() {
-        const name = document.getElementById('bName').value;
-        const phone = document.getElementById('bPhone').value;
-        const problem = document.getElementById('bProblem').value;
-        const txn = document.getElementById('bTxn').value;
+    const name = document.getElementById('bName').value;
+    const phone = document.getElementById('bPhone').value;
+    const problem = document.getElementById('bProblem').value;
+    const txn = document.getElementById('bTxn').value;
 
-        if(!name || !phone || !txn) {
-            alert("অনুগ্ৰহ কৰি নাম, ফোন আৰু Transaction ID লিখক।");
-            return;
-        }
-
-        const upiUrl = `upi://pay?pa=9954340102@okbizaxis&pn=Haris%20Homoeo%20Hall&am=100&cu=INR&tn=Booking_for_${name}`;
-        
-        if(confirm("বুকিং কনফৰ্ম কৰিবলৈ এতিয়া ₹100 পৰিশোধ কৰিবনে?")) {
-            window.location.href = upiUrl;
-            
-            const d = { name, phone, problem, txn_id: txn };
-            const { error } = await _supabase.from('clinic_bookings').insert([d]);
-            
-            if(!error) { 
-                alert("বুকিং তথ্য জমা দিয়া হ’ল। পেমেন্টটো পৰীক্ষা কৰি আমরা আপোনাক যোগাযোগ কৰিম।"); 
-                location.reload(); 
-            }
-        }
+    // ১. প্ৰথমে চেক কৰিব নাম আৰু ফোন নম্বৰ লিখিছে নে নাই
+    if(!name || !phone) {
+        alert("অনুগ্ৰহ কৰি প্ৰথমে আপোনাৰ নাম আৰু মোবাইল নম্বৰ লিখক।");
+        return;
     }
+
+    // ২. যদি Transaction ID লিখা নাই, তেন্তে পোনপটীয়াকৈ পেমেন্ট কৰিবলৈ ক'ব
+    if(!txn) {
+        alert("প্ৰথমে ₹100 পেমেন্ট কৰক। তাৰপিছতহে Transaction ID দি কনফৰ্ম কৰিব পাৰিব।");
+        
+        // পেমেন্ট লিংক (পোনপটীয়াকৈ পেমেন্ট এপ খোল খাব)
+        const upiUrl = `upi://pay?pa=9954340102@okbizaxis&pn=Haris%20Homoeo%20Hall&am=100&cu=INR&tn=Booking_for_${name}`;
+        window.location.href = upiUrl;
+        return; 
+    }
+
+    // ৩. যদি Transaction ID লিখা হৈ গৈছে, তেতিয়া ডাটাবেচত চেভ হ'ব
+    const d = { name, phone, problem, txn_id: txn };
+    const { error } = await _supabase.from('clinic_bookings').insert([d]);
+    
+    if(!error) { 
+        alert("ধন্যবাদ! আপোনাৰ বুকিং সফল হৈছে। আমি অতি সোনকালে যোগাযোগ কৰিম।"); 
+        location.reload(); 
+    } else {
+        alert("কিবা ভুল হৈছে, অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।");
+    }
+}
 </script>
 </body>
 </html>
