@@ -225,9 +225,33 @@
     function showBookingForm() { document.getElementById('loginArea').style.display = 'none'; document.getElementById('bookingForm').style.display = 'block'; }
     
     async function submitBooking() {
-        const d = { name: document.getElementById('bName').value, phone: document.getElementById('bPhone').value, problem: document.getElementById('bProblem').value, txn_id: document.getElementById('bTxn').value };
+    const name = document.getElementById('bName').value;
+    const phone = document.getElementById('bPhone').value;
+    const problem = document.getElementById('bProblem').value;
+    const txn = document.getElementById('bTxn').value;
+
+    if(!name || !phone || !txn) {
+        alert("অনুগ্ৰহ কৰি নাম, ফোন আৰু Transaction ID লিখক।");
+        return;
+    }
+
+    // পেমেন্ট এপ খোলিবলৈ (₹100 অটোমেটিক লিখা থাকিব)
+    const upiUrl = `upi://pay?pa=9954340102@okbizaxis&pn=Haris%20Homoeo%20Hall&am=100&cu=INR&tn=Booking_for_${name}`;
+    
+    // প্ৰথমে পেমেন্টৰ বাবে সোধা হ’ব
+    if(confirm("বুকিং কনফৰ্ম কৰিবলৈ এতিয়া ₹100 পৰিশোধ কৰিবনে?")) {
+        window.location.href = upiUrl;
+        
+        // পেমেন্ট এপৰ পৰা ঘূৰি অহাৰ পাছত ডাটাবেচত চেভ হ’ব
+        const d = { name, phone, problem, txn_id: txn };
         const { error } = await _supabase.from('clinic_bookings').insert([d]);
-        if(!error) { alert("বুকিং সফল!"); location.reload(); }
+        
+        if(!error) { 
+            alert("বুকিং তথ্য জমা দিয়া হ’ল। পেমেন্টটো পৰীক্ষা কৰি আমি আপোনাক যোগাযোগ কৰিম।"); 
+            location.reload(); 
+        }
+    }
+}
     }
 </script>
 </body>
