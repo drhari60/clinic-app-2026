@@ -199,16 +199,28 @@ function sendReminder(p) {
     }
 
     async function loadPatients() {
-        const { data } = await _supabase.from('clinic_data').select('*').order('created_at', { ascending: false });
-        if(data) document.getElementById('listPatients').innerHTML = data.map(p => `
-            <div class="card">
-                <b>${p.name}</b> (${p.phone})<br>
-                <div style="margin-top:8px;">
-                    <button onclick='printPrescription(${JSON.stringify(p)})' style="width:auto; background:#555; color:white; padding:5px 10px; border:none; border-radius:5px;">Print</button>
-                    <button onclick='sendWhatsApp(${JSON.stringify(p)})' style="width:auto; background:#25d366; color:white; padding:5px 10px; border:none; border-radius:5px;">WhatsApp</button>
+    const { data } = await _supabase.from('clinic_data').select('*').order('created_at', { ascending: false });
+    if(data) document.getElementById('listPatients').innerHTML = data.map(p => `
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                    <b style="font-size: 1.1em; color: var(--primary);">${p.name}</b><br>
+                    <small style="color: #666;">📞 ${p.phone}</small>
                 </div>
-            </div>`).join('');
-    }
+            </div>
+            <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+                <button onclick='printPrescription(${JSON.stringify(p)})' style="flex:1; background:#555; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
+                    <i class="fas fa-print"></i> Print
+                </button>
+                <button onclick='sendWhatsApp(${JSON.stringify(p)})' style="flex:1; background:#25d366; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
+                    <i class="fab fa-whatsapp"></i> Rx
+                </button>
+                <button onclick='sendReminder(${JSON.stringify(p)})' style="flex:1; background:#ff9800; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
+                    <i class="fas fa-bell"></i> Remind
+                </button>
+            </div>
+        </div>`).join('');
+}
 
     async function loadBookings() {
         const { data } = await _supabase.from('clinic_bookings').select('*').order('created_at', { ascending: false });
