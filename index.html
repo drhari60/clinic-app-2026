@@ -72,22 +72,28 @@
         </div>
 
         <div id="section-rx">
-            <input type="text" id="searchBox" placeholder="নাম বা নম্বৰ দি বিচাৰক..." onkeyup="filterPatients()">
-            <div class="card">
-                <h3>New Entry</h3>
-                <input type="text" id="pName" placeholder="ৰোগীৰ নাম">
-                <div style="display:flex; gap:10px;">
-                    <input type="text" id="pAgeSex" placeholder="বয়স/লিংগ">
-                    <input type="text" id="pBP" placeholder="BP">
-                </div>
-                <input type="text" id="pPhone" placeholder="মোবাইল নম্বৰ">
-                <textarea id="pHistory" placeholder="Patient History (ৰোগীৰ পুৰণা ৰোগ বা অন্য তথ্য)"></textarea>
-                <textarea id="pMedicine" placeholder="Rx (ঔষধসমূহ)"></textarea>
-                <input type="number" id="pFees" placeholder="Fees (₹)">
-                <button class="btn-primary" onclick="addPatient()">SAVE Rx</button>
-            </div>
-            <div id="listPatients"></div>
+    <div class="card" style="border-bottom: 3px solid var(--primary);">
+        <input type="text" id="searchBox" placeholder="🔍 নাম বা নম্বৰ দি বিচাৰক..." onkeyup="filterPatients()" style="padding: 15px; border: 2px solid var(--primary);">
+    </div>
+
+    <div id="listPatients"></div>
+
+    <hr style="margin: 20px 0;">
+
+    <div class="card">
+        <h3 style="margin-top:0; color: var(--primary);">New Entry</h3>
+        <input type="text" id="pName" placeholder="ৰোগীৰ নাম">
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="pAgeSex" placeholder="বয়স/লিংগ">
+            <input type="text" id="pBP" placeholder="BP">
         </div>
+        <input type="text" id="pPhone" placeholder="মোবাইল নম্বৰ">
+        <textarea id="pHistory" placeholder="Patient History (ৰোগীৰ পুৰণা ৰোগ)"></textarea>
+        <textarea id="pMedicine" placeholder="Rx (ঔষধসমূহ)"></textarea>
+        <input type="number" id="pFees" placeholder="Fees (₹)">
+        <button class="btn-primary" onclick="addPatient()">SAVE Rx</button>
+    </div>
+</div>
 
         <div id="section-booking" style="display:none;">
             <h3>শেহতীয়া অনলাইন বুকিংসমূহ</h3>
