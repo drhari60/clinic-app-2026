@@ -236,14 +236,52 @@
         if(data) document.getElementById('listBookings').innerHTML = data.map(b => `<div class="card"><b>${b.name}</b> (${b.phone})<br>Txn ID: ${b.txn_id}</div>`).join('');
     }
 
-    async function loadAccounts() {
-        const { data } = await _supabase.from('clinic_accounts').select('*').order('created_at', { ascending: false });
-        if(data) {
-            let i=0, e=0; data.forEach(d => d.type==='Income'?i+=d.amount:e+=d.amount);
-            document.getElementById('totalInc').innerText = '₹'+i; document.getElementById('totalExp').innerText = '₹'+e;
-            document.getElementById('expenseList').innerHTML = "<h4>খৰচৰ তালিকা:</h4>" + data.filter(d => d.type === 'Expense').map(d => `<div style="font-size:12px; border-bottom:1px solid #eee; padding:5px;">${new Date(d.created_at).toLocaleDateString()}: ${d.note} - ₹${d.amount}</div>`).join('');
-        }
+   let currentEditAccountId = null; // কোনটো একাউণ্ট এডিট হৈছে মনত ৰাখিবলৈ
+
+async function loadAccounts() {
+    const { data } = await _supabase.from('clinic_accounts').select('*').order('created_at', { ascending: false });
+    if(data) {
+        let i=0, e=0; data.forEach(d => d.type==='Income'?i+=d.amount:e+=d.amount);
+        document.getElementById('totalInc').innerText = '₹'+i; document.getElementById('totalExp').innerText = '₹'+e;
+        
+        // ইয়াত এতিয়া Edit আৰু Delete দুয়োটাই কাম কৰিব
+        document.getElementById('expenseList').innerHTML = "<h4>খৰচৰ তালিকা:</h4>" + data.filter(d => d.type === 'Expense').map(d => `
+            <div style="font-size:14px; border-bottom:1px solid #eee; padding:10px 5px; display:flex; justify-content:space-between; align-items:center;">
+                <span>${new Date(d.created_at).toLocaleDateString()}: ${d.note} - ₹${d.amount}</span>
+                <div style="display:flex; gap:8px;">
+                    <button onclick='editAccountInline(${JSON.stringify(d)})' style="width:auto; margin:0; padding:6px 10px; background:#3498db; color:white; border:none; border-radius:5px; font-size:12px; cursor:pointer;"><i class="fas fa-edit"></i> Edit</button>
+                    <button onclick="deleteAccount(${d.id})" style="width:auto; margin:0; padding:6px 10px; background:#e74c3c; color:white; border:none; border-radius:5px; font-size:12px; cursor:pointer;"><i class="fas fa-trash-alt"></i> Mosi Diya</button>
+                </div>
+            </div>`).join('');
     }
+}
+
+// এডিট বুটাম টিপিলে পুৰণা ডাটা খৰচৰ ফৰ্মত গৈ বহিব
+function editAccountInline(d) {
+    currentEditAccountId = d.id;
+    const parts = d.note.split(': ');
+    const noteContent = parts.length > 1 ? parts.slice(1).join(': ') : d.note;
+    
+    document.getElementById('accAmount').value = d.amount;
+    document.getElementById('accNote').value = noteContent;
+    
+    // বুটামৰ নাম সলনি হ'ব
+    const btn = document.querySelector("#section-acc .btn-primary");
+    btn.innerText = "UPDATE EXPENSE";
+    btn.style.background = "#e67e22";
+    
+    // স্ক্ৰীল কৰি এন্ট্ৰি ফৰ্মলৈ লৈ যাব
+    document.getElementById('accCategory').scrollIntoView({behavior: 'smooth'});
+}
+
+// এইটো নতুন ডিলিট ফাংচন
+async function deleteAccount(id) {
+    if(confirm("আপুনি নিশ্চিতনে যে এই খৰচটো তালিকাৰ পৰা মচি দিব খোজে?")) {
+        const { error } = await _supabase.from('clinic_accounts').delete().eq('id', id);
+        if(!error) { alert("মচি দিয়া হ’ল!"); location.reload(); }
+        else { alert("ভুল হৈছে, আকৌ চেষ্টা কৰক।"); }
+    }
+}
 
     function filterPatients() {
         const term = document.getElementById('searchBox').value.toLowerCase();
