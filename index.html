@@ -366,26 +366,31 @@ async function deleteAccount(id) {
     const problem = document.getElementById('bProblem').value;
     const txn = document.getElementById('bTxn').value;
 
-   // ১. প্ৰথমে চেক কৰিব নাম আৰু ফোন নম্বৰ লিখিছে নে নাই
+  // ১. প্ৰথমে চেক কৰিব নাম আৰু ফোন নম্বৰ লিখিছে নে নাই
     if(!name || !phone) {
-        alert("অনুগ্ৰহ কৰি প্ৰথমে আপোনাৰ নাম আৰু মোবাইল নম্বৰ লিখক।");
+        alert("অনুগ্ৰহ কৰি প্ৰথমে আপোনাৰ নাম আৰু মোবাইল নম্বৰ লিখক。");
         return;
     }
 
-    // ২. পেমেন্ট পপ-আপ বক্সটো স্ক্ৰীনত দেখুৱাই দিয়া হ'ল (GPay/PhonePe ৰিক্স বাইপাছ কৰিবলৈ)
-    // ৰোগীৰ ডাটাখিনি অলপ সময়ৰ বাবে গ্ল’বেল ভেৰিয়েবলত ৰখা হ'ল
+    // ২. পেমেন্ট পপ-আপ বক্সটো স্ক্ৰীনত দেখুৱাই দিয়া হ'ল
     window.temporaryBookingData = { name, phone, problem };
 
     // পপ-আপটো স্ক্ৰীনত দেখুৱাব
     document.getElementById('paymentModal').style.display = 'flex';
 }
 
-// ৩. পপ-আপত থকা Done বুটাম টিপিলে এইটো ফাংচন চলিব আৰু ডাটাবেচত চেভ হ'ব
+// ৩. পপ-আপত থকা Confirm Booking বুটাম টিপিলে এইটো ফাংচন চলিব
 async function closePaymentModal() {
-    const txn = document.getElementById('bTxn') ? document.getElementById('bTxn').value : '';
+    const txn = document.getElementById('bTxn') ? document.getElementById('bTxn').value.trim() : '';
+    
+    // !!! ইয়াতে ফিক্স কৰা হ'ল: ট্ৰেনজেকচন আইডি খালী থাকিলে বুকিং নহয় !!!
+    if(!txn) {
+        alert("অনুগ্ৰহ কৰি পেমেন্ট কৰাৰ পিছত লাভ কৰা Transaction ID টো ইয়াত লিখক। ইয়াৰ অবিহনে বুকিং কনফৰ্ম নহব।");
+        return;
+    }
     
     if(window.temporaryBookingData) {
-        // ডাটাবেচৰ অবজেক্ট তৈয়াৰ কৰা হ'ল (যদি আপোনাৰ টেবুলত txn_id কলমটো আছে)
+        // ডাটাবেচৰ অবজেক্ট তৈয়াৰ কৰা হ'ল
         const d = { 
             name: window.temporaryBookingData.name, 
             phone: window.temporaryBookingData.phone, 
@@ -396,7 +401,7 @@ async function closePaymentModal() {
         const { error } = await _supabase.from('clinic_bookings').insert([d]);
         
         if(!error) { 
-            alert("ধন্যবাদ! আপোনাৰ বুকিং সফল হৈছে আৰু পেমেন্ট ৰেকৰ্ড কৰা হৈছে।"); 
+            alert("ধন্যবাদ! আপোনাৰ বুকিং সফলতাৰে সম্পন্ন হ’ল আৰু পেমেন্ট ৰেকৰ্ড কৰা হ’ল।"); 
             document.getElementById('paymentModal').style.display = 'none';
             window.temporaryBookingData = null;
             location.reload(); 
@@ -414,11 +419,14 @@ async function closePaymentModal() {
         
         <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=9954340102@okbizaxis%26pn=Haris%20Homoeo%20Hall%26am=100%26cu=INR" alt="UPI QR Code" style="width:220px; height:220px; margin:10px auto; display:block; border:1px solid #eee; padding:5px; border-radius:10px;">
         
-        <div style="font-weight:bold; font-size:18px; color:#e67e22; margin:10px 0;">পৰিমাণ: ₹১০০</div>
+        <div style="font-weight:bold; font-size:18px; color:#e67e22; margin:5px 0;">পৰিমাণ: ₹১০০</div>
         
-        <input type="text" id="bTxn" placeholder="Transaction ID (অপচনেল)" style="width:100%; padding:10px; margin-bottom:12px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box; text-align:center;">
+        <div style="margin-bottom:12px; text-align:left;">
+            <label for="bTxn" style="font-size:12px; font-weight:bold; color:#e74c3c;">* Transaction ID (বাধ্যতামূলক):</label>
+            <input type="text" id="bTxn" placeholder="ইউটিআৰ (UTR) বা ট্ৰেনজেকচন নম্বৰটো লিখক" style="width:100%; padding:12px; margin-top:5px; border:2px solid #e74c3c; border-radius:8px; box-sizing:border-box; text-align:center; font-weight:bold;">
+        </div>
         
-        <button onclick="closePaymentModal()" style="width:100%; background:#27ae60; color:white; padding:12px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:14px;">মই পেমেন্ট কৰিলোঁ (Confirm Booking)</button>
+        <button onclick="closePaymentModal()" style="width:100%; background:#27ae60; color:white; padding:14px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:15px;">মই পেমেন্ট কৰিলোঁ (Confirm Booking)</button>
     </div>
 </div>
 
