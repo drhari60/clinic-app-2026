@@ -131,7 +131,7 @@ function sendReminder(p) {
     window.open(`https://wa.me/91${p.phone}?text=${encodeURIComponent(text)}`);
 }
     function checkPass() {
-        if(document.getElementById('adminPass').value === 'drharis') {
+        if(document.getElementById('adminPass').value === 'drharis1') {
             document.getElementById('loginArea').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
             loadPatients(); loadAccounts(); loadBookings();
