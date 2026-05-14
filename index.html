@@ -190,14 +190,27 @@
     }
 
     async function addAccount(type) {
-        const amt = parseInt(document.getElementById('accAmount').value);
-        const cat = document.getElementById('accCategory').value;
-        const note = document.getElementById('accNote').value;
-        if(amt) {
-            await _supabase.from('clinic_accounts').insert([{ type: type, amount: amt, note: `${cat}: ${note}` }]);
-            alert("খৰচ চেভ কৰা হ'ল!"); location.reload();
+    const amt = parseInt(document.getElementById('accAmount').value);
+    const cat = document.getElementById('accCategory').value;
+    const note = document.getElementById('accNote').value;
+    if(!amt) return;
+
+    if(currentEditAccountId) {
+        // যদি কোনো খৰচ এডিট হৈ আছে, তেন্তে পুৰণা ডাটা আপডেট হ'ব
+        const { error } = await _supabase.from('clinic_accounts').update({ amount: amt, note: `${cat}: ${note}` }).eq('id', currentEditAccountId);
+        if(!error) {
+            alert("খৰচৰ হিচাপ শুধৰোৱা হ’ল!");
+            currentEditAccountId = null; 
+        } else {
+            alert("আপডেট কৰাত কিবা ভুল হৈছে।");
         }
+    } else {
+        // নহলে স্বাভাৱিক দৰেই নতুন খৰচৰ এন্ট্ৰি হ'ব
+        const { error } = await _supabase.from('clinic_accounts').insert([{ type: type, amount: amt, note: `${cat}: ${note}` }]);
+        if(!error) alert("খৰচ চেভ কৰা হ'ল!");
     }
+    location.reload();
+}
 
     function switchTab(t) {
         document.getElementById('section-rx').style.display = t==='rx'?'block':'none';
