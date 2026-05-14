@@ -76,6 +76,11 @@
         <input type="text" id="searchBox" placeholder="🔍 নাম বা নম্বৰ দি বিচাৰক..." onkeyup="filterPatients()" style="padding: 15px; border: 2px solid var(--primary);">
     </div>
 
+            <button onclick="document.getElementById('newEntryForm').scrollIntoView({behavior: 'smooth'})" 
+        style="background: #e67e22; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; margin: 15px 0; font-weight: bold; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    ➕ নতুন ৰোগী লিখক (Go to New Entry)
+</button>
+
     <div id="listPatients"></div>
 
     <hr style="margin: 20px 0;">
