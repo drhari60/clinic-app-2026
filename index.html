@@ -125,6 +125,9 @@
 <div id="printArea" class="print-only" style="padding:50px;"></div>
 
 <script>
+function scrollToNewEntry() {
+    document.getElementById('newEntryForm').scrollIntoView({ behavior: 'smooth' });
+}
     const supabaseUrl = 'https://oblvgjnyecvvnnnesegl.supabase.co';
     const supabaseKey = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9';
     const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
