@@ -27,7 +27,7 @@
 
 <div id="loginArea" class="card no-print" style="max-width: 400px; margin: 80px auto; text-align:center;">
     <h2 style="color: var(--primary);">Dr. Haris Clinic</h2>
-    <input type="password" id="adminPass" placeholder="পাছৱৰ্ড দিয়ক">
+    <input type="password" id="adminPass" placeholder="পাছৱৰ্ড দিয়ক">
     <div style="display:flex; gap:10px;">
         <button class="btn-primary" onclick="checkPass()">LOGIN</button>
         <button class="btn-primary" style="background:#555;" onclick="showBookingForm()">BOOK NOW</button>
@@ -72,36 +72,36 @@
         </div>
 
         <div id="section-rx">
-    <div class="card" style="border-bottom: 3px solid var(--primary);">
-        <input type="text" id="searchBox" placeholder="🔍 নাম বা নম্বৰ দি বিচাৰক..." onkeyup="filterPatients()" style="padding: 15px; border: 2px solid var(--primary);">
-    </div>
+            <div class="card" style="border-bottom: 3px solid var(--primary);">
+                <input type="text" id="searchBox" placeholder="🔍 নাম বা নম্বৰ দি বিচাৰক..." onkeyup="filterPatients()" style="padding: 15px; border: 2px solid var(--primary);">
+            </div>
 
-            <button onclick="document.getElementById('newEntryForm').scrollIntoView({behavior: 'smooth'})" 
-        style="background: #e67e22; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; margin: 15px 0; font-weight: bold; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-    ➕ নতুন ৰোগী লিখক (Go to New Entry)
-</button>
+            <button onclick="window.scrollTo({ top: document.getElementById('newEntryForm').offsetTop - 20, behavior: 'smooth' })" 
+                    style="background: #e67e22; color: white; border: none; padding: 15px; border-radius: 10px; width: 100%; margin: 15px 0; font-weight: bold; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                ➕ নতুন ৰোগী লিখক (Direct to Form)
+            </button>
 
-    <div id="listPatients"></div>
+            <div id="listPatients"></div>
 
-    <hr style="margin: 20px 0;">
+            <hr style="margin: 20px 0;">
 
-    <div class="card">
-        <h3 style="margin-top:0; color: var(--primary);">New Entry</h3>
-        <input type="text" id="pName" placeholder="ৰোগীৰ নাম">
-        <div style="display:flex; gap:10px;">
-            <input type="text" id="pAgeSex" placeholder="বয়স/লিংগ">
-            <input type="text" id="pBP" placeholder="BP">
+            <div class="card" id="newEntryForm">
+                <h3 style="margin-top:0; color: var(--primary);">New Entry</h3>
+                <input type="text" id="pName" placeholder="ৰোগীৰ নাম">
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="pAgeSex" placeholder="বয়স/লিংগ">
+                    <input type="text" id="pBP" placeholder="BP">
+                </div>
+                <input type="text" id="pPhone" placeholder="মোবাইল নম্বৰ">
+                <textarea id="pHistory" placeholder="Patient History (ৰোগীৰ পুৰণা ৰোগ)"></textarea>
+                <textarea id="pMedicine" placeholder="Rx (ঔষধসমূহ)"></textarea>
+                <input type="number" id="pFees" placeholder="Fees (₹)">
+                <button class="btn-primary" onclick="addPatient()">SAVE Rx</button>
+            </div>
         </div>
-        <input type="text" id="pPhone" placeholder="মোবাইল নম্বৰ">
-        <textarea id="pHistory" placeholder="Patient History (ৰোগীৰ পুৰণা ৰোগ)"></textarea>
-        <textarea id="pMedicine" placeholder="Rx (ঔষধসমূহ)"></textarea>
-        <input type="number" id="pFees" placeholder="Fees (₹)">
-        <button class="btn-primary" onclick="addPatient()">SAVE Rx</button>
-    </div>
-</div>
 
         <div id="section-booking" style="display:none;">
-            <h3>শেহতীয়া অনলাইন বুকিংসমূহ</h3>
+            <h3>শেহতীয়া অনলাইন বুকিংসমূহ</h3>
             <div id="listBookings"></div>
         </div>
 
@@ -130,20 +130,19 @@
 <div id="printArea" class="print-only" style="padding:50px;"></div>
 
 <script>
-function scrollToNewEntry() {
-    document.getElementById('newEntryForm').scrollIntoView({ behavior: 'smooth' });
-}
     const supabaseUrl = 'https://oblvgjnyecvvnnnesegl.supabase.co';
     const supabaseKey = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9';
     const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
-function sendReminder(p) {
-    const text = `নমস্কাৰ ${p.name} ডাঙৰীয়া/আইদেউ, 
+
+    function sendReminder(p) {
+        const text = `নমস্কাৰ ${p.name} ডাঙৰীয়া/আইদেউ, 
 ড° হৰি ক্লিনিকৰ পৰা আপোনাক মনত পেলাই দিয়া হৈছে যে আপোনাৰ ঔষধ খোৱাৰ সময় হৈছে। সুস্থ থাকক, সময়মতে ঔষধ খাওক।
 ---
 পৰামৰ্শৰ বাবে যোগাযোগ কৰক: 9707722511`;
-    
-    window.open(`https://wa.me/91${p.phone}?text=${encodeURIComponent(text)}`);
-}
+        
+        window.open(`https://wa.me/91${p.phone}?text=${encodeURIComponent(text)}`);
+    }
+
     function checkPass() {
         if(document.getElementById('adminPass').value === 'drharis1') {
             document.getElementById('loginArea').style.display = 'none';
@@ -171,7 +170,7 @@ function sendReminder(p) {
         document.getElementById('printArea').innerHTML = `
             <div style="text-align:center;"><h2>DR. HARIS HOMEOPATHIC CLINIC</h2><p>গোগামুখ, ধেমাজি | ফোন: 9707722511</p><hr></div>
             <div style="display:flex; justify-content:space-between; margin:15px 0;">
-                <div><b>ৰোগী:</b> ${p.name}</div><div><b>বয়স/লিংগ:</b> ${p.age}</div><div><b>BP:</b> ${p.bp}</div>
+                <div><b>ৰোগী:</b> ${p.name}</div><div><b>বয়স/লিংग:</b> ${p.age}</div><div><b>BP:</b> ${p.bp}</div>
             </div>
             <p><b>History:</b> ${p.history || 'N/A'}</p><hr>
             <h3>Rx:</h3><div style="min-height:400px; font-size:18px;">${p.medicine.replace(/\n/g, '<br>')}</div><hr>
@@ -179,19 +178,16 @@ function sendReminder(p) {
         window.print();
     }
 
-   function sendWhatsApp(p) {
-    // আপোনাৰ চোচিয়েল মিডিয়া লিংকসমূহ
-    const clinicLinks = `---
+    function sendWhatsApp(p) {
+        const clinicLinks = `---
 🔗 *Follow us for Health Tips:*
 📘 Facebook: https://www.facebook.com/drhari365
 📺 YouTube: https://www.youtube.com/@drhari
 🌐 Website: https://drhariswellfuture.com/`;
 
-    // মেছেজটো তৈয়াৰ কৰা হৈছে (ঔষধ + হিষ্ট্ৰী + লিংক)
-    const text = `*Dr. Haris Clinic Prescription*%0A%0A*Patient:* ${p.name}%0A*History:* ${p.history || 'N/A'}%0A*Rx (Medicines):*%0A${p.medicine}%0A%0A${encodeURIComponent(clinicLinks)}`;
-    
-    window.open(`https://wa.me/91${p.phone}?text=${text}`);
-}
+        const text = `*Dr. Haris Clinic Prescription*%0A%0A*Patient:* ${p.name}%0A*History:* ${p.history || 'N/A'}%0A*Rx (Medicines):*%0A${p.medicine}%0A%0A${encodeURIComponent(clinicLinks)}`;
+        window.open(`https://wa.me/91${p.phone}?text=${text}`);
+    }
 
     async function addAccount(type) {
         const amt = parseInt(document.getElementById('accAmount').value);
@@ -203,7 +199,6 @@ function sendReminder(p) {
         }
     }
 
-    // চুইচ টেব আৰু ডাটা লোড কৰা
     function switchTab(t) {
         document.getElementById('section-rx').style.display = t==='rx'?'block':'none';
         document.getElementById('section-booking').style.display = t==='booking'?'block':'none';
@@ -213,28 +208,28 @@ function sendReminder(p) {
     }
 
     async function loadPatients() {
-    const { data } = await _supabase.from('clinic_data').select('*').order('created_at', { ascending: false });
-    if(data) document.getElementById('listPatients').innerHTML = data.map(p => `
-        <div class="card" id="newEntryForm">
-            <div style="display: flex; justify-content: space-between; align-items: start;">
-                <div>
-                    <b style="font-size: 1.1em; color: var(--primary);">${p.name}</b><br>
-                    <small style="color: #666;">📞 ${p.phone}</small>
+        const { data } = await _supabase.from('clinic_data').select('*').order('created_at', { ascending: false });
+        if(data) document.getElementById('listPatients').innerHTML = data.map(p => `
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <b style="font-size: 1.1em; color: var(--primary);">${p.name}</b><br>
+                        <small style="color: #666;">📞 ${p.phone}</small>
+                    </div>
                 </div>
-            </div>
-            <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
-                <button onclick='printPrescription(${JSON.stringify(p)})' style="flex:1; background:#555; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
-                    <i class="fas fa-print"></i> Print
-                </button>
-                <button onclick='sendWhatsApp(${JSON.stringify(p)})' style="flex:1; background:#25d366; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
-                    <i class="fab fa-whatsapp"></i> Rx
-                </button>
-                <button onclick='sendReminder(${JSON.stringify(p)})' style="flex:1; background:#ff9800; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
-                    <i class="fas fa-bell"></i> Remind
-                </button>
-            </div>
-        </div>`).join('');
-}
+                <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+                    <button onclick='printPrescription(${JSON.stringify(p)})' style="flex:1; background:#555; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                    <button onclick='sendWhatsApp(${JSON.stringify(p)})' style="flex:1; background:#25d366; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
+                        <i class="fab fa-whatsapp"></i> Rx
+                    </button>
+                    <button onclick='sendReminder(${JSON.stringify(p)})' style="flex:1; background:#ff9800; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
+                        <i class="fas fa-bell"></i> Remind
+                    </button>
+                </div>
+            </div>`).join('');
+    }
 
     async function loadBookings() {
         const { data } = await _supabase.from('clinic_bookings').select('*').order('created_at', { ascending: false });
@@ -258,32 +253,29 @@ function sendReminder(p) {
     function showBookingForm() { document.getElementById('loginArea').style.display = 'none'; document.getElementById('bookingForm').style.display = 'block'; }
     
     async function submitBooking() {
-    const name = document.getElementById('bName').value;
-    const phone = document.getElementById('bPhone').value;
-    const problem = document.getElementById('bProblem').value;
-    const txn = document.getElementById('bTxn').value;
+        const name = document.getElementById('bName').value;
+        const phone = document.getElementById('bPhone').value;
+        const problem = document.getElementById('bProblem').value;
+        const txn = document.getElementById('bTxn').value;
 
-    if(!name || !phone || !txn) {
-        alert("অনুগ্ৰহ কৰি নাম, ফোন আৰু Transaction ID লিখক।");
-        return;
-    }
-
-    // পেমেন্ট এপ খোলিবলৈ (₹100 অটোমেটিক লিখা থাকিব)
-    const upiUrl = `upi://pay?pa=9954340102@okbizaxis&pn=Haris%20Homoeo%20Hall&am=100&cu=INR&tn=Booking_for_${name}`;
-    
-    // প্ৰথমে পেমেন্টৰ বাবে সোধা হ’ব
-    if(confirm("বুকিং কনফৰ্ম কৰিবলৈ এতিয়া ₹100 পৰিশোধ কৰিবনে?")) {
-        window.location.href = upiUrl;
-        
-        // পেমেন্ট এপৰ পৰা ঘূৰি অহাৰ পাছত ডাটাবেচত চেভ হ’ব
-        const d = { name, phone, problem, txn_id: txn };
-        const { error } = await _supabase.from('clinic_bookings').insert([d]);
-        
-        if(!error) { 
-            alert("বুকিং তথ্য জমা দিয়া হ’ল। পেমেন্টটো পৰীক্ষা কৰি আমি আপোনাক যোগাযোগ কৰিম।"); 
-            location.reload(); 
+        if(!name || !phone || !txn) {
+            alert("অনুগ্ৰহ কৰি নাম, ফোন আৰু Transaction ID লিখক।");
+            return;
         }
-}
+
+        const upiUrl = `upi://pay?pa=9954340102@okbizaxis&pn=Haris%20Homoeo%20Hall&am=100&cu=INR&tn=Booking_for_${name}`;
+        
+        if(confirm("বুকিং কনফৰ্ম কৰিবলৈ এতিয়া ₹100 পৰিশোধ কৰিবনে?")) {
+            window.location.href = upiUrl;
+            
+            const d = { name, phone, problem, txn_id: txn };
+            const { error } = await _supabase.from('clinic_bookings').insert([d]);
+            
+            if(!error) { 
+                alert("বুকিং তথ্য জমা দিয়া হ’ল। পেমেন্টটো পৰীক্ষা কৰি আমরা আপোনাক যোগাযোগ কৰিম।"); 
+                location.reload(); 
+            }
+        }
     }
 </script>
 </body>
