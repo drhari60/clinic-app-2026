@@ -366,33 +366,61 @@ async function deleteAccount(id) {
     const problem = document.getElementById('bProblem').value;
     const txn = document.getElementById('bTxn').value;
 
-    // ১. প্ৰথমে চেক কৰিব নাম আৰু ফোন নম্বৰ লিখিছে নে নাই
+   // ১. প্ৰথমে চেক কৰিব নাম আৰু ফোন নম্বৰ লিখিছে নে নাই
     if(!name || !phone) {
         alert("অনুগ্ৰহ কৰি প্ৰথমে আপোনাৰ নাম আৰু মোবাইল নম্বৰ লিখক।");
         return;
     }
 
-    // ২. যদি Transaction ID লিখা নাই, তেন্তে পোনপটীয়াকৈ পেমেন্ট কৰিবলৈ ক'ব
-    if(!txn) {
-        alert("প্ৰথমে ₹100 পেমেন্ট কৰক। তাৰপিছতহে Transaction ID দি কনফৰ্ম কৰিব পাৰিব।");
-        
-        // পেমেন্ট লিংক (পোনপটীয়াকৈ পেমেন্ট এপ খোল খাব)
-        const upiUrl = `upi://pay?pa=9954340102@okbizaxis&pn=Haris%20Homoeo%20Hall&am=100&cu=INR&tn=Booking_for_${name}`;
-        window.location.href = upiUrl;
-        return; 
-    }
+    // ২. পেমেন্ট পপ-আপ বক্সটো স্ক্ৰীনত দেখুৱাই দিয়া হ'ল (GPay/PhonePe ৰিক্স বাইপাছ কৰিবলৈ)
+    // ৰোগীৰ ডাটাখিনি অলপ সময়ৰ বাবে গ্ল’বেল ভেৰিয়েবলত ৰখা হ'ল
+    window.temporaryBookingData = { name, phone, problem };
 
-    // ৩. যদি Transaction ID লিখা হৈ গৈছে, তেতিয়া ডাটাবেচত চেভ হ'ব
-    const d = { name, phone, problem, txn_id: txn };
-    const { error } = await _supabase.from('clinic_bookings').insert([d]);
+    // পপ-আপটো স্ক্ৰীনত দেখুৱাব
+    document.getElementById('paymentModal').style.display = 'flex';
+}
+
+// ৩. পপ-আপত থকা Done বুটাম টিপিলে এইটো ফাংচন চলিব আৰু ডাটাবেচত চেভ হ'ব
+async function closePaymentModal() {
+    const txn = document.getElementById('bTxn') ? document.getElementById('bTxn').value : '';
     
-    if(!error) { 
-        alert("ধন্যবাদ! আপোনাৰ বুকিং সফল হৈছে। আমি অতি সোনকালে যোগাযোগ কৰিম।"); 
-        location.reload(); 
-    } else {
-        alert("কিবা ভুল হৈছে, অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।");
+    if(window.temporaryBookingData) {
+        // ডাটাবেচৰ অবজেক্ট তৈয়াৰ কৰা হ'ল (যদি আপোনাৰ টেবুলত txn_id কলমটো আছে)
+        const d = { 
+            name: window.temporaryBookingData.name, 
+            phone: window.temporaryBookingData.phone, 
+            problem: window.temporaryBookingData.problem,
+            txn_id: txn 
+        };
+
+        const { error } = await _supabase.from('clinic_bookings').insert([d]);
+        
+        if(!error) { 
+            alert("ধন্যবাদ! আপোনাৰ বুকিং সফল হৈছে আৰু পেমেন্ট ৰেকৰ্ড কৰা হৈছে।"); 
+            document.getElementById('paymentModal').style.display = 'none';
+            window.temporaryBookingData = null;
+            location.reload(); 
+        } else {
+            alert("কিবা ভুল হৈছে, অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।");
+        }
     }
 }
 </script>
+
+<div id="paymentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center; padding:20px;">
+    <div style="background:white; padding:20px; border-radius:15px; max-width:400px; width:100%; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.3); position:relative; font-family: sans-serif;">
+        <h3 style="color:#2c3e50; margin-top:0;">পেমেন্ট কৰক</h3>
+        <p style="font-size:14px; color:#555; margin-bottom:15px; line-height: 1.4;">অনুগ্ৰহ কৰি তলৰ QR Code খন স্ক্ৰীনশ্বট লৈ GPay/PhonePe-ৰ Gallery-ৰ পৰা স্কেন কৰি <b>₹১০০</b> পেমেণ্ট কৰক।</p>
+        
+        <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=9954340102@okbizaxis%26pn=Haris%20Homoeo%20Hall%26am=100%26cu=INR" alt="UPI QR Code" style="width:220px; height:220px; margin:10px auto; display:block; border:1px solid #eee; padding:5px; border-radius:10px;">
+        
+        <div style="font-weight:bold; font-size:18px; color:#e67e22; margin:10px 0;">পৰিমাণ: ₹১০০</div>
+        
+        <input type="text" id="bTxn" placeholder="Transaction ID (অপচনেল)" style="width:100%; padding:10px; margin-bottom:12px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box; text-align:center;">
+        
+        <button onclick="closePaymentModal()" style="width:100%; background:#27ae60; color:white; padding:12px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:14px;">মই পেমেন্ট কৰিলোঁ (Confirm Booking)</button>
+    </div>
+</div>
+
 </body>
 </html>
