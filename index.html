@@ -127,6 +127,46 @@
     /* Print settings */
     @media print { .no-print { display: none !important; } .print-only { display: block !important; } }
     .print-only { display: none; }
+
+/* Modern Bottom Navbar */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--white);
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 0;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+    border-radius: 20px 20px 0 0;
+    z-index: 1000;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #7f8c8d;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.nav-item i {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+.nav-item.active {
+    color: var(--primary);
+}
+
+/* Page content padding to avoid overlap with navbar */
+.content-area {
+    padding-bottom: 80px;
+}       
 </style>
 </head>
 <body>
