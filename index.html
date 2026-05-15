@@ -563,6 +563,10 @@ window.onload = function() {
 }
 
     async function addAccount(type) {
+        if(sessionStorage.getItem('userRole') !== 'admin'){
+    alert("Unauthorized Access!");
+    return;
+}
         const amt = parseInt(document.getElementById('accAmount').value);
         const cat = document.getElementById('accCategory').value;
         const note = document.getElementById('accNote').value;
