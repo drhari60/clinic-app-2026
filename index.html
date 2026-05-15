@@ -393,11 +393,18 @@ window.onload = function() {
     }
 
     async function deletePatient(id) {
+    // ইয়াতে প্ৰথমে চেক কৰিব যে ইউজাৰজন এডমিন হয়নে নহয়
+    if (sessionStorage.getItem('userRole') !== 'admin') { 
+        alert("অনুমতি নাই! কেৱল ড° হৰিয়েহে মচিব পাৰিব।"); 
+        return; 
+    }
+
+    // যদি এডমিন হয়, তেতিয়াহে তলৰ ডিলিট প্ৰক্ৰিয়াটো চলিব
     if(confirm("আপুনি এই ৰোগীৰ সম্পূৰ্ণ ৰেকৰ্ড মচি দিব খোজে নেকি?")) {
         const { error } = await _supabase.from('clinic_data').delete().eq('id', id);
         if(!error) { 
             alert("ৰোগীৰ ৰেকৰ্ড মচি দিয়া হ’ল!"); 
-            loadPatients(); // পেজ ৰিলোড নকৰাকৈ কেৱল লিষ্টখন আপডেট কৰিব
+            loadPatients(); 
         }
     }
 }
