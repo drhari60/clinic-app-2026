@@ -25,7 +25,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Modern Header */
         .header { 
             background: linear-gradient(135deg, var(--primary), #00695c); 
             color: white; 
@@ -35,14 +34,12 @@
             box-shadow: 0 4px 20px rgba(0,77,64,0.3);
         }
 
-        /* Container */
         .container {
             max-width: 800px;
             margin: auto;
             padding: 0 15px;
         }
 
-        /* Cards */
         .card { 
             background: var(--white); 
             border-radius: 24px; 
@@ -52,7 +49,6 @@
             border: 1px solid rgba(0,0,0,0.03);
         }
 
-        /* Better Inputs */
         input, textarea, select { 
             width: 100%; 
             padding: 15px; 
@@ -79,7 +75,6 @@
             width: 100%;
         }
 
-        /* Social Bar */
         .social-bar { display: flex; justify-content: center; gap: 20px; margin-top: 15px; }
         .social-bar a { 
             color: white; 
@@ -96,7 +91,6 @@
         @media print { .no-print { display: none !important; } .print-only { display: block !important; } }
         .print-only { display: none; }
 
-        /* Modern Bottom Navbar Fixed */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: var(--white); display: flex; justify-content: space-around; padding: 12px 0;
@@ -111,7 +105,6 @@
         .nav-item i { font-size: 20px; margin-bottom: 4px; }
         .nav-item.active { color: var(--primary); }
         
-        /* Dynamic Tabs Content Display */
         .tab-content { display: none; }
         .tab-content.active { display: block; }
     </style>
@@ -166,47 +159,182 @@
         </div>
     </div>
 </div>
+
 <div id="bookingForm" class="container no-print" style="max-width: 500px; margin: 20px auto; display:none;">
-
-
-<div id="consultationForm" class="card no-print" style="display:none; max-width: 400px; margin: 40px auto; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-radius: 20px; background: #fff;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3 style="color: var(--primary); margin: 0; font-weight: 700;">অনলাইন পৰামৰ্শ ফৰ্ম</h3>
-            <button onclick="hideConsultationForm()" style="background: none; border: none; color: #777; font-size: 20px; cursor: pointer;"><i class="fas fa-times"></i></button>
+    <div class="card">
+        <h2 style="text-align:center; color: var(--primary);">অনলাইন বুকিং</h2>
+        <div class="qr-section">
+            <p><b>Scan to Pay ₹100</b></p>
+            <a href="upi://pay?pa=9954340102@okbizaxis&pn=Haris%20Homoeo%20Hall&am=100&cu=INR">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=9954340102@okbizaxis%26pn=Haris%20Homoeo%20Hall%26am=100" alt="GPay QR">
+            </a>
+            <p><b>Haris Homoeo Hall</b></p>
         </div>
+        <input type="text" id="bName" placeholder="ৰোগীৰ নাম">
+        <input type="text" id="bPhone" placeholder="মোবাইল নম্বৰ">
+        <textarea id="bProblem" placeholder="সমস্যাটো চমুকৈ লিখক..."></textarea>
+        <input type="text" id="bFormTxn" placeholder="Transaction ID (পেমেন্টৰ পাছত)">
+        <button class="btn-primary" style="background:var(--accent);" onclick="submitBooking()">CONFIRM BOOKING</button>
+        <button onclick="location.reload()" style="background:none; border:none; color:gray; cursor:pointer; margin-top:10px; width:100%;">Cancel</button>
+    </div>
+</div>
 
-        <div id="consStep1">
-            <p style="font-size: 14px; color: #555; margin-bottom: 15px;">অনুগ্ৰহ কৰি প্ৰথমে আপোনাৰ নাম আৰু ম’বাইল নম্বৰ লিখক:</p>
-            <input type="text" id="consName" placeholder="আপোনাৰ নাম লিখক" style="margin-bottom: 15px; width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
-            <input type="tel" id="consPhone" placeholder="ম’বাইল নম্বৰ লিখক" style="margin-bottom: 20px; width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
-            <button type="button" class="btn-primary" onclick="verifyConsStep1()" style="width: 100%; padding: 12px; font-weight: bold;">পৰৱৰ্তী খোজ (Next)</button>
+<div id="consultationForm" class="card no-print" style="display:none; max-width: 500px; margin: 30px auto; padding: 25px;">
+    <h3 style="color: var(--primary); text-align:center; margin-bottom: 20px;">অনলাইন চিকিৎসা পৰামৰ্শ (Online Consultation)</h3>
+    
+    <div id="consStep1">
+        <label>ৰোগীৰ নাম (Patient Name):</label>
+        <input type="text" id="consName" placeholder="নাম লিখক">
+        
+        <label>ফোন নম্বৰ (Phone Number):</label>
+        <input type="tel" id="consPhone" placeholder="মোবাইল নম্বৰ">
+        
+        <button class="btn-primary" style="width:100%; margin-top:15px;" onclick="verifyConsStep1()">পৰৱৰ্তী খোজ (Next)</button>
+    </div>
+
+    <div id="consStep2" style="display:none; text-align:center;">
+        <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ffe0b2;">
+            <p style="margin:0; color:#e65100; font-weight:bold;">পৰামৰ্শ ফীজ: ২৫০ টকা (₹250)</p>
+            <p style="font-size:13px; margin:5px 0 0 0;">অনুগ্ৰহ কৰি তলৰ UPI ID ত ২৫০ টকা পেমেণ্ট কৰক আৰু Transaction ID টো তলত লিখক।</p>
+            <p style="font-size:16px; font-weight:bold; color:#004d40; margin:10px 0 0 0;">UPI ID: drhari365@apl</p> </div>
+
+        <label style="text-align:left; display:block;">Transaction ID (UPI/UTR No):</label>
+        <input type="text" id="consTxn" placeholder="ট্ৰেনজেকচন আইডি লিখক">
+        
+        <button class="btn-primary" style="width:100%; margin-top:10px; background:#00796b;" onclick="verifyConsPayment()">পেমেণ্ট সাবমিট কৰক (Verify Payment)</button>
+    </div>
+
+    <div id="consStep3" style="display:none;">
+        <div style="background: #e8f5e9; padding: 10px; border-radius: 8px; margin-bottom: 15px; color: #2e7d32; font-weight: bold; text-align: center;">
+            ✓ পেমেণ্ট গ্ৰহণ কৰা হৈছে। এতিয়া আপোনাৰ প্ৰশ্নটো লিখক।
         </div>
+        <label>আপোনাৰ স্বাস্থ্যজনিত সমস্যা বা প্ৰশ্নটো বিতংভাৱে লিখক (Write your question):</label>
+        <textarea id="consQuestion" rows="5" placeholder="আপোনাৰ কি সমস্যা হৈছে আৰু আপুনি কি জানিব বিচাৰে ইয়াত লিখক..." style="width:100%; border-radius:8px; padding:10px; border:1px solid #ccc; font-family:inherit;"></textarea>
+        
+        <button class="btn-primary" style="width:100%; margin-top:15px; background:#2e7d32;" onclick="submitConsultation()">পৰামৰ্শ সাবমিট কৰক (Submit Consultation)</button>
+    </div>
 
-        <div id="consStep2" style="display:none; text-align: center;">
-            <div style="background: #e0f2f1; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
-                <p style="margin: 0 0 5px 0; font-size: 14px; color: #004d40;">অনলাইন পৰামৰ্শৰ মাচুল:</p>
-                <h2 style="margin: 0; color: #004d40; font-weight: 800;">₹ ২৫০ টকা</h2>
+    <button class="btn-primary" style="background:#555; width:100%; margin-top:15px;" onclick="hideConsultationForm()">ফিৰি যাওক (Back)</button>
+</div>
+
+<div id="mainApp" style="display:none;">
+    <div class="header no-print">
+        <h1>Dr. Haris Clinic</h1>
+        <div class="social-bar">
+            <a href="https://www.facebook.com/drhari365" target="_blank"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.youtube.com/@drhari" target="_blank"><i class="fab fa-youtube"></i></a>
+            <a href="https://drhariswellfuture.com/" target="_blank"><i class="fas fa-globe"></i></a>
+        </div>
+    </div>
+
+    <div class="container no-print" style="margin-top: 20px;">
+        
+        <div id="section-home" class="tab-content active">
+            <div class="card" style="border-bottom: 3px solid var(--primary);">
+                <input type="text" id="searchBox" placeholder="🔍 নাম বা নম্বৰ দি বিচাৰক..." onkeyup="filterPatients()" style="padding: 15px; border: 2px solid var(--primary); margin: 0;">
             </div>
-            <p style="font-size: 13px; color: #666; margin-bottom: 15px;">তলৰ QR ক’ড স্কেন কৰি বা <b>9707722511</b> নম্বৰত ২৫০ টকা পৰিশোধ কৰক।</p>
-            
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=9707722511@upi%26pn=Dr%20Haris%20Clinic%26am=250" alt="QR Code" style="margin-bottom: 15px; border: 1px solid #eee; padding: 10px; border-radius: 12px; background: #fff;">
-            
-            <p style="font-size: 13px; color: #e65100; font-weight: bold; margin-bottom: 10px;">টকা পঠোৱাৰ পাছত Transaction ID টো ইয়াত লিখক:</p>
-            <input type="text" id="consTxn" placeholder="Transaction ID (ইউটিআৰ নম্বৰ) লিখক" style="margin-bottom: 20px; width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
-            <button type="button" class="btn-primary" onclick="verifyConsPayment()" style="width: 100%; padding: 12px; font-weight: bold;">পেমেণ্ট নিশ্চিত কৰক</button>
+
+            <button onclick="document.getElementById('newEntryForm').scrollIntoView({ behavior: 'smooth' })" 
+                    style="background: #e67e22; color: white; border: none; padding: 15px; border-radius: 10px; width: 100%; margin: 15px 0; font-weight: bold; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                ➕ নতুন ৰোগী লিখক (Direct to Form)
+            </button>
+
+            <div id="listPatients"></div>
+
+            <div class="card" id="newEntryForm" style="margin-top: 30px;">
+                <h3 style="margin-top:0; color: var(--primary);">New Entry</h3>
+                <input type="text" id="pName" placeholder="ৰোগীৰ নাম">
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="pAgeSex" placeholder="বয়স/লিংগ">
+                    <input type="text" id="pBP" placeholder="BP">
+                </div>
+                <input type="text" id="pPhone" placeholder="মোবাইল নম্বৰ">
+                <textarea id="pHistory" placeholder="Patient History (ৰোগীৰ পুৰণা ৰোগ)"></textarea>
+                <textarea id="pMedicine" placeholder="Rx (ঔষধসমূহ)"></textarea>
+                <input type="number" id="pFees" placeholder="Fees (₹)">
+                <button class="btn-primary" onclick="addPatient()">SAVE Rx</button>
+            </div>
         </div>
 
-        <div id="consStep3" style="display:none;">
-            <p style="font-size: 14px; color: #333; font-weight: bold; margin-bottom: 10px;">আপোনাৰ স্বাস্থ্যজনিত সমস্যা বা প্ৰশ্নটো বিতংভাৱে লিখক:</p>
-            <textarea id="consQuestion" rows="4" placeholder="ইয়াত লিখক (যেনে: মোৰ ৩ দিনৰ পৰা জ্বৰ হৈছে...)" style="margin-bottom: 20px; width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit; resize: vertical;"></textarea>
-            <button type="button" class="btn-primary" onclick="submitConsultation()" style="width: 100%; padding: 12px; font-weight: bold; background: #00c853;">প্ৰশ্ন জমা কৰক (Submit)</button>
+        <div id="section-bookings" class="tab-content">
+            <div class="card">
+                <h3 style="margin-top:0; color:var(--primary);">শেহতীয়া অনলাইন বুকিংসমূহ</h3>
+                <div id="listBookings"></div>
+            </div>
         </div>
-    </div> <script>
+
+        <div id="section-reports" class="tab-content">
+            <div class="card" style="display:flex; justify-content:space-between; background:var(--primary); color:white; text-align:center;">
+                <div>উপাৰ্জন (Income)<br><b id="totalInc">0</b></div>
+                <div>খৰচ (Expense)<br><b id="totalExp">0</b></div>
+            </div>
+            <div class="card">
+                <h3>খৰচৰ এন্ট্ৰি (Expense Entry)</h3>
+                <select id="accCategory">
+                    <option value="Salary">Salary (দৰমহা)</option>
+                    <option value="Light Bill">Light Bill (বিদ্যুতৰ বিল)</option>
+                    <option value="House Rent">House Rent (ঘৰ ভাড়া)</option>
+                    <option value="Others">Others (অন্যান্য)</option>
+                </select>
+                <input type="number" id="accAmount" placeholder="Amount (₹)">
+                <input type="text" id="accNote" placeholder="Note (কিহৰ খৰচ?)">
+                <button class="btn-primary" onclick="addAccount('Expense')">SAVE EXPENSE</button>
+            </div>
+            <div id="expenseList"></div>
+        </div>
+
+        <div id="section-profile" class="tab-content">
+            <div class="card" style="text-align: center;">
+                <h3 style="color: var(--primary);">Dr. Haris Profile</h3>
+                <p>গোগামুখ, ধেমাজি, অসম</p>
+                <p>পৰামৰ্শৰ বাবে যোগাযোগ কৰক: 9707722511</p>
+                <hr style="opacity: 0.2; margin: 20px 0;">
+                <button class="btn-primary" style="background:#e74c3c;" onclick="sessionStorage.clear(); location.reload();">LOGOUT (বাহিৰ হওক)</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="bottom-nav no-print">
+        <div id="nav-home" class="nav-item active" onclick="showTab('home')">
+            <i class="fas fa-home"></i><span>Home</span>
+        </div>
+        <div id="nav-bookings" class="nav-item" onclick="showTab('bookings')">
+            <i class="fas fa-calendar-alt"></i><span>Bookings</span>
+        </div>
+        <div id="nav-reports" class="nav-item" onclick="showTab('reports')">
+            <i class="fas fa-money-bill-wave"></i><span>খৰচ</span>
+        </div>
+        <div id="nav-profile" class="nav-item" onclick="showTab('profile')">
+            <i class="fas fa-user-md"></i><span>Profile</span>
+        </div>
+    </div>
+</div>
+
+<div id="printArea" class="print-only" style="padding:50px;"></div>
+
+<div id="paymentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center; padding:20px;">
+    <div style="background:white; padding:20px; border-radius:15px; max-width:400px; width:100%; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.3); position:relative;">
+        <h3 style="color:#2c3e50; margin-top:0;">পেমেন্ট কৰক</h3>
+        <p style="font-size:14px; color:#555; margin-bottom:15px; line-height: 1.4;">অনুগ্ৰহ কৰি তলৰ QR Code খন স্ক্ৰীনশ্বট লৈ GPay/PhonePe-ৰ Gallery-ৰ পৰা স্কেন কৰি <b>₹১০০</b> পেমেণ্ট কৰক।</p>
+        
+        <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=9954340102@okbizaxis%26pn=Haris%20Homoeo%20Hall%26am=100%26cu=INR" alt="UPI QR Code" style="width:220px; height:220px; margin:10px auto; display:block; border:1px solid #eee; padding:5px; border-radius:10px;">
+        
+        <div style="font-weight:bold; font-size:18px; color:#e67e22; margin:5px 0;">পৰিমাণ: ₹১০০</div>
+        
+        <div style="margin-bottom:12px; text-align:left;">
+            <label for="modalTxn" style="font-size:12px; font-weight:bold; color:#e74c3c;">* Transaction ID (বাধ্যতামূলক):</label>
+            <input type="text" id="modalTxn" placeholder="ইউটিআৰ (UTR) বা ট্ৰেনজেকচন নম্বৰটো লিখক" style="width:100%; padding:12px; margin-top:5px; border:2px solid #e74c3c; border-radius:8px; box-sizing:border-box; text-align:center; font-weight:bold;">
+        </div>
+        
+        <button onclick="closePaymentModal()" style="width:100%; background:#27ae60; color:white; padding:14px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:15px;">মই পেমেন্ট কৰিলোঁ (Confirm Booking)</button>
+    </div>
+</div>
+
+<script>
     const supabaseUrl = 'https://oblvgjnyecvvnnnesegl.supabase.co';
     const supabaseKey = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9';
-    
-    // লাইব্ৰেৰীৰ সংযোগ গোলমাল নোহোৱাকৈ ইয়াত ঠিক কৰা হৈছে
-    const _supabase = window.supabase.createClient(supabaseUrl, supabaseKey); 
+    const _supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
     
     let currentEditPatientId = null; 
     let currentEditAccountId = null; 
@@ -235,6 +363,7 @@ function checkPass() {
     }
 }
 
+// একত্ৰিত কৰা এটা মাত্ৰ window.onload লজিক
 window.onload = function() {
     if (sessionStorage.getItem('isLoggedIn') === 'true') {
         checkPass();
@@ -358,7 +487,7 @@ window.onload = function() {
 }
 
     function sendReminder(p) {
-        const text = `নমস্কাৰ ${p.name} ডাঙৰীয়া/আইদেউ,\nড° হৰি ক্লিনিকৰ পৰা আপোনাক মনত পেলাই দিয়া হৈছে যে আপোনাৰ ঔষধ খোৱাৰ সময় হৈছে। সুস্থ থাকক।\n--- 📞 9707722511`;
+        const text = `নமস্কাৰ ${p.name} ডাঙৰীয়া/আইদেউ,\nড° হৰি ক্লিনিকৰ পৰা আপোনাক মনত পেলাই দিয়া হৈছে যে আপোনাৰ ঔষধ খোৱাৰ সময় হৈছে। সুস্থ থাকক।\n--- 📞 9707722511`;
         window.open(`https://wa.me/91${p.phone}?text=${encodeURIComponent(text)}`);
     }
 
@@ -438,94 +567,4 @@ window.onload = function() {
         document.querySelectorAll('#listPatients .card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(term) ? 'block' : 'none');
     }
     
-    function showBookingForm() { document.getElementById('loginArea').style.display = 'none'; document.getElementById('bookingForm').style.display = 'block'; }
-    
-    async function submitBooking() {
-        const name = document.getElementById('bName').value;
-        const phone = document.getElementById('bPhone').value;
-        const problem = document.getElementById('bProblem').value;
-        if(!name || !phone) { alert("অনুগ্ৰহ কৰি প্ৰথমে আপোনাৰ নাম আৰু মোবাইল নম্বৰ লিখক।"); return; }
-        window.temporaryBookingData = { name, phone, problem };
-        document.getElementById('paymentModal').style.display = 'flex';
-    }
-
-    async function closePaymentModal() {
-        const txn = document.getElementById('modalTxn').value.trim();
-        if(!txn) { alert("অনুগ্ৰহ কৰি Transaction ID টো লিখক। ইয়াৰ অবিহনে বুকিং কনফৰ্ম নাথাকিব।"); return; }
-        
-        if(window.temporaryBookingData) {
-            const d = { name: window.temporaryBookingData.name, phone: window.temporaryBookingData.phone, problem: window.temporaryBookingData.problem, txn_id: txn };
-            const { error } = await _supabase.from('clinic_bookings').insert([d]);
-            if(!error) { alert("ধন্যবাদ! আপোনাৰ বুকিং সফলতাৰে সম্পন্ন হ’ল।"); location.reload(); }
-        }
-    }
-
-// হেলথ টিপছ স্লাইডাৰ লজিক
-let currentSlide = 0;
-setInterval(() => {
-    const track = document.getElementById('sliderTrack');
-    if (!track) return;
-    currentSlide = (currentSlide + 1) % 3;
-    let percentage = currentSlide * -33.333;
-    track.style.transform = `translateX(${percentage}%)`;
-}, 4000);
-
-// নতুন অনলাইন পৰামৰ্শ ফাংচনসমূহ
-function showConsultationForm() {
-    document.getElementById('loginArea').style.display = 'none';
-    document.getElementById('consultationForm').style.display = 'block';
-    document.getElementById('consStep1').style.display = 'block';
-    document.getElementById('consStep2').style.display = 'none';
-    document.getElementById('consStep3').style.display = 'none';
-}
-
-function hideConsultationForm() {
-    document.getElementById('consultationForm').style.display = 'none';
-    document.getElementById('loginArea').style.display = 'block';
-}
-
-function verifyConsStep1() {
-    const name = document.getElementById('consName').value.trim();
-    const phone = document.getElementById('consPhone').value.trim();
-    if(!name || !phone) { alert("অনুগ্ৰহ কৰি নাম আৰু ফোন নম্বৰ লিখক।"); return; }
-    document.getElementById('consStep1').style.display = 'none';
-    document.getElementById('consStep2').style.display = 'block';
-}
-
-function verifyConsPayment() {
-    const txn = document.getElementById('consTxn').value.trim();
-    if(!txn) { alert("অনুগ্ৰহ কৰি Transaction ID টো লিখক।"); return; }
-    document.getElementById('consStep2').style.display = 'none';
-    document.getElementById('consStep3').style.display = 'block';
-}
-
-async function submitConsultation() {
-    const name = document.getElementById('consName').value.trim();
-    const phone = document.getElementById('consPhone').value.trim();
-    const txn = document.getElementById('consTxn').value.trim();
-    const question = document.getElementById('consQuestion').value.trim();
-    
-    if(!question) { alert("অনুগ্ৰহ কৰি আপোনাৰ প্ৰশ্নটো লিখক।"); return; }
-    
-    const fullProblemDescription = `ONLINE CONSULTATION \nTxn ID: ${txn} \nQuestion: ${question}`;
-
-    try {
-        const { error } = await _supabase.from('clinic_bookings').insert([
-            { name: name, phone: phone, problem: fullProblemDescription }
-        ]);
-        
-        if(!error) { 
-            alert("ধন্যবাদ! আপোনাৰ পেমেণ্ট আৰু প্ৰশ্ন সফলতাৰে সম্পন্ন হ’ল। ডক্টৰে আপোনাক সোনকালেই যোগাযোগ কৰিব।"); 
-            location.reload(); 
-        } else {
-            console.error("Supabase Error:", error);
-            alert("দুঃখিত, ডাটাবেচৰ সৈতে সংযোগ কৰিব পৰা হোৱা নাই।");
-        }
-    } catch (e) {
-        console.error("Runtime Error:", e);
-        alert("কাৰিকৰী বিজুতি ঘটিছে।");
-    }
-}
-</script>
-</body>
-</html>
+    function showBookingForm() { document.getElementById('loginArea').style
