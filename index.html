@@ -393,6 +393,9 @@ function checkPass() {
         document.getElementById('loginArea').style.display = 'none';
         document.getElementById('mainApp').style.display = 'block';
         loadPatients(); loadAccounts(); loadBookings();
+        if(userRole !== 'admin'){
+    document.getElementById('nav-reports').style.display = 'none';
+}
     } else { 
         alert("ভুল পাছৱৰ্ড!"); 
     }
