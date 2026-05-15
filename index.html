@@ -127,7 +127,7 @@
 <body>
 
 <div id="loginArea" class="card no-print" style="max-width: 400px; margin: 40px auto; padding: 20px; text-align:center; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-radius: 20px;">
-<img src="doctor.jpg.jpeg"
+<img src="doctor.jpg"
 style="
 width:110px;
 height:110px;
@@ -338,9 +338,9 @@ style="padding:16px;border-radius:16px;border:1px solid #cbd5e1;background:white
         <div id="nav-bookings" class="nav-item" onclick="showTab('bookings')">
             <i class="fas fa-calendar-alt"></i><span>Bookings</span>
         </div>
-      <div id="nav-reports" class="nav-item" onclick="showTab('reports')">
-    <i class="fas fa-money-bill-wave"></i><span>খৰচ</span>
-</div>
+        <div id="nav-reports" class="nav-item" onclick="showTab('reports')">
+            <i class="fas fa-money-bill-wave"></i><span>খৰচ</span>
+        </div>
         <div id="nav-profile" class="nav-item" onclick="showTab('profile')">
             <i class="fas fa-user-md"></i><span>Profile</span>
         </div>
@@ -376,46 +376,25 @@ style="padding:16px;border-radius:16px;border:1px solid #cbd5e1;background:white
     let userRole = 'assistant'; 
 
 function checkPass() {
-
     const inputPass = document.getElementById('adminPass').value;
     const savedRole = sessionStorage.getItem('userRole');
 
     if (savedRole === 'admin' || inputPass === 'drharis1') {
-
         userRole = 'admin';
-
         sessionStorage.setItem('userRole', 'admin');
         sessionStorage.setItem('isLoggedIn', 'true');
-
         document.getElementById('loginArea').style.display = 'none';
         document.getElementById('mainApp').style.display = 'block';
-
-        document.getElementById('nav-reports').style.display = 'flex';
-
-        loadPatients();
-        loadAccounts();
-        loadBookings();
-
-    } else if (savedRole === 'assistant' || inputPass === 'assistant123') {
-
+        loadPatients(); loadAccounts(); loadBookings();
+    } else if (savedRole === 'assistant' || inputPass === 'assistant123') { 
         userRole = 'assistant';
-
         sessionStorage.setItem('userRole', 'assistant');
         sessionStorage.setItem('isLoggedIn', 'true');
-
         document.getElementById('loginArea').style.display = 'none';
         document.getElementById('mainApp').style.display = 'block';
-
-        document.getElementById('nav-reports').style.display = 'none';
-
-        loadPatients();
-        loadAccounts();
-        loadBookings();
-
-    } else {
-
-        alert("ভুল পাছৱৰ্ড!");
-
+        loadPatients(); loadAccounts(); loadBookings();
+    } else { 
+        alert("ভুল পাছৱৰ্ড!"); 
     }
 }
 
