@@ -267,10 +267,23 @@
     let currentEditPatientId = null; 
     let currentEditAccountId = null; 
 
-   function checkPass() {
-    // পেজ ল’ড হওতেই আগৰ লগ-ইন আছে নেকি পৰীক্ষা কৰিব
-    if (sessionStorage.getItem('isLoggedIn') === 'true' || document.getElementById('adminPass').value === 'drharis1') {
-        sessionStorage.setItem('isLoggedIn', 'true'); // মেমৰীত সংৰক্ষণ কৰিলে
+   let userRole = 'assistant'; // অবিকল্পিতভাৱে এচিষ্টেণ্ট ধৰা হৈছে
+
+function checkPass() {
+    const inputPass = document.getElementById('adminPass').value;
+    const savedRole = sessionStorage.getItem('userRole');
+
+    if (savedRole === 'admin' || inputPass === 'drharis1') {
+        userRole = 'admin';
+        sessionStorage.setItem('userRole', 'admin');
+        sessionStorage.setItem('isLoggedIn', 'true');
+        document.getElementById('loginArea').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+        loadPatients(); loadAccounts(); loadBookings();
+    } else if (savedRole === 'assistant' || inputPass === 'assistant123') { // এচিষ্টেণ্টৰ পাছৱৰ্ড
+        userRole = 'assistant';
+        sessionStorage.setItem('userRole', 'assistant');
+        sessionStorage.setItem('isLoggedIn', 'true');
         document.getElementById('loginArea').style.display = 'none';
         document.getElementById('mainApp').style.display = 'block';
         loadPatients(); loadAccounts(); loadBookings();
@@ -278,6 +291,12 @@
         alert("ভুল পাছৱৰ্ড!"); 
     }
 }
+
+window.onload = function() {
+    if (sessionStorage.getItem('isLoggedIn') === 'true') {
+        checkPass();
+    }
+};
 
 // পেজটো খোল খাই উঠিয়েই যাতে আগৰ লগ-ইন চেক কৰিব পাৰে, তাৰ বাবে এই তলৰ লাইনটো যোগ কৰক
 window.onload = function() {
