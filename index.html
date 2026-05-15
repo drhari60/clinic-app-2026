@@ -344,11 +344,13 @@
 <script>
     const supabaseUrl = 'https://oblvgjnyecvvnnnesegl.supabase.co';
     const supabaseKey = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9';
-    const _supabase = supabase.createClient(supabaseUrl, supabaseKey); // সমগ্ৰ ফাইলত '_supabase' অবজেক্টটো সক্ৰিয় ৰখা হৈছে
+    
+    // লাইব্ৰেৰীৰ সংযোগ সঠিক কৰা হৈছে
+    const _supabase = window.supabase.createClient(supabaseUrl, supabaseKey); 
+    
     let currentEditPatientId = null; 
     let currentEditAccountId = null; 
-
-   let userRole = 'assistant'; 
+    let userRole = 'assistant'; 
 
 function checkPass() {
     const inputPass = document.getElementById('adminPass').value;
@@ -407,7 +409,7 @@ window.onload = function() {
             const { error } = await _supabase.from('clinic_data').insert([d]);
             if(!error) {
                 if(fees > 0) await _supabase.from('clinic_accounts').insert([{ type: 'Income', amount: fees, note: 'ৰোগী: ' + name }]);
-                alert("Saved!"); location.reload();
+                alert("সংৰক্ষণ কৰা হ’ল!"); location.reload();
             }
         }
     }
@@ -543,7 +545,7 @@ window.onload = function() {
             if(!error) { alert("খৰচৰ হিচাপ শুধৰোৱা হ’ল!"); currentEditAccountId = null; }
         } else {
             const { error } = await _supabase.from('clinic_accounts').insert([{ type: type, amount: amt, note: `${cat}: ${note}` }]);
-            if(!error) alert("খৰচ চেভ কৰা হ'ল!");
+            if(!error) alert("খৰচ সংৰক্ষণ কৰা হ'ল!");
         }
         location.reload();
     }
@@ -589,7 +591,7 @@ window.onload = function() {
 
     async function closePaymentModal() {
         const txn = document.getElementById('modalTxn').value.trim();
-        if(!txn) { alert("অনুগ্ৰহ কৰি Transaction ID টো লিখক। ইয়াৰ অবিহনে বুকিং কনফৰ্ম নাثাকিব।"); return; }
+        if(!txn) { alert("অনুগ্ৰহ কৰি Transaction ID টো লিখক। ইয়াৰ অবিহনে বুকিং কনফৰ্ম নাথাকিব।"); return; }
         
         if(window.temporaryBookingData) {
             const d = { name: window.temporaryBookingData.name, phone: window.temporaryBookingData.phone, problem: window.temporaryBookingData.problem, txn_id: txn };
@@ -598,7 +600,7 @@ window.onload = function() {
         }
     }
 
-// হেলথ টিপছ স্লাইডার লজিক
+// হেলথ টিপছ স্লাইডাৰ লজিক
 let currentSlide = 0;
 setInterval(() => {
     const track = document.getElementById('sliderTrack');
@@ -608,7 +610,7 @@ setInterval(() => {
     track.style.transform = `translateX(${percentage}%)`;
 }, 4000);
 
-// নতুন অনলাইন পৰামৰ্শ ফৰ্ম নিয়ন্ত্ৰণৰ ফাংচনসমূহ
+// নতুন অনলাইন পৰামৰ্শ ফাংচনসমূহ
 function showConsultationForm() {
     document.getElementById('loginArea').style.display = 'none';
     document.getElementById('consultationForm').style.display = 'block';
@@ -637,7 +639,6 @@ function verifyConsPayment() {
     document.getElementById('consStep3').style.display = 'block';
 }
 
-// অনলাইন পৰামৰ্শ সুৰক্ষিতভাৱে ডাটাবেচত জমা কৰা ফাংচন
 async function submitConsultation() {
     const name = document.getElementById('consName').value.trim();
     const phone = document.getElementById('consPhone').value.trim();
@@ -649,7 +650,6 @@ async function submitConsultation() {
     const fullProblemDescription = `ONLINE CONSULTATION \nTxn ID: ${txn} \nQuestion: ${question}`;
 
     try {
-        // ইয়াত '_supabase' ব্যৱহাৰ কৰি এৰৰটো চিৰদিনৰ বাবে নাইকীয়া কৰা হৈছে
         const { error } = await _supabase.from('clinic_bookings').insert([
             { name: name, phone: phone, problem: fullProblemDescription }
         ]);
