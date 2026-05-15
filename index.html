@@ -163,10 +163,13 @@
             <div>খৰচ: <b id="totalExp">0</b></div>
         </div>
         <div class="card">
+            <h4 id="accFormTitle" style="margin:0 0 10px 0; color:var(--primary);">Expense Entry</h4>
             <input type="number" id="accAmount" placeholder="Amount (₹)">
             <input type="text" id="accNote" placeholder="Note">
-            <button class="btn-primary" onclick="addAccount('Expense')">SAVE EXPENSE</button>
+            <button class="btn-primary" id="accSaveBtn" onclick="addAccount('Expense')">SAVE EXPENSE</button>
+            <button id="accCancelBtn" style="display:none; background:none; border:none; color:red; margin-top:10px; width:100%;" onclick="clearAccForm()">Cancel Edit</button>
         </div>
+        <div id="expenseList"></div>
     </div>
 
     <div class="bottom-nav no-print">
@@ -184,6 +187,7 @@
     const supabaseKey = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9';
     const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
     let currentEditPatientId = null;
+    let currentEditAccountId = null; // New variable for accounts
 
     function checkPass() {
         if(document.getElementById('adminPass').value === 'drharis1') {
@@ -239,10 +243,8 @@
         document.getElementById('pHistory').value = p.history || '';
         document.getElementById('pMedicine').value = p.medicine;
         document.getElementById('pFees').value = p.fees || '';
-        
         document.getElementById('formTitle').innerText = "Edit: " + p.name;
         document.getElementById('saveBtn').innerText = "UPDATE";
-        
         showTab('newrx', document.querySelectorAll('.nav-item')[1]);
     }
 
@@ -260,20 +262,71 @@
         if(data) document.getElementById('listBookings').innerHTML = data.map(b => `<div style="padding:10px; border-bottom:1px solid #eee;">${b.name}</div>`).join('');
     }
 
+    /* --- ACCOUNT FUNCTIONS (MODIFIED) --- */
     async function loadAccounts() {
-        const { data } = await _supabase.from('clinic_accounts').select('*');
+        const { data } = await _supabase.from('clinic_accounts').select('*').order('created_at', { ascending: false });
         if(data) {
-            let i=0, e=0; data.forEach(d => d.type==='Income'?i+=d.amount:e+=d.amount);
+            let i=0, e=0; 
+            data.forEach(d => d.type==='Income'?i+=d.amount:e+=d.amount);
             document.getElementById('totalInc').innerText = '₹'+i;
             document.getElementById('totalExp').innerText = '₹'+e;
+
+            document.getElementById('expenseList').innerHTML = data.map(acc => `
+                <div class="card" style="padding:10px 15px; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <b style="color:${acc.type==='Income'?'green':'red'}">${acc.type}: ₹${acc.amount}</b><br>
+                            <small>${acc.note || 'No Note'}</small>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <i class="fas fa-edit" style="color:blue; cursor:pointer;" onclick='editAccount(${JSON.stringify(acc)})'></i>
+                            <i class="fas fa-trash" style="color:red; cursor:pointer;" onclick="deleteAccount('${acc.id}')"></i>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         }
     }
 
     async function addAccount(type) {
         const amt = parseInt(document.getElementById('accAmount').value);
+        const note = document.getElementById('accNote').value;
         if(!amt) return;
-        await _supabase.from('clinic_accounts').insert([{ type, amount: amt, note: document.getElementById('accNote').value }]);
+
+        if(currentEditAccountId) {
+            // Update existing
+            await _supabase.from('clinic_accounts').update({ amount: amt, note }).eq('id', currentEditAccountId);
+        } else {
+            // New Entry
+            await _supabase.from('clinic_accounts').insert([{ type, amount: amt, note }]);
+        }
         location.reload();
+    }
+
+    function editAccount(acc) {
+        currentEditAccountId = acc.id;
+        document.getElementById('accAmount').value = acc.amount;
+        document.getElementById('accNote').value = acc.note;
+        document.getElementById('accFormTitle').innerText = "Update Entry";
+        document.getElementById('accSaveBtn').innerText = "UPDATE";
+        document.getElementById('accCancelBtn').style.display = "block";
+        window.scrollTo(0, 0);
+    }
+
+    async function deleteAccount(id) {
+        if(confirm("এই ডেটা মচিব খুজিছে নেকি?")) {
+            await _supabase.from('clinic_accounts').delete().eq('id', id);
+            location.reload();
+        }
+    }
+
+    function clearAccForm() {
+        currentEditAccountId = null;
+        document.getElementById('accAmount').value = '';
+        document.getElementById('accNote').value = '';
+        document.getElementById('accFormTitle').innerText = "Expense Entry";
+        document.getElementById('accSaveBtn').innerText = "SAVE EXPENSE";
+        document.getElementById('accCancelBtn').style.display = "none";
     }
 
     function filterPatients() {
