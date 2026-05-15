@@ -267,13 +267,24 @@
     let currentEditPatientId = null; 
     let currentEditAccountId = null; 
 
-    function checkPass() {
-        if(document.getElementById('adminPass').value === 'drharis1') {
-            document.getElementById('loginArea').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            loadPatients(); loadAccounts(); loadBookings();
-        } else { alert("ভুল পাছৱৰ্ড!"); }
+   function checkPass() {
+    // পেজ ল’ড হওতেই আগৰ লগ-ইন আছে নেকি পৰীক্ষা কৰিব
+    if (sessionStorage.getItem('isLoggedIn') === 'true' || document.getElementById('adminPass').value === 'drharis1') {
+        sessionStorage.setItem('isLoggedIn', 'true'); // মেমৰীত সংৰক্ষণ কৰিলে
+        document.getElementById('loginArea').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+        loadPatients(); loadAccounts(); loadBookings();
+    } else { 
+        alert("ভুল পাছৱৰ্ড!"); 
     }
+}
+
+// পেজটো খোল খাই উঠিয়েই যাতে আগৰ লগ-ইন চেক কৰিব পাৰে, তাৰ বাবে এই তলৰ লাইনটো যোগ কৰক
+window.onload = function() {
+    if (sessionStorage.getItem('isLoggedIn') === 'true') {
+        checkPass();
+    }
+};
 
     function showTab(tabName) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
