@@ -463,13 +463,15 @@ window.onload = function() {
         document.getElementById('accCategory').scrollIntoView({behavior: 'smooth'});
     }
 
-    async function deleteAccount(id) {
-        if(confirm("আপুনি নিশ্চিতনে?")) {
-            const { error } = await _supabase.from('clinic_accounts').delete().eq('id', id);
-            if(!error) { alert("মচি দিয়া হ’ল!"); location.reload(); }
+   async function deleteAccount(id) {
+    if(confirm("আপুনি নিশ্চিতনে?")) {
+        const { error } = await _supabase.from('clinic_accounts').delete().eq('id', id);
+        if(!error) { 
+            alert("মচি দিয়া হ’ল!"); 
+            loadAccounts(); // ইয়াতেও পেজ ৰিলোড নহয়, কেৱল হিচাপ আপডেট হ’ব
         }
     }
-
+}
     async function loadBookings() {
         const { data } = await _supabase.from('clinic_bookings').select('*').order('created_at', { ascending: false });
         if(data) document.getElementById('listBookings').innerHTML = data.map(b => `<div class="card"><b>${b.name}</b> (${b.phone})<br>Txn ID: ${b.txn_id}</div>`).join('');
