@@ -613,6 +613,16 @@ window.onload = function() {
             if(!error) { alert("ধন্যবাদ! আপোনাৰ বুকিং সফলতাৰে সম্পন্ন হ’ল।"); location.reload(); }
         }
     }
+
+    // এইখিনি জাভাস্ক্ৰিপ্টৰ একেবাৰে শেষত তলত যোগ কৰি দিয়ক, যাতে টিপছবোৰ সলনি হৈ থাকে
+let currentSlide = 0;
+setInterval(() => {
+    const slides = document.querySelectorAll('.health-slide');
+    if(!slides.length) return;
+    slides[currentSlide].classList.remove('active-slide');
+    currentSlide = (currentSlide + 1) % slides.length;
+    slides[currentSlide].classList.add('active-slide');
+}, 3000); // প্ৰতি ৩ চেকেণ্ডত নিজে নিজে সলনি হ’ব
 </script>
 </body>
 </html>
