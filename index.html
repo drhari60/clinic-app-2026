@@ -384,12 +384,48 @@ window.onload = function() {
         window.print();
     }
 
-    function sendWhatsApp(p) {
-        const clinicHeader = "🏥 *DR. HARIS HOMEOPATHIC CLINIC*\n📍 গোগামুখ, ধেমাজি, অসম\n📞 ফোন: 9707722511\n----------------------------\n\n";
-        const socialLinks = "\n\n----------------------------\n🔗 *Follow us for Health Tips:*\n📘 Facebook: https://www.facebook.com/drhari365\n📺 YouTube: https://www.youtube.com/@drhari\n📸 Instagram: https://www.instagram.com/drharikanta\n🌐 Website: https://www.drhariswellfuture.com";
-        const fullMessage = clinicHeader + `*Prescription for:* ${p.name}\n` + `*Age/Sex:* ${p.age || 'N/A'}\n` + `*History:* ${p.history || 'N/A'}\n` + `*Rx (Medicines):*\n${p.medicine}` + socialLinks;
-        window.open(`https://wa.me/91${p.phone}?text=${encodeURIComponent(fullMessage)}`);
+   function sendWhatsApp(p) {
+    if (!p.phone) {
+        alert("ৰোগীৰ ম’বাইল নম্বৰ নাই!");
+        return;
     }
+
+    // ক্লিনিকৰ হেডাৰ
+    const clinicHeader = "🏥 *DR. HARIS HOMEOPATHIC CLINIC*\n" +
+                         "📍 গোগামুখ, ধেমাজি, অসম\n" +
+                         "📞 ফোন: 9707722511\n" +
+                         "----------------------------\n\n";
+
+    // আপোনাৰ ছচিয়েল মিডিয়া লিংকসমূহ
+    const socialLinks = "\n\n----------------------------\n" +
+                        "🔗 *Follow us for Health Tips:*\n" +
+                        "📘 Facebook: https://www.facebook.com/drhari365\n" +
+                        "📺 YouTube: https://www.youtube.com/@drhari\n" +
+                        "📸 Instagram: https://www.instagram.com/drharikanta\n" +
+                        "🌐 Website: https://www.drhariswellfuture.com";
+
+    // সম্পূৰ্ণ মেছেজটো টেক্সট ফৰ্মেটত প্ৰস্তুত কৰা হৈছে
+    const fullMessage = clinicHeader +
+                        `*Prescription for:* ${p.name}\n` +
+                        `*Age/Sex:* ${p.age || 'N/A'}\n` +
+                        `*History:* ${p.history || 'N/A'}\n` +
+                        `*Rx (Medicines):*\n${p.medicine}` + 
+                        socialLinks;
+
+    // ৰোগীৰ নম্বৰটো পৰিষ্কাৰ কৰা (স্পেচ বা ড্যাশ থাকিলে আঁতৰাই দিব)
+    let cleanPhone = p.phone.replace(/\D/g, '');
+    
+    // যদি নম্বৰটো ১০টা সংখ্যাৰ হয়, তেন্তে আগত ৯১ যোগ কৰিব
+    if (cleanPhone.length === 10) {
+        cleanPhone = '91' + cleanPhone;
+    }
+
+    // মেছেজটো সুৰক্ষিতভাৱে এনক’ড কৰা হৈছে যাতে হোৱাটছএপে লিংকটো ভাঙিব নোৱাৰে
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(fullMessage)}`;
+    
+    // নতুন টেবত হোৱাটছএপ মুকলি কৰা
+    window.open(whatsappUrl, '_blank');
+}
 
     function sendReminder(p) {
         const text = `নমস্কাৰ ${p.name} ডাঙৰীয়া/আইদেউ,\nড° হৰি ক্লিনিকৰ পৰা আপোনাক মনত পেলাই দিয়া হৈছে যে আপোনাৰ ঔষধ খোৱাৰ সময় হৈছে। সুস্থ থাকক।\n--- 📞 9707722511`;
