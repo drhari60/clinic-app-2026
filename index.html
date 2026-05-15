@@ -102,6 +102,7 @@
             font-weight: 700;
             transition: all 0.3s ease;
             flex: 1;
+            cursor: pointer;
         }
 
         .nav-item i { font-size: 20px; margin-bottom: 4px; }
@@ -153,19 +154,22 @@
             <input type="text" id="searchBox" placeholder="🔍 নাম বা নম্বৰ দি বিচাৰক..." onkeyup="filterPatients()">
         </div>
         <div id="listPatients"></div>
-        
+    </div>
+
+    <div id="section-newrx" class="tab-content" style="display:none;">
         <div class="card" id="newEntryForm">
-            <h3 style="color: var(--primary); margin-top:0;">New Rx Entry</h3>
+            <h3 style="color: var(--primary); margin-top:0;" id="formTitle">New Rx Entry</h3>
             <input type="text" id="pName" placeholder="ৰোগীৰ নাম">
             <div style="display:flex; gap:10px;">
                 <input type="text" id="pAgeSex" placeholder="বয়স/লিংগ">
                 <input type="text" id="pBP" placeholder="BP">
             </div>
             <input type="text" id="pPhone" placeholder="মোবাইল নম্বৰ">
-            <textarea id="pHistory" placeholder="Patient History"></textarea>
-            <textarea id="pMedicine" placeholder="Rx (ঔষধসমূহ)"></textarea>
+            <textarea id="pHistory" placeholder="Patient History" style="height: 100px;"></textarea>
+            <textarea id="pMedicine" placeholder="Rx (ঔষধসমূহ)" style="height: 150px;"></textarea>
             <input type="number" id="pFees" placeholder="Fees (₹)">
-            <button class="btn-primary" onclick="addPatient()">SAVE Rx</button>
+            <button class="btn-primary" id="saveBtn" onclick="addPatient()">SAVE Rx</button>
+            <button class="btn-primary" style="background:#95a5a6; margin-top:10px;" onclick="clearForm()">CLEAR FORM</button>
         </div>
     </div>
 
@@ -206,16 +210,19 @@
     </div>
 
     <div class="bottom-nav no-print">
-        <a href="javascript:void(0)" class="nav-item active" onclick="showTab('home')">
-            <i class="fas fa-home"></i><span>Home</span>
+        <a class="nav-item active" onclick="showTab('home', this)">
+            <i class="fas fa-search"></i><span>Search</span>
         </a>
-        <a href="javascript:void(0)" class="nav-item" onclick="showTab('bookings')">
+        <a class="nav-item" onclick="showTab('newrx', this)">
+            <i class="fas fa-plus-circle" style="font-size:24px; color:var(--accent);"></i><span>New Rx</span>
+        </a>
+        <a class="nav-item" onclick="showTab('bookings', this)">
             <i class="fas fa-calendar-alt"></i><span>Bookings</span>
         </a>
-        <a href="javascript:void(0)" class="nav-item" onclick="showTab('reports')">
+        <a class="nav-item" onclick="showTab('reports', this)">
             <i class="fas fa-chart-line"></i><span>Accounts</span>
         </a>
-        <a href="javascript:void(0)" class="nav-item" onclick="showTab('profile')">
+        <a class="nav-item" onclick="showTab('profile', this)">
             <i class="fas fa-user-md"></i><span>Profile</span>
         </a>
     </div>
@@ -236,7 +243,6 @@
     const supabaseKey = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9';
     const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
     let currentEditPatientId = null;
-    let currentEditAccountId = null;
 
     function checkPass() {
         if(document.getElementById('adminPass').value === 'drharis1') {
@@ -246,11 +252,11 @@
         } else { alert("ভুল পাছৱৰ্ড!"); }
     }
 
-    function showTab(tabName) {
+    function showTab(tabName, el) {
         document.querySelectorAll('.tab-content').forEach(div => div.style.display = 'none');
         document.getElementById('section-' + tabName).style.display = 'block';
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        event.currentTarget.classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        if(el) el.classList.add('active');
     }
 
     async function addPatient() {
@@ -270,19 +276,20 @@
 
         if(!error) {
             if(fees > 0 && !currentEditPatientId) await _supabase.from('clinic_accounts').insert([{ type: 'Income', amount: fees, note: 'ৰোগী: ' + name }]);
-            alert("Success!"); location.reload();
-        }
+            alert("সংৰক্ষণ কৰা হ'ল!"); location.reload();
+        } else { alert("Error: " + error.message); }
     }
 
     async function loadPatients() {
         const { data } = await _supabase.from('clinic_data').select('*').order('created_at', { ascending: false });
         if(data) document.getElementById('listPatients').innerHTML = data.map(p => `
             <div class="card">
-                <b>${p.name}</b> (${p.phone})
-                <div style="margin-top:10px; display:flex; gap:5px;">
-                    <button onclick='printPrescription(${JSON.stringify(p)})' style="padding:5px; flex:1;">Print</button>
-                    <button onclick='sendWhatsApp(${JSON.stringify(p)})' style="padding:5px; flex:1; background:#25d366; color:white; border:none; border-radius:5px;">WA</button>
-                    <button onclick='editPatientInline(${JSON.stringify(p)})' style="padding:5px; flex:1; background:#3498db; color:white; border:none; border-radius:5px;">Edit</button>
+                <div style="font-size:18px;"><b>${p.name}</b></div>
+                <div style="color:#666; font-size:14px; margin:5px 0;">ID: ${p.id.substring(0,8)} | ${p.phone || 'No Phone'}</div>
+                <div style="margin-top:10px; display:flex; gap:8px;">
+                    <button onclick='printPrescription(${JSON.stringify(p)})' style="padding:10px; flex:1; border-radius:8px; border:1px solid #ddd; background:white;"><i class="fas fa-print"></i> Print</button>
+                    <button onclick='sendWhatsApp(${JSON.stringify(p)})' style="padding:10px; flex:1; background:#25d366; color:white; border:none; border-radius:8px;"><i class="fab fa-whatsapp"></i> WA</button>
+                    <button onclick='editPatientInline(${JSON.stringify(p)})' style="padding:10px; flex:1; background:#3498db; color:white; border:none; border-radius:8px;"><i class="fas fa-edit"></i> Edit</button>
                 </div>
             </div>`).join('');
     }
@@ -291,14 +298,38 @@
         currentEditPatientId = p.id;
         document.getElementById('pName').value = p.name;
         document.getElementById('pAgeSex').value = p.age || '';
-        document.getElementById('pPhone').value = p.phone;
+        document.getElementById('pBP').value = p.bp || '';
+        document.getElementById('pPhone').value = p.phone || '';
+        document.getElementById('pHistory').value = p.history || '';
         document.getElementById('pMedicine').value = p.medicine;
-        document.getElementById('newEntryForm').scrollIntoView();
+        document.getElementById('pFees').value = p.fees || 0;
+        
+        document.getElementById('formTitle').innerText = "Update Rx: " + p.name;
+        document.getElementById('saveBtn').innerText = "UPDATE Rx";
+        document.getElementById('saveBtn').style.background = "#e67e22";
+        
+        // Switch to New Rx tab
+        const rxTab = document.querySelectorAll('.nav-item')[1];
+        showTab('newrx', rxTab);
+    }
+
+    function clearForm() {
+        currentEditPatientId = null;
+        document.getElementById('pName').value = '';
+        document.getElementById('pAgeSex').value = '';
+        document.getElementById('pBP').value = '';
+        document.getElementById('pPhone').value = '';
+        document.getElementById('pHistory').value = '';
+        document.getElementById('pMedicine').value = '';
+        document.getElementById('pFees').value = '';
+        document.getElementById('formTitle').innerText = "New Rx Entry";
+        document.getElementById('saveBtn').innerText = "SAVE Rx";
+        document.getElementById('saveBtn').style.background = "var(--primary)";
     }
 
     async function loadBookings() {
         const { data } = await _supabase.from('clinic_bookings').select('*').order('created_at', { ascending: false });
-        if(data) document.getElementById('listBookings').innerHTML = data.map(b => `<div style="border-bottom:1px solid #eee; padding:10px;"><b>${b.name}</b><br>ID: ${b.txn_id}</div>`).join('');
+        if(data) document.getElementById('listBookings').innerHTML = data.map(b => `<div style="border-bottom:1px solid #eee; padding:15px;"><b>${b.name}</b> (${b.phone})<br><small style="color:gray;">ID: ${b.txn_id} | ${new Date(b.created_at).toLocaleDateString()}</small></div>`).join('');
     }
 
     async function loadAccounts() {
@@ -320,33 +351,58 @@
 
     function filterPatients() {
         const term = document.getElementById('searchBox').value.toLowerCase();
-        document.querySelectorAll('#listPatients .card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(term) ? 'block' : 'none');
+        document.querySelectorAll('#listPatients .card').forEach(c => {
+            c.style.display = c.innerText.toLowerCase().includes(term) ? 'block' : 'none';
+        });
     }
 
-    function showBookingForm() { document.getElementById('loginArea').style.display = 'none'; document.getElementById('bookingForm').style.display = 'block'; }
+    function showBookingForm() { 
+        document.getElementById('loginArea').style.display = 'none'; 
+        document.getElementById('bookingForm').style.display = 'block'; 
+    }
     
     function printPrescription(p) {
-        document.getElementById('printArea').innerHTML = `<div style="text-align:center;"><h2>DR. HARIS CLINIC</h2><hr><h3>Rx for ${p.name}</h3><p>${p.medicine.replace(/\n/g, '<br>')}</p></div>`;
+        document.getElementById('printArea').innerHTML = `
+            <div style="padding:40px; font-family:sans-serif;">
+                <div style="text-align:center;">
+                    <h1 style="margin:0; color:#004d40;">DR. HARIS CLINIC</h1>
+                    <p>Gogamukh, Dhemaji, Assam</p>
+                    <hr>
+                </div>
+                <div style="margin-top:20px;">
+                    <p><b>Patient:</b> ${p.name} (${p.age})</p>
+                    <p><b>BP:</b> ${p.bp} | <b>Date:</b> ${new Date(p.created_at).toLocaleDateString()}</p>
+                    <hr>
+                    <h3>Rx:</h3>
+                    <div style="min-height:300px; font-size:18px; line-height:1.6;">
+                        ${p.medicine.replace(/\n/g, '<br>')}
+                    </div>
+                </div>
+                <div style="margin-top:50px; text-align:right;">
+                    <p>___________________<br>Signature</p>
+                </div>
+            </div>`;
         window.print();
     }
 
     function sendWhatsApp(p) {
-        window.open(`https://wa.me/91${p.phone}?text=Dr. Haris Clinic Rx: ${encodeURIComponent(p.medicine)}`);
+        const msg = `*Dr. Haris Clinic Rx*%0A*Patient:* ${p.name}%0A*Medicine:*%0A${encodeURIComponent(p.medicine)}`;
+        window.open(`https://wa.me/91${p.phone}?text=${msg}`);
     }
 
     async function submitBooking() {
         const name = document.getElementById('bName').value;
         const phone = document.getElementById('bPhone').value;
-        if(!name || !phone) return alert("Fill data!");
+        if(!name || !phone) return alert("তথ্যখিনি সম্পূৰ্ণকৈ লিখক!");
         window.temporaryBookingData = { name, phone, problem: document.getElementById('bProblem').value };
         document.getElementById('paymentModal').style.display = 'flex';
     }
 
     async function closePaymentModal() {
         const txn = document.getElementById('bTxnInput').value;
-        if(!txn) return alert("Enter ID");
+        if(!txn) return alert("Transaction ID লিখক");
         const { error } = await _supabase.from('clinic_bookings').insert([{ ...window.temporaryBookingData, txn_id: txn }]);
-        if(!error) { alert("Booked!"); location.reload(); }
+        if(!error) { alert("বুকিং সফল হ'ল!"); location.reload(); }
     }
 </script>
 </body>
