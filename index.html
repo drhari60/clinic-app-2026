@@ -118,14 +118,51 @@
 </head>
 <body>
 
-<div id="loginArea" class="card no-print" style="max-width: 400px; margin: 80px auto; text-align:center;">
-    <h2 style="color: var(--primary);">Dr. Haris Clinic</h2>
-    <input type="password" id="adminPass" placeholder="পাছৱৰ্ড দিয়ক">
-    <div style="display:flex; gap:10px;">
-        <button class="btn-primary" onclick="checkPass()">LOGIN</button>
-        <button class="btn-primary" style="background:#555;" onclick="showBookingForm()">BOOK NOW</button>
+<div id="loginArea" class="card no-print" style="max-width: 400px; margin: 40px auto; padding: 20px; text-align:center; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-radius: 20px;">
+    <h2 style="color: var(--primary); margin-bottom: 20px; font-weight: 700;">Dr. Haris Clinic</h2>
+    
+    <input type="password" id="adminPass" placeholder="পাছৱৰ্ড দিয়ক" style="margin-bottom: 15px;">
+    
+    <div style="display:flex; gap:10px; margin-bottom: 20px;">
+        <button class="btn-primary" onclick="checkPass()" style="flex: 1;">LOGIN</button>
+        <button class="btn-primary" style="background:#555; flex: 1;" onclick="showBookingForm()">BOOK NOW</button>
+    </div>
+
+    <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+        <p style="margin: 0 0 10px 0; font-size: 13px; font-weight: bold; color: #555;">আমাৰ Social Media ৰ সৈতে জড়িত হওক:</p>
+        <div style="display: flex; justify-content: center; gap: 20px; font-size: 24px;">
+            <a href="https://www.facebook.com/drhari365" target="_blank" style="color: #1877F2;"><i class="fab fa-facebook"></i></a>
+            <a href="https://www.youtube.com/@drhari" target="_blank" style="color: #FF0000;"><i class="fab fa-youtube"></i></a>
+            <a href="https://www.instagram.com/drharikanta" target="_blank" style="color: #E1306C;"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.drhariswellfuture.com" target="_blank" style="color: #004d40;"><i class="fas fa-globe"></i></a>
+        </div>
+    </div>
+
+    <div style="margin-top: 20px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; height: 150px;">
+        <div class="health-slide active-slide" style="background: linear-gradient(135deg, #004d40, #00796b); color: white; padding: 20px; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; position: absolute; width: 100%; transition: opacity 0.8s ease-in-out;">
+            <i class="fas fa-heartbeat" style="font-size: 26px; margin-bottom: 8px; color: #a7ffeb;"></i>
+            <h4 style="margin: 0 0 5px 0; font-size: 15px;">প্ৰতিদিনে পুৱা-গধূলি অন্তত ৩০/৪০ মিনিট খোজ কাঢ়ক</h4>
+            <p style="margin: 0; font-size: 12px; color: #e0f2f1;">হৃদযন্ত্ৰ সুস্থ ৰাখিবলৈ দৈনিক ৪০ মিনিট খোজ কাঢ়াটো অতি জৰুৰী।</p>
+        </div>
+        
+        <div class="health-slide" style="background: linear-gradient(135deg, #1565c0, #1e88e5); color: white; padding: 20px; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; position: absolute; width: 100%; opacity: 0; transition: opacity 0.8s ease-in-out;">
+            <i class="fas fa-tint" style="font-size: 26px; margin-bottom: 8px; color: #90caf9;"></i>
+            <h4 style="margin: 0 0 5px 0; font-size: 15px;">পৰ্যাপ্ত পৰিমাণে পানী খাওক</h4>
+            <p style="margin: 0; font-size: 12px; color: #e3f2fd;">শৰীৰটোক হাইড্ৰেট কৰি ৰাখিবলৈ দিনটোত ৩-৪ লিটাৰ পানী খোৱা উচিত।</p>
+        </div>
+
+        <div class="health-slide" style="background: linear-gradient(135deg, #2e7d32, #43a047); color: white; padding: 20px; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; position: absolute; width: 100%; opacity: 0; transition: opacity 0.8s ease-in-out;">
+            <i class="fas fa-apple-alt" style="font-size: 26px; margin-bottom: 8px; color: #a5d6a7;"></i>
+            <h4 style="margin: 0 0 5px 0; font-size: 15px;">প্ৰাকৃতিক সুষম আহাৰ লওক</h4>
+            <p style="margin: 0; font-size: 12px; color: #e8f5e9;">ফাষ্ট ফুড, জাঙ্ক ফুড বৰ্জন কৰক, সেউজীয়া শাক-পাচলি আৰু ফল-মূল বেছিকৈ খাওক।</p>
+        </div>
     </div>
 </div>
+
+<style>
+    .health-slide { opacity: 0; z-index: 1; }
+    .health-slide.active-slide { opacity: 1; z-index: 2; }
+</style>
 
 <div id="bookingForm" class="container no-print" style="max-width: 500px; margin: 20px auto; display:none;">
     <div class="card">
