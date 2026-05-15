@@ -706,24 +706,42 @@ function verifyConsPayment() {
 }
 
 // তৃতীয় খোজ: ডাটাবেচত প্ৰশ্ন আৰু পেমেণ্ট আইডি জমা কৰা
+// তৃতীয় খোজ: ডাটাবেচত প্ৰশ্ন আৰু পেমেণ্ট আইডি জমা কৰা (মেৰামত কৰা সংস্কৰণ)
 async function submitConsultation() {
     const name = document.getElementById('consName').value.trim();
     const phone = document.getElementById('consPhone').value.trim();
     const txn = document.getElementById('consTxn').value.trim();
     const question = document.getElementById('consQuestion').value.trim();
     
-    if(!question) { alert("অনুগ্ৰহ কৰি আপোনাৰ প্ৰশ্নটো লিখক।"); return; }
+    if(!question) { 
+        alert("অনুগ্ৰহ কৰি আপোনাৰ প্ৰশ্নটো লিখক।"); 
+        return; 
+    }
     
-    // আপোনাৰ Supabase টেবুলত ডাটা জমা কৰা
-    const { error } = await _supabase.from('clinic_bookings').insert([
-        { name: name, phone: phone, problem: "ONLINE CONSULTATION: " + question, txn_id: txn }
-    ]);
-    
-    if(!error) { 
-        alert("ধন্যবাদ! আপোনাৰ পেমেণ্ট আৰু প্ৰশ্ন সফলতাৰে সম্পন্ন হ’ল। ডক্টৰে আপোনাক সোনকালেই যোগাযোগ কৰিব।"); 
-        location.reload(); 
-    } else {
-        alert("দুঃখিত, কিবা কাৰিকৰী বিজুতি ঘটিছে। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।");
+    // ইয়াত আমি সুৰক্ষিতভাৱে 'problem' কলামৰ ভিতৰতে প্ৰশ্ন আৰু Txn ID দুয়োটো সুমুৱাই দিছোঁ
+    // ইয়াৰ ফলত আপোনাৰ Supabase টেবুলত নতুন কলাম বনোৱাৰ কোনো প্ৰয়োজন নহব
+    const fullProblemDescription = `ONLINE CONSULTATION \nTxn ID: ${txn} \nQuestion: ${question}`;
+
+    try {
+        // ইয়াৰ পৰা আণ্ডাৰস্ক'ৰ (_) টো আঁতৰাই কেৱল supabase কৰা হৈছে
+        const { error } = await supabase.from('clinic_bookings').insert([
+            { 
+                name: name, 
+                phone: phone, 
+                problem: fullProblemDescription
+            }
+        ]);
+        
+        if(!error) { 
+            alert("ধন্যবাদ! আপোনাৰ পেমেণ্ট আৰু প্ৰশ্ন সফলতাৰে সম্পন্ন হ’ল। ডক্টৰে আপোনাক সোনকালেই যোগাযোগ কৰিব।"); 
+            location.reload(); 
+        } else {
+            console.error("Supabase Error:", error);
+            alert("দুঃখিত, ডাটাবেচৰ সৈতে সংযোগ কৰিব পৰা হোৱা নাই। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।");
+        }
+    } catch (e) {
+        console.error("Runtime Error:", e);
+        alert("কাৰিকৰী বিজুতি ঘটিছে। ক’ডৰ নামটো এবাৰ পৰীক্ষা কৰক।");
     }
 }
 </script>
