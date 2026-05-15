@@ -416,6 +416,10 @@ window.onload = function() {
     }
 
     async function addPatient() {
+        if(sessionStorage.getItem('userRole') !== 'admin'){
+    alert("Unauthorized Access!");
+    return;
+}
         const fees = parseInt(document.getElementById('pFees').value) || 0;
         const name = document.getElementById('pName').value;
         if(!name) { alert("অনুগ্ৰহ কৰি ৰোগীৰ নাম লিখক!"); return; }
