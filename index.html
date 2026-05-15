@@ -669,6 +669,63 @@ setInterval(() => {
     
     track.style.transform = `translateX(${percentage}%)`;
 }, 4000); // প্ৰতি ৪ চেকেণ্ডত একোখনকৈ স্লাইড স্মুথভাৱে পিছলি আহিব
+
+// অনলাইন পৰামৰ্শ ফৰ্ম দেখুওৱা আৰু লুকুওৱা লজিক (ই বুটামটোক সক্ৰিয় কৰিব)
+function showConsultationForm() {
+    document.getElementById('loginArea').style.display = 'none';
+    document.getElementById('consultationForm').style.display = 'block';
+    document.getElementById('consStep1').style.display = 'block';
+    document.getElementById('consStep2').style.display = 'none';
+    document.getElementById('consStep3').style.display = 'none';
+}
+
+function hideConsultationForm() {
+    document.getElementById('consultationForm').style.display = 'none';
+    document.getElementById('loginArea').style.display = 'block';
+}
+
+// প্ৰথম খোজ: নাম আৰু ফোন নম্বৰ চেক কৰা
+function verifyConsStep1() {
+    const name = document.getElementById('consName').value.trim();
+    const phone = document.getElementById('consPhone').value.trim();
+    if(!name || !phone) { alert("অনুগ্ৰহ কৰি নাম আৰু ফোন নম্বৰ লিখক।"); return; }
+    
+    // দ্বিতীয় খোজলৈ যোৱা (পেমেণ্ট স্ক্ৰীন)
+    document.getElementById('consStep1').style.display = 'none';
+    document.getElementById('consStep2').style.display = 'block';
+}
+
+// দ্বিতীয় খোজ: পেমেণ্ট আইডি চেক কৰি প্ৰশ্নৰ বাকচ খোলা
+function verifyConsPayment() {
+    const txn = document.getElementById('consTxn').value.trim();
+    if(!txn) { alert("অনুগ্ৰহ কৰি Transaction ID টো লিখক। ইয়াৰ অবিহনে প্ৰশ্ন সুধিব নোৱাৰিব।"); return; }
+    
+    // পেমেণ্ট আইডি লিখাৰ পাছতহে ৩ নম্বৰ খোজ (প্ৰশ্নৰ বাকচ) খোল খাব
+    document.getElementById('consStep2').style.display = 'none';
+    document.getElementById('consStep3').style.display = 'block';
+}
+
+// তৃতীয় খোজ: ডাটাবেচত প্ৰশ্ন আৰু পেমেণ্ট আইডি জমা কৰা
+async function submitConsultation() {
+    const name = document.getElementById('consName').value.trim();
+    const phone = document.getElementById('consPhone').value.trim();
+    const txn = document.getElementById('consTxn').value.trim();
+    const question = document.getElementById('consQuestion').value.trim();
+    
+    if(!question) { alert("অনুগ্ৰহ কৰি আপোনাৰ প্ৰশ্নটো লিখক।"); return; }
+    
+    // আপোনাৰ Supabase টেবুলত ডাটা জমা কৰা
+    const { error } = await _supabase.from('clinic_bookings').insert([
+        { name: name, phone: phone, problem: "ONLINE CONSULTATION: " + question, txn_id: txn }
+    ]);
+    
+    if(!error) { 
+        alert("ধন্যবাদ! আপোনাৰ পেমেণ্ট আৰু প্ৰশ্ন সফলতাৰে সম্পন্ন হ’ল। ডক্টৰে আপোনাক সোনকালেই যোগাযোগ কৰিব।"); 
+        location.reload(); 
+    } else {
+        alert("দুঃখিত, কিবা কাৰিকৰী বিজুতি ঘটিছে। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।");
+    }
+}
 </script>
 </body>
 </html>
