@@ -613,15 +613,17 @@ window.onload = function() {
         }
     }
 
-    // এইখিনি জাভাস্ক্ৰিপ্টৰ একেবাৰে শেষত তলত যোগ কৰি দিয়ক, যাতে টিপছবোৰ সলনি হৈ থাকে
+   // সোঁফালৰ পৰা স্লাইড হৈ অহাকৈ নতুন টাইমাৰ ক’ড
 let currentSlide = 0;
 setInterval(() => {
-    const slides = document.querySelectorAll('.health-slide');
-    if(!slides.length) return;
-    slides[currentSlide].classList.remove('active-slide');
-    currentSlide = (currentSlide + 1) % slides.length;
-    slides[currentSlide].classList.add('active-slide');
-}, 3000); // প্ৰতি ৩ চেকেণ্ডত নিজে নিজে সলনি হ’ব
+    const track = document.getElementById('sliderTrack');
+    if (!track) return;
+    
+    currentSlide = (currentSlide + 1) % 3; // ৩ টা স্লাইডৰ বাবে
+    let percentage = currentSlide * -33.333; // বাওঁফাললৈ ঠেলি দিয়াৰ হিচাপ
+    
+    track.style.transform = `translateX(${percentage}%)`;
+}, 4000); // প্ৰতি ৪ চেকেণ্ডত একোখনকৈ স্লাইড স্মুথভাৱে পিছলি আহিব
 </script>
 </body>
 </html>
