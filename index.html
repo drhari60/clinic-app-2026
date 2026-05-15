@@ -363,11 +363,14 @@ window.onload = function() {
     }
 
     async function deletePatient(id) {
-        if(confirm("আপুনি এই ৰোগীৰ সম্পূৰ্ণ ৰেকৰ্ড মচি দিব খোজে নেকি?")) {
-            const { error } = await _supabase.from('clinic_data').delete().eq('id', id);
-            if(!error) { alert("ৰোগীৰ ৰেকৰ্ড মচি দিয়া হ’ল!"); location.reload(); }
+    if(confirm("আপুনি এই ৰোগীৰ সম্পূৰ্ণ ৰেকৰ্ড মচি দিব খোজে নেকি?")) {
+        const { error } = await _supabase.from('clinic_data').delete().eq('id', id);
+        if(!error) { 
+            alert("ৰোগীৰ ৰেকৰ্ড মচি দিয়া হ’ল!"); 
+            loadPatients(); // পেজ ৰিলোড নকৰাকৈ কেৱল লিষ্টখন আপডেট কৰিব
         }
     }
+}
 
     function printPrescription(p) {
         document.getElementById('printArea').innerHTML = `
