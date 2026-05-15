@@ -344,11 +344,11 @@
 <script>
     const supabaseUrl = 'https://oblvgjnyecvvnnnesegl.supabase.co';
     const supabaseKey = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9';
-    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    const _supabase = supabase.createClient(supabaseUrl, supabaseKey); // সমগ্ৰ ফাইলত '_supabase' অবজেক্টটো সক্ৰিয় ৰখা হৈছে
     let currentEditPatientId = null; 
     let currentEditAccountId = null; 
 
-   let userRole = 'assistant'; // অবিকল্পিতভাৱে এচিষ্টেণ্ট ধৰা হৈছে
+   let userRole = 'assistant'; 
 
 function checkPass() {
     const inputPass = document.getElementById('adminPass').value;
@@ -361,7 +361,7 @@ function checkPass() {
         document.getElementById('loginArea').style.display = 'none';
         document.getElementById('mainApp').style.display = 'block';
         loadPatients(); loadAccounts(); loadBookings();
-    } else if (savedRole === 'assistant' || inputPass === 'assistant123') { // এচিষ্টেণ্টৰ পাছৱৰ্ড
+    } else if (savedRole === 'assistant' || inputPass === 'assistant123') { 
         userRole = 'assistant';
         sessionStorage.setItem('userRole', 'assistant');
         sessionStorage.setItem('isLoggedIn', 'true');
@@ -373,13 +373,6 @@ function checkPass() {
     }
 }
 
-window.onload = function() {
-    if (sessionStorage.getItem('isLoggedIn') === 'true') {
-        checkPass();
-    }
-};
-
-// পেজটো খোল খাই উঠিয়েই যাতে আগৰ লগ-ইন চেক কৰিব পাৰে, তাৰ বাবে এই তলৰ লাইনটো যোগ কৰক
 window.onload = function() {
     if (sessionStorage.getItem('isLoggedIn') === 'true') {
         checkPass();
@@ -421,13 +414,9 @@ window.onload = function() {
 
     async function loadPatients() {
     const { data } = await _supabase.from('clinic_data').select('*').order('created_at', { ascending: false });
-    
-    // ব্ৰাউজাৰৰ মেমৰীৰ পৰা ৰোলটো চেক কৰা হৈছে
     const currentRole = sessionStorage.getItem('userRole') || userRole;
 
     if(data) document.getElementById('listPatients').innerHTML = data.map(p => {
-        
-        // যদি ইউজাৰজন ড° হৰি (Admin) হয়, তেতিয়াহে এডিট-ডিলিট বুটাম ওলাব, নহলে খালী থাকিব
         const adminControls = currentRole === 'admin' ? `
             <div style="display:flex; gap:12px;">
                 <button onclick='editPatientInline(${JSON.stringify(p)})' style="background:none; border:none; color:#3498db; font-size:18px; cursor:pointer;"><i class="fas fa-edit"></i></button>
@@ -474,19 +463,13 @@ window.onload = function() {
     }
 
     async function deletePatient(id) {
-    // ইয়াতে প্ৰথমে চেক কৰিব যে ইউজাৰজন এডমিন হয়নে নহয়
     if (sessionStorage.getItem('userRole') !== 'admin') { 
         alert("অনুমতি নাই! কেৱল ড° হৰিয়েহে মচিব পাৰিব।"); 
         return; 
     }
-
-    // যদি এডমিন হয়, তেতিয়াহে তলৰ ডিলিট প্ৰক্ৰিয়াটো চলিব
     if(confirm("আপুনি এই ৰোগীৰ সম্পূৰ্ণ ৰেকৰ্ড মচি দিব খোজে নেকি?")) {
         const { error } = await _supabase.from('clinic_data').delete().eq('id', id);
-        if(!error) { 
-            alert("ৰোগীৰ ৰেকৰ্ড মচি দিয়া হ’ল!"); 
-            loadPatients(); 
-        }
+        if(!error) { alert("ৰোগীৰ ৰেকৰ্ড মচি দিয়া হ’ল!"); loadPatients(); }
     }
 }
 
@@ -503,46 +486,13 @@ window.onload = function() {
     }
 
    function sendWhatsApp(p) {
-    if (!p.phone) {
-        alert("ৰোগীৰ ম’বাইল নম্বৰ নাই!");
-        return;
-    }
-
-    // ক্লিনিকৰ হেডাৰ
-    const clinicHeader = "🏥 *DR. HARIS HOMEOPATHIC CLINIC*\n" +
-                         "📍 গোগামুখ, ধেমাজি, অসম\n" +
-                         "📞 ফোন: 9707722511\n" +
-                         "----------------------------\n\n";
-
-    // আপোনাৰ ছচিয়েল মিডিয়া লিংকসমূহ
-    const socialLinks = "\n\n----------------------------\n" +
-                        "🔗 *Follow us for Health Tips:*\n" +
-                        "📘 Facebook: https://www.facebook.com/drhari365\n" +
-                        "📺 YouTube: https://www.youtube.com/@drhari\n" +
-                        "📸 Instagram: https://www.instagram.com/drharikanta\n" +
-                        "🌐 Website: https://www.drhariswellfuture.com";
-
-    // সম্পূৰ্ণ মেছেজটো টেক্সট ফৰ্মেটত প্ৰস্তুত কৰা হৈছে
-    const fullMessage = clinicHeader +
-                        `*Prescription for:* ${p.name}\n` +
-                        `*Age/Sex:* ${p.age || 'N/A'}\n` +
-                        `*History:* ${p.history || 'N/A'}\n` +
-                        `*Rx (Medicines):*\n${p.medicine}` + 
-                        socialLinks;
-
-    // ৰোগীৰ নম্বৰটো পৰিষ্কাৰ কৰা (স্পেচ বা ড্যাশ থাকিলে আঁতৰাই দিব)
+    if (!p.phone) { alert("ৰোগীৰ ম’বাইল নম্বৰ নাই!"); return; }
+    const clinicHeader = "🏥 *DR. HARIS HOMEOPATHIC CLINIC*\n📍 গোগামুখ, ধেমাজি, অসম\n📞 ফোন: 9707722511\n----------------------------\n\n";
+    const socialLinks = "\n\n----------------------------\n🔗 *Follow us for Health Tips:*\n📘 Facebook: https://www.facebook.com/drhari365\n📺 YouTube: https://www.youtube.com/@drhari\n📸 Instagram: https://www.instagram.com/drharikanta\n🌐 Website: https://www.drhariswellfuture.com";
+    const fullMessage = clinicHeader + `*Prescription for:* ${p.name}\n` + `*Age/Sex:* ${p.age || 'N/A'}\n` + `*History:* ${p.history || 'N/A'}\n` + `*Rx (Medicines):*\n${p.medicine}` + socialLinks;
     let cleanPhone = p.phone.replace(/\D/g, '');
-    
-    // যদি নম্বৰটো ১০টা সংখ্যাৰ হয়, তেন্তে আগত ৯১ যোগ কৰিব
-    if (cleanPhone.length === 10) {
-        cleanPhone = '91' + cleanPhone;
-    }
-
-    // মেছেজটো সুৰক্ষিতভাৱে এনক’ড কৰা হৈছে যাতে হোৱাটছএপে লিংকটো ভাঙিব নোৱাৰে
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(fullMessage)}`;
-    
-    // নতুন টেবত হোৱাটছএপ মুকলি কৰা
-    window.open(whatsappUrl, '_blank');
+    if (cleanPhone.length === 10) { cleanPhone = '91' + cleanPhone; }
+    window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(fullMessage)}`, '_blank');
 }
 
     function sendReminder(p) {
@@ -557,10 +507,7 @@ window.onload = function() {
         document.getElementById('totalInc').innerText = '₹'+i; 
         document.getElementById('totalExp').innerText = '₹'+e;
         
-        // উপাৰ্জন আৰু খৰচ দুয়োটাৰে সম্পূৰ্ণ ম’বাইল ফ্ৰেণ্ডলী তালিকা
-        document.getElementById('expenseList').innerHTML = `
-            <h4 style='margin-top:20px; color:var(--primary);'><i class="fas fa-list"></i> লেনদেনৰ সম্পূৰ্ণ তালিকা:</h4>
-            ` + data.map(d => {
+        document.getElementById('expenseList').innerHTML = `<h4 style='margin-top:20px; color:var(--primary);'><i class="fas fa-list"></i> লেনদেনৰ সম্পূৰ্ণ তালিকা:</h4>` + data.map(d => {
                 const isIncome = d.type === 'Income';
                 const borderSide = isIncome ? 'border-left:4px solid #27ae60;' : 'border-left:4px solid #e74c3c;';
                 const badgeColor = isIncome ? '#27ae60' : '#e74c3c';
@@ -577,12 +524,8 @@ window.onload = function() {
                         <b style="font-size:16px; color:${badgeColor};">₹${d.amount}</b>
                     </div>
                     <div style="display:flex; gap:10px; border-top:1px dashed #eee; padding-top:10px;">
-                        <button onclick='editAccountInline(${JSON.stringify(d)})' style="flex:1; background:#3498db; color:white; border:none; padding:8px; border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button onclick="deleteAccount(${d.id})" style="flex:1; background:#e74c3c; color:white; border:none; padding:8px; border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
-                            <i class="fas fa-trash-alt"></i> Moci Diya
-                        </button>
+                        <button onclick='editAccountInline(${JSON.stringify(d)})' style="flex:1; background:#3498db; color:white; border:none; padding:8px; border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;"><i class="fas fa-edit"></i> Edit</button>
+                        <button onclick="deleteAccount(${d.id})" style="flex:1; background:#e74c3c; color:white; border:none; padding:8px; border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;"><i class="fas fa-trash-alt"></i> Moci Diya</button>
                     </div>
                 </div>`;
             }).join('');
@@ -620,15 +563,12 @@ window.onload = function() {
    async function deleteAccount(id) {
     if(confirm("আপুনি নিশ্চিতনে?")) {
         const { error } = await _supabase.from('clinic_accounts').delete().eq('id', id);
-        if(!error) { 
-            alert("মচি দিয়া হ’ল!"); 
-            loadAccounts(); // ইয়াতেও পেজ ৰিলোড নহয়, কেৱল হিচাপ আপডেট হ’ব
-        }
+        if(!error) { alert("মচি দিয়া হ’ল!"); loadAccounts(); }
     }
 }
     async function loadBookings() {
         const { data } = await _supabase.from('clinic_bookings').select('*').order('created_at', { ascending: false });
-        if(data) document.getElementById('listBookings').innerHTML = data.map(b => `<div class="card"><b>${b.name}</b> (${b.phone})<br>Txn ID: ${b.txn_id}</div>`).join('');
+        if(data) document.getElementById('listBookings').innerHTML = data.map(b => `<div class="card"><b>${b.name}</b> (${b.phone})<br>Problem/Txn: ${b.problem || b.txn_id}</div>`).join('');
     }
 
     function filterPatients() {
@@ -649,7 +589,7 @@ window.onload = function() {
 
     async function closePaymentModal() {
         const txn = document.getElementById('modalTxn').value.trim();
-        if(!txn) { alert("অনুগ্ৰহ কৰি Transaction ID টো লিখক। ইয়াৰ অবিহনে বুকিং কনফৰ্ম নাথাকিব।"); return; }
+        if(!txn) { alert("অনুগ্ৰহ কৰি Transaction ID টো লিখক। ইয়াৰ অবিহনে বুকিং কনফৰ্ম নাثাকিব।"); return; }
         
         if(window.temporaryBookingData) {
             const d = { name: window.temporaryBookingData.name, phone: window.temporaryBookingData.phone, problem: window.temporaryBookingData.problem, txn_id: txn };
@@ -658,19 +598,17 @@ window.onload = function() {
         }
     }
 
-   // সোঁফালৰ পৰা স্লাইড হৈ অহাকৈ নতুন টাইমাৰ ক’ড
+// হেলথ টিপছ স্লাইডার লজিক
 let currentSlide = 0;
 setInterval(() => {
     const track = document.getElementById('sliderTrack');
     if (!track) return;
-    
-    currentSlide = (currentSlide + 1) % 3; // ৩ টা স্লাইডৰ বাবে
-    let percentage = currentSlide * -33.333; // বাওঁফাললৈ ঠেলি দিয়াৰ হিচাপ
-    
+    currentSlide = (currentSlide + 1) % 3;
+    let percentage = currentSlide * -33.333;
     track.style.transform = `translateX(${percentage}%)`;
-}, 4000); // প্ৰতি ৪ চেকেণ্ডত একোখনকৈ স্লাইড স্মুথভাৱে পিছলি আহিব
+}, 4000);
 
-// অনলাইন পৰামৰ্শ ফৰ্ম দেখুওৱা আৰু লুকুওৱা লজিক (ই বুটামটোক সক্ৰিয় কৰিব)
+// নতুন অনলাইন পৰামৰ্শ ফৰ্ম নিয়ন্ত্ৰণৰ ফাংচনসমূহ
 function showConsultationForm() {
     document.getElementById('loginArea').style.display = 'none';
     document.getElementById('consultationForm').style.display = 'block';
@@ -684,52 +622,36 @@ function hideConsultationForm() {
     document.getElementById('loginArea').style.display = 'block';
 }
 
-// প্ৰথম খোজ: নাম আৰু ফোন নম্বৰ চেক কৰা
 function verifyConsStep1() {
     const name = document.getElementById('consName').value.trim();
     const phone = document.getElementById('consPhone').value.trim();
     if(!name || !phone) { alert("অনুগ্ৰহ কৰি নাম আৰু ফোন নম্বৰ লিখক।"); return; }
-    
-    // দ্বিতীয় খোজলৈ যোৱা (পেমেণ্ট স্ক্ৰীন)
     document.getElementById('consStep1').style.display = 'none';
     document.getElementById('consStep2').style.display = 'block';
 }
 
-// দ্বিতীয় খোজ: পেমেণ্ট আইডি চেক কৰি প্ৰশ্নৰ বাকচ খোলা
 function verifyConsPayment() {
     const txn = document.getElementById('consTxn').value.trim();
-    if(!txn) { alert("অনুগ্ৰহ কৰি Transaction ID টো লিখক। ইয়াৰ অবিহনে প্ৰশ্ন সুধিব নোৱাৰিব।"); return; }
-    
-    // পেমেণ্ট আইডি লিখাৰ পাছতহে ৩ নম্বৰ খোজ (প্ৰশ্নৰ বাকচ) খোল খাব
+    if(!txn) { alert("অনুগ্ৰহ কৰি Transaction ID টো লিখক।"); return; }
     document.getElementById('consStep2').style.display = 'none';
     document.getElementById('consStep3').style.display = 'block';
 }
 
-// তৃতীয় খোজ: ডাটাবেচত প্ৰশ্ন আৰু পেমেণ্ট আইডি জমা কৰা
-// তৃতীয় খোজ: ডাটাবেচত প্ৰশ্ন আৰু পেমেণ্ট আইডি জমা কৰা (মেৰামত কৰা সংস্কৰণ)
+// অনলাইন পৰামৰ্শ সুৰক্ষিতভাৱে ডাটাবেচত জমা কৰা ফাংচন
 async function submitConsultation() {
     const name = document.getElementById('consName').value.trim();
     const phone = document.getElementById('consPhone').value.trim();
     const txn = document.getElementById('consTxn').value.trim();
     const question = document.getElementById('consQuestion').value.trim();
     
-    if(!question) { 
-        alert("অনুগ্ৰহ কৰি আপোনাৰ প্ৰশ্নটো লিখক।"); 
-        return; 
-    }
+    if(!question) { alert("অনুগ্ৰহ কৰি আপোনাৰ প্ৰশ্নটো লিখক।"); return; }
     
-    // ইয়াত আমি সুৰক্ষিতভাৱে 'problem' কলামৰ ভিতৰতে প্ৰশ্ন আৰু Txn ID দুয়োটো সুমুৱাই দিছোঁ
-    // ইয়াৰ ফলত আপোনাৰ Supabase টেবুলত নতুন কলাম বনোৱাৰ কোনো প্ৰয়োজন নহব
     const fullProblemDescription = `ONLINE CONSULTATION \nTxn ID: ${txn} \nQuestion: ${question}`;
 
     try {
-        // ইয়াৰ পৰা আণ্ডাৰস্ক'ৰ (_) টো আঁতৰাই কেৱল supabase কৰা হৈছে
-        const { error } = await supabase.from('clinic_bookings').insert([
-            { 
-                name: name, 
-                phone: phone, 
-                problem: fullProblemDescription
-            }
+        // ইয়াত '_supabase' ব্যৱহাৰ কৰি এৰৰটো চিৰদিনৰ বাবে নাইকীয়া কৰা হৈছে
+        const { error } = await _supabase.from('clinic_bookings').insert([
+            { name: name, phone: phone, problem: fullProblemDescription }
         ]);
         
         if(!error) { 
@@ -737,11 +659,11 @@ async function submitConsultation() {
             location.reload(); 
         } else {
             console.error("Supabase Error:", error);
-            alert("দুঃখিত, ডাটাবেচৰ সৈতে সংযোগ কৰিব পৰা হোৱা নাই। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।");
+            alert("দুঃখিত, ডাটাবেচৰ সৈতে সংযোগ কৰিব পৰা হোৱা নাই।");
         }
     } catch (e) {
         console.error("Runtime Error:", e);
-        alert("কাৰিকৰী বিজুতি ঘটিছে। ক’ডৰ নামটো এবাৰ পৰীক্ষা কৰক।");
+        alert("কাৰিকৰী বিজুতি ঘটিছে।");
     }
 }
 </script>
