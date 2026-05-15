@@ -376,28 +376,46 @@ style="padding:16px;border-radius:16px;border:1px solid #cbd5e1;background:white
     let userRole = 'assistant'; 
 
 function checkPass() {
+
     const inputPass = document.getElementById('adminPass').value;
     const savedRole = sessionStorage.getItem('userRole');
 
     if (savedRole === 'admin' || inputPass === 'drharis1') {
+
         userRole = 'admin';
+
         sessionStorage.setItem('userRole', 'admin');
         sessionStorage.setItem('isLoggedIn', 'true');
+
         document.getElementById('loginArea').style.display = 'none';
         document.getElementById('mainApp').style.display = 'block';
-        loadPatients(); loadAccounts(); loadBookings();
-    } else if (savedRole === 'assistant' || inputPass === 'assistant123') { 
+
+        document.getElementById('nav-reports').style.display = 'flex';
+
+        loadPatients();
+        loadAccounts();
+        loadBookings();
+
+    } else if (savedRole === 'assistant' || inputPass === 'assistant123') {
+
         userRole = 'assistant';
+
         sessionStorage.setItem('userRole', 'assistant');
         sessionStorage.setItem('isLoggedIn', 'true');
+
         document.getElementById('loginArea').style.display = 'none';
         document.getElementById('mainApp').style.display = 'block';
-        loadPatients(); loadAccounts(); loadBookings();
-        if(userRole !== 'admin'){
-    document.getElementById('nav-reports').style.display = 'none';
-}
-    } else { 
-        alert("ভুল পাছৱৰ্ড!"); 
+
+        document.getElementById('nav-reports').style.display = 'none';
+
+        loadPatients();
+        loadAccounts();
+        loadBookings();
+
+    } else {
+
+        alert("ভুল পাছৱৰ্ড!");
+
     }
 }
 
