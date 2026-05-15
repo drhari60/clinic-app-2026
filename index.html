@@ -345,29 +345,33 @@ async function addPatient() {
     }
 
    function sendWhatsApp(p) {
-    // আপোনাৰ সকলো লিংক ইয়াত যোগ কৰা হৈছে
-    const clinicLinks = 
-        "\n\n---" +
-        "\n🔗 *Follow us for Health Tips:*" +
-        "\n📘 *Facebook:* https://www.facebook.com/drhari365" +
-        "\n📺 *YouTube:* https://www.youtube.com/@drhari" +
-        "\n📸 *Instagram:* https://www.instagram.com/dr_harikanta_das" +
-        "\n🌐 *Website:* https://drhariswellfuture.com/";
+    // আপুনি দিয়া সঠিক লিংকসমূহ
+    const clinicHeader = "🏥 *DR. HARIS HOMEOPATHIC CLINIC*\n" +
+                         "📍 গোগামুখ, ধেমাজি, অসম\n" +
+                         "📞 ফোন: 9707722511\n" +
+                         "----------------------------\n\n";
+
+    const socialLinks = "\n\n----------------------------\n" +
+                        "🔗 *Follow us for Health Tips:*\n" +
+                        "📘 Facebook: https://www.facebook.com/drhari365\n" +
+                        "📺 YouTube: https://www.youtube.com/@drhari\n" +
+                        "📸 Instagram: https://www.instagram.com/drharikanta\n" +
+                        "🌐 Website: https://www.drhariswellfuture.com";
 
     // মেছেজটো সজোৱা হৈছে
-    const message = 
-        "*Dr. Haris Clinic Prescription*" +
-        "\n\n*Patient:* " + p.name +
-        "\n*History:* " + (p.history || 'N/A') +
-        "\n*Rx (Medicines):*\n" + p.medicine + 
-        clinicLinks;
+    const fullMessage = clinicHeader +
+                        `*Prescription for:* ${p.name}\n` +
+                        `*Age/Sex:* ${p.age || 'N/A'}\n` +
+                        `*History:* ${p.history || 'N/A'}\n` +
+                        `*Rx (Medicines):*\n${p.medicine}` + 
+                        socialLinks;
 
-    // WhatsApp-লৈ পঠোৱাৰ লিংক
-    const finalUrl = `https://wa.me/91${p.phone}?text=${encodeURIComponent(message)}`;
+    // পঠোৱাৰ ব্যৱস্থা
+    const whatsappUrl = `https://wa.me/91${p.phone}?text=${encodeURIComponent(fullMessage)}`;
     
-    window.open(finalUrl);
+    window.open(whatsappUrl);
 }
-
+    
     async function addAccount(type) {
     const amt = parseInt(document.getElementById('accAmount').value);
     const cat = document.getElementById('accCategory').value;
