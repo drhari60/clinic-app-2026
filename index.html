@@ -383,21 +383,43 @@
     }
 
     async function loadAccounts() {
-        const { data } = await _supabase.from('clinic_accounts').select('*').order('created_at', { ascending: false });
-        if(data) {
-            let i=0, e=0; data.forEach(d => d.type==='Income'?i+=d.amount:e+=d.amount);
-            document.getElementById('totalInc').innerText = '₹'+i; document.getElementById('totalExp').innerText = '₹'+e;
-            
-            document.getElementById('expenseList').innerHTML = "<h4>খৰচৰ তালিকা:</h4>" + data.filter(d => d.type === 'Expense').map(d => `
-                <div style="font-size:14px; border-bottom:1px solid #eee; padding:10px 5px; display:flex; justify-content:space-between; align-items:center;">
-                    <span>${new Date(d.created_at).toLocaleDateString()}: ${d.note} - ₹${d.amount}</span>
-                    <div style="display:flex; gap:8px;">
-                        <button onclick='editAccountInline(${JSON.stringify(d)})' style="width:auto; margin:0; padding:6px 10px; background:#3498db; color:white; border:none; border-radius:5px; font-size:12px; cursor:pointer;">Edit</button>
-                        <button onclick="deleteAccount(${d.id})" style="width:auto; margin:0; padding:6px 10px; background:#e74c3c; color:white; border:none; border-radius:5px; font-size:12px; cursor:pointer;">Moci Diya</button>
+    const { data } = await _supabase.from('clinic_accounts').select('*').order('created_at', { ascending: false });
+    if(data) {
+        let i=0, e=0; data.forEach(d => d.type==='Income'?i+=d.amount:e+=d.amount);
+        document.getElementById('totalInc').innerText = '₹'+i; 
+        document.getElementById('totalExp').innerText = '₹'+e;
+        
+        // উপাৰ্জন আৰু খৰচ দুয়োটাৰে সম্পূৰ্ণ ম’বাইল ফ্ৰেণ্ডলী তালিকা
+        document.getElementById('expenseList').innerHTML = `
+            <h4 style='margin-top:20px; color:var(--primary);'><i class="fas fa-list"></i> লেনদেনৰ সম্পূৰ্ণ তালিকা:</h4>
+            ` + data.map(d => {
+                const isIncome = d.type === 'Income';
+                const borderSide = isIncome ? 'border-left:4px solid #27ae60;' : 'border-left:4px solid #e74c3c;';
+                const badgeColor = isIncome ? '#27ae60' : '#e74c3c';
+                const badgeText = isIncome ? 'উপাৰ্জন (Income)' : 'খৰচ (Expense)';
+                
+                return `
+                <div class="card" style="padding:15px; margin:10px 0; background:#fff; ${borderSide} box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <span style="font-size:12px; color:#7f8c8d;"><i class="far fa-calendar-alt"></i> ${new Date(d.created_at).toLocaleDateString()}</span>
+                        <span style="font-size:11px; background:${badgeColor}; color:white; padding:3px 8px; border-radius:12px; font-weight:bold;">${badgeText}</span>
                     </div>
-                </div>`).join('');
-        }
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <span style="font-size:14px; font-weight:600; color:#2c3e50;"><i class="fas fa-tag"></i> ${d.note}</span>
+                        <b style="font-size:16px; color:${badgeColor};">₹${d.amount}</b>
+                    </div>
+                    <div style="display:flex; gap:10px; border-top:1px dashed #eee; padding-top:10px;">
+                        <button onclick='editAccountInline(${JSON.stringify(d)})' style="flex:1; background:#3498db; color:white; border:none; padding:8px; border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button onclick="deleteAccount(${d.id})" style="flex:1; background:#e74c3c; color:white; border:none; padding:8px; border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
+                            <i class="fas fa-trash-alt"></i> Moci Diya
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
     }
+}
 
     async function addAccount(type) {
         const amt = parseInt(document.getElementById('accAmount').value);
