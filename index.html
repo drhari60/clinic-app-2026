@@ -344,16 +344,29 @@ async function addPatient() {
         window.print();
     }
 
-    function sendWhatsApp(p) {
-        const clinicLinks = `---
-🔗 *Follow us for Health Tips:*
-📘 Facebook: https://www.facebook.com/drhari365
-📺 YouTube: https://www.youtube.com/@drhari
-🌐 Website: https://drhariswellfuture.com/`;
+   function sendWhatsApp(p) {
+    // আপোনাৰ সকলো লিংক ইয়াত যোগ কৰা হৈছে
+    const clinicLinks = 
+        "\n\n---" +
+        "\n🔗 *Follow us for Health Tips:*" +
+        "\n📘 *Facebook:* https://www.facebook.com/drhari365" +
+        "\n📺 *YouTube:* https://www.youtube.com/@drhari" +
+        "\n📸 *Instagram:* https://www.instagram.com/dr_harikanta_das" +
+        "\n🌐 *Website:* https://drhariswellfuture.com/";
 
-        const text = `*Dr. Haris Clinic Prescription*%0A%0A*Patient:* ${p.name}%0A*History:* ${p.history || 'N/A'}%0A*Rx (Medicines):*%0A${p.medicine}%0A%0A${encodeURIComponent(clinicLinks)}`;
-        window.open(`https://wa.me/91${p.phone}?text=${text}`);
-    }
+    // মেছেজটো সজোৱা হৈছে
+    const message = 
+        "*Dr. Haris Clinic Prescription*" +
+        "\n\n*Patient:* " + p.name +
+        "\n*History:* " + (p.history || 'N/A') +
+        "\n*Rx (Medicines):*\n" + p.medicine + 
+        clinicLinks;
+
+    // WhatsApp-লৈ পঠোৱাৰ লিংক
+    const finalUrl = `https://wa.me/91${p.phone}?text=${encodeURIComponent(message)}`;
+    
+    window.open(finalUrl);
+}
 
     async function addAccount(type) {
     const amt = parseInt(document.getElementById('accAmount').value);
