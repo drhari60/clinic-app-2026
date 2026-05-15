@@ -339,18 +339,28 @@ window.onload = function() {
     }
 
     async function loadPatients() {
-        const { data } = await _supabase.from('clinic_data').select('*').order('created_at', { ascending: false });
-        if(data) document.getElementById('listPatients').innerHTML = data.map(p => `
+    const { data } = await _supabase.from('clinic_data').select('*').order('created_at', { ascending: false });
+    
+    // ব্ৰাউজাৰৰ মেমৰীৰ পৰা ৰোলটো চেক কৰা হৈছে
+    const currentRole = sessionStorage.getItem('userRole') || userRole;
+
+    if(data) document.getElementById('listPatients').innerHTML = data.map(p => {
+        
+        // যদি ইউজাৰজন ড° হৰি (Admin) হয়, তেতিয়াহে এডিট-ডিলিট বুটাম ওলাব, নহলে খালী থাকিব
+        const adminControls = currentRole === 'admin' ? `
+            <div style="display:flex; gap:12px;">
+                <button onclick='editPatientInline(${JSON.stringify(p)})' style="background:none; border:none; color:#3498db; font-size:18px; cursor:pointer;"><i class="fas fa-edit"></i></button>
+                <button onclick="deletePatient(${p.id})" style="background:none; border:none; color:#e74c3c; font-size:18px; cursor:pointer;"><i class="fas fa-trash-alt"></i></button>
+            </div>` : '';
+
+        return `
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: start;">
                     <div>
                         <b style="font-size: 1.1em; color: var(--primary);">${p.name}</b><br>
                         <small style="color: #666;">📞 ${p.phone}</small>
                     </div>
-                    <div style="display:flex; gap:12px;">
-                        <button onclick='editPatientInline(${JSON.stringify(p)})' style="background:none; border:none; color:#3498db; font-size:18px; cursor:pointer;"><i class="fas fa-edit"></i></button>
-                        <button onclick="deletePatient(${p.id})" style="background:none; border:none; color:#e74c3c; font-size:18px; cursor:pointer;"><i class="fas fa-trash-alt"></i></button>
-                    </div>
+                    ${adminControls}
                 </div>
                 <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
                     <button onclick='printPrescription(${JSON.stringify(p)})' style="flex:1; background:#555; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
@@ -363,8 +373,9 @@ window.onload = function() {
                         <i class="fas fa-bell"></i> Remind
                     </button>
                 </div>
-            </div>`).join('');
-    }
+            </div>`;
+    }).join('');
+}
 
     function editPatientInline(p) {
         currentEditPatientId = p.id;
