@@ -472,16 +472,25 @@
         window.print();
     }
 
+    // আপোনাৰ ছ’চিয়েল মিডিয়া লিংক থকা শুদ্ধ কৰা ৱাটছএপ ফাংশন
     function sendWhatsApp(p) {
-        if (!p.phone) { alert("মোবাইল নম্বৰ নাই!"); return; }
-        const msg = `🏥 *DR. HARIS HOMEOPATHIC CLINIC*\n*Patient:* ${p.name}\n*Rx:*\n${p.medicine}`;
+        if (!p.phone) { alert("ৰোগীৰ ম’বাইল নম্বৰ নাই!"); return; }
+        
+        const clinicHeader = "🏥 *DR. HARIS HOMEOPATHIC CLINIC*\n📍 গোগামুখ, ধেমাজি, অসম\n📞 ফোন: 9707722511\n----------------------------\n\n";
+        
+        const socialLinks = "\n\n----------------------------\n🔗 *Follow us for Health Tips:*\n📘 Facebook: https://www.facebook.com/drhari365\n📺 YouTube: https://www.youtube.com/@drhari\n📸 Instagram: https://www.instagram.com/drharikanta\n🌐 Website: https://www.drhariswellfuture.com";
+        
+        const fullMessage = clinicHeader + `*Prescription for:* ${p.name}\n*Age/Sex:* ${p.age || 'N/A'}\n*History:* ${p.history || 'N/A'}\n\n*Rx (Medicines):*\n${p.medicine}` + socialLinks;
+        
         let cleanPhone = p.phone.replace(/\D/g, '');
-        if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
-        window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(msg)}`, '_blank');
+        if (cleanPhone.length === 10) { cleanPhone = '91' + cleanPhone; }
+        
+        const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(fullMessage)}`;
+        window.open(whatsappUrl, '_blank');
     }
 
     function sendReminder(p) {
-        const text = `নमস্কাৰ ${p.name}, ড° হৰি ক্লিনিকৰ পৰা ঔষধ খোৱাৰ সময় মনত পেলাই দিয়া হৈছে।`;
+        const text = `নমস্কাৰ ${p.name} ডাঙৰীয়া/আইদেউ,\nড° হৰি ক্লিনিকৰ পৰা আপোনাক মনত পেলাই দিয়া হৈছে যে আপোনাৰ ঔষধ খোৱাৰ সময় হৈছে। সুস্থ থাকক।\n--- 📞 9707722511`;
         window.open(`https://wa.me/91${p.phone}?text=${encodeURIComponent(text)}`);
     }
 
