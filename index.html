@@ -25,7 +25,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* আপোনাৰ ফটো আৰু নাম থকা মূল ইন্টাৰফেচ */
         .clinic-profile {
             text-align: center;
             padding: 30px 15px;
@@ -165,7 +164,7 @@
         <div id="sliderTrack" style="display: flex; width: 300%; height: 100%; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);">
             <div style="background: linear-gradient(135deg, #004d40, #00796b); color: white; padding: 20px; width: 33.333%; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; flex-shrink: 0;">
                 <i class="fas fa-heartbeat" style="font-size: 26px; margin-bottom: 8px; color: #a7ffeb;"></i>
-                <h4 style="margin: 0 0 5px 0; font-size: 15px;">প্ৰতিদিনে পুৱা-গধূলি অন্তত ৩০/৪০ মিনিট খোজ কাঢ়ক</h4>
+                <h4 style="margin: 0 0 5px 0; font-size: 15px;">প্ৰতিদিনে পুৱา-গধূলি অন্তত ৩০/৪০ মিনিট খোজ কাঢ়ক</h4>
                 <p style="margin: 0; font-size: 12px; color: #e0f2f1;">হৃদযন্ত্ৰ সুস্থ ৰাখিবলৈ দৈনিক ৪০ মিনিট খোজ কাঢ়াটো অতি জৰুৰী।</p>
             </div>
             <div style="background: linear-gradient(135deg, #1565c0, #1e88e5); color: white; padding: 20px; width: 33.333%; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; flex-shrink: 0;">
@@ -188,7 +187,7 @@
         <div class="qr-section">
             <p><b>Scan to Pay ₹100</b></p>
             <a href="upi://pay?pa=9954340102@okbizaxis&pn=Haris%20Homoeo%20Hall&am=100&cu=INR">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=9954340102@okbizaxis%26pn=Haris%20Homoeo%20Hall%26am=100" alt="GPay QR">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=9954340102@okbizaxis%26pn=Haris%20Homoeo%20Hall%26am=100" alt="GPay QR 100">
             </a>
             <p><b>Haris Homoeo Hall</b></p>
         </div>
@@ -214,11 +213,18 @@
     <div id="consStep2" style="display:none; text-align:center;">
         <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ffe0b2;">
             <p style="margin:0; color:#e65100; font-weight:bold;">পৰামৰ্শ ফীজ: ২৫০ টকা (₹250)</p>
-            <p style="font-size:13px; margin:5px 0 0 0;">অনুগ্ৰহ কৰি তলৰ UPI ID ত ২৫০ টকা পেমেণ্ট কৰক আৰু Transaction ID টো তলত লিখক।</p>
-            <p style="font-size:16px; font-weight:bold; color:#004d40; margin:10px 0 0 0;">UPI ID: drhari365@apl</p> 
+            <p style="font-size:13px; margin:5px 0 10px 0;">অনুগ্ৰহ কৰি তলৰ QR Code খন স্কেন কৰি ২৫০ টকা পেমেণ্ট কৰক আৰু Transaction ID টো তলত লিখক।</p>
+            
+            <div class="qr-section">
+                <a href="upi://pay?pa=9954340102@okbizaxis&pn=Haris%20Homoeo%20Hall&am=250&cu=INR">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa=9954340102@okbizaxis%26pn=Haris%20Homoeo%20Hall%26am=250" alt="GPay QR 250" style="width:200px; height:200px; margin:10px auto; display:block;">
+                </a>
+                <p style="font-size:14px; font-weight:bold; color:#004d40;">UPI ID: 9954340102@okbizaxis</p>
+            </div>
         </div>
-        <label style="text-align:left; display:block;">Transaction ID (UPI/UTR No):</label>
-        <input type="text" id="consTxn" placeholder="ট্ৰেনজেকচন আইডি লিখক">
+        
+        <label style="text-align:left; display:block; font-weight:bold; color:#e74c3c;">* Transaction ID (UPI/UTR No):</label>
+        <input type="text" id="consTxn" placeholder="ট্ৰেনজেকচন আইডি লিখক" style="border:2px solid #e74c3c; text-align:center; font-weight:bold;">
         <button class="btn-primary" style="width:100%; margin-top:10px; background:#00796b;" onclick="verifyConsPayment()">পেমেণ্ট সাবমিট কৰক (Verify Payment)</button>
     </div>
 
@@ -329,7 +335,7 @@
 
 <div id="paymentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center; padding:20px;">
     <div style="background:white; padding:20px; border-radius:15px; max-width:400px; width:100%; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.3); position:relative;">
-        <h3 style="color:#2c3e50; margin-top:0;">পেমেন্ট কৰক</h3>
+        <h3 style="color:#2c3e50; margin-top:0;">বুকিং পেমেন্ট</h3>
         <p style="font-size:14px; color:#555; margin-bottom:15px;">QR Code স্কেন কৰি <b>₹১০০</b> পেমেণ্ট কৰক।</p>
         <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=9954340102@okbizaxis%26pn=Haris%20Homoeo%20Hall%26am=100%26cu=INR" alt="UPI QR" style="width:220px; height:220px; margin:10px auto; display:block; border:1px solid #eee; padding:5px; border-radius:10px;">
         <div style="font-weight:bold; font-size:18px; color:#e67e22; margin:5px 0;">পৰিমাণ: ₹১০০</div>
@@ -342,7 +348,6 @@
 </div>
 
 <script>
-    // Supabase Connection Corrected
     const supabaseUrl = 'https://oblvgjnyecvvnnnesegl.supabase.co';
     const supabaseKey = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9';
     const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
@@ -472,19 +477,14 @@
         window.print();
     }
 
-    // আপোনাৰ ছ’চিয়েল মিডিয়া লিংক থকা শুদ্ধ কৰা ৱাটছএপ ফাংশন
     function sendWhatsApp(p) {
         if (!p.phone) { alert("ৰোগীৰ ম’বাইল নম্বৰ নাই!"); return; }
-        
         const clinicHeader = "🏥 *DR. HARIS HOMEOPATHIC CLINIC*\n📍 গোগামুখ, ধেমাজি, অসম\n📞 ফোন: 9707722511\n----------------------------\n\n";
-        
         const socialLinks = "\n\n----------------------------\n🔗 *Follow us for Health Tips:*\n📘 Facebook: https://www.facebook.com/drhari365\n📺 YouTube: https://www.youtube.com/@drhari\n📸 Instagram: https://www.instagram.com/drharikanta\n🌐 Website: https://www.drhariswellfuture.com";
-        
         const fullMessage = clinicHeader + `*Prescription for:* ${p.name}\n*Age/Sex:* ${p.age || 'N/A'}\n*History:* ${p.history || 'N/A'}\n\n*Rx (Medicines):*\n${p.medicine}` + socialLinks;
         
         let cleanPhone = p.phone.replace(/\D/g, '');
         if (cleanPhone.length === 10) { cleanPhone = '91' + cleanPhone; }
-        
         const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(fullMessage)}`;
         window.open(whatsappUrl, '_blank');
     }
