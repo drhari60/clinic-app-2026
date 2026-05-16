@@ -226,31 +226,79 @@ Homeopathic Physician & Physiotherapist
         <button class="btn-primary" style="width:100%; margin-top:15px;" onclick="verifyConsStep1()">পৰৱৰ্তী খোজ (Next)</button>
     </div>
 
-    <div id="consStep2" style="display:none; text-align:center;">
-        <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ffe0b2;">
-            <p style="margin:0; color:#e65100; font-weight:bold;">পৰামৰ্শ ফীজ: ২৫০ টকা (₹250)</p>
-            <p style="font-size:13px; margin:5px 0 0 0;">অনুগ্ৰহ কৰি তলৰ UPI ID ত ২৫০ টকা পেমেণ্ট কৰক আৰু Transaction ID টো তলত লিখক।</p>
-            <p style="font-size:16px; font-weight:bold; color:#004d40; margin:10px 0 0 0;">UPI ID: drhari365@apl</p> </div>
+<div id="consStep2" style="display:none; text-align:center;">
 
-        <label style="text-align:left; display:block;">Transaction ID (UPI/UTR No):</label>
-        <input type="text" id="consTxn" placeholder="ট্ৰেনজেকচন আইডি লিখক">
-        
-        <button class="btn-primary" style="width:100%; margin-top:10px; background:#00796b;" onclick="verifyConsPayment()">পেমেণ্ট সাবমিট কৰক (Verify Payment)</button>
+    <div style="background:#fff3e0;padding:15px;border-radius:10px;margin-bottom:15px;border:1px solid #ffe0b2;">
+
+        <p style="margin:0;color:#e65100;font-weight:bold;">
+            পৰামৰ্শ ফীজ: ₹250
+        </p>
+
+        <p style="font-size:13px;margin-top:8px;">
+            তলৰ QR Code scan কৰি Payment কৰক
+        </p>
+
+        <img 
+        src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa=9954340102@okbizaxis%26pn=Haris%20Homoeo%20Hall%26am=250%26cu=INR"
+        style="width:220px;height:220px;border-radius:12px;border:1px solid #ddd;padding:5px;background:white;">
+
+        <p style="font-size:16px;font-weight:bold;color:#004d40;margin-top:10px;">
+            UPI ID: 9954340102@okbizaxis
+        </p>
+
     </div>
 
-    <div id="consStep3" style="display:none;">
-        <div style="background: #e8f5e9; padding: 10px; border-radius: 8px; margin-bottom: 15px; color: #2e7d32; font-weight: bold; text-align: center;">
-            ✓ পেমেণ্ট গ্ৰহণ কৰা হৈছে। এতিয়া আপোনাৰ প্ৰশ্নটো লিখক।
-        </div>
-        <label>আপোনাৰ স্বাস্থ্যজনিত সমস্যা বা প্ৰশ্নটো বিতংভাৱে লিখক (Write your question):</label>
-        <textarea id="consQuestion" rows="5" placeholder="আপোনাৰ কি সমস্যা হৈছে আৰু আপুনি কি জানিব বিচাৰে ইয়াত লিখক..." style="width:100%; border-radius:8px; padding:10px; border:1px solid #ccc; font-family:inherit;"></textarea>
-        
-        <button class="btn-primary" style="width:100%; margin-top:15px; background:#2e7d32;" onclick="submitConsultation()">পৰামৰ্শ সাবমিট কৰক (Submit Consultation)</button>
-    </div>
+    <label style="text-align:left; display:block;">
+        Transaction ID (UPI/UTR No):
+    </label>
 
-    <button class="btn-primary" style="background:#555; width:100%; margin-top:15px;" onclick="hideConsultationForm()">ফিৰি যাওক (Back)</button>
+    <input type="text" id="consTxn" placeholder="ট্ৰেনজেকচন আইডি লিখক">
+
+    <button class="btn-primary"
+    style="width:100%; margin-top:10px; background:#00796b;"
+    onclick="verifyConsPayment()">
+
+    পেমেণ্ট সাবমিট কৰক
+
+    </button>
+
 </div>
 
+<div id="consStep3" style="display:none;">
+
+    <div style="background:#e8f5e9;padding:10px;border-radius:8px;margin-bottom:15px;color:#2e7d32;font-weight:bold;text-align:center;">
+        ✓ পেমেণ্ট গ্ৰহণ কৰা হৈছে। এতিয়া আপোনাৰ প্ৰশ্নটো লিখক।
+    </div>
+
+    <label>
+        আপোনাৰ স্বাস্থ্যজনিত সমস্যা বা প্ৰশ্নটো লিখক:
+    </label>
+
+    <textarea id="consQuestion"
+    rows="5"
+    placeholder="আপোনাৰ সমস্যা লিখক..."
+    style="width:100%;border-radius:8px;padding:10px;border:1px solid #ccc;font-family:inherit;">
+    </textarea>
+
+    <button class="btn-primary"
+    style="width:100%;margin-top:15px;background:#2e7d32;"
+    onclick="submitConsultation()">
+
+    পৰামৰ্শ সাবমিট কৰক
+
+    </button>
+
+</div>
+
+<button class="btn-primary"
+style="background:#555;width:100%;margin-top:15px;"
+onclick="hideConsultationForm()">
+
+ফিৰি যাওক
+
+</button>
+
+    
 <div id="mainApp" style="display:none;">
     <div class="header no-print">
 
