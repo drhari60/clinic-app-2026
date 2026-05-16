@@ -1,14 +1,13 @@
-// ১. Supabase Initialization
+// ১. Supabase Initialization (প্ৰকৃত ক্ৰেডেন্সিয়েলছ সংলগ্ন কৰা হ’ল)
 const SUPABASE_URL = 'https://oblvgjnyecvvnnnesegl.supabase.co'; 
 const SUPABASE_ANON_KEY = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9'; 
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentEditId = null;
-let currentUserRole = 'staff'; // ডিফল্ট ৰোল
 
 window.addEventListener('DOMContentLoaded', () => {
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
-        if (session) checkUserRole(session.user);
+        if (session) showDashboard();
     });
 
     document.getElementById('btnStaffLogin').addEventListener('click', handleLogin);
@@ -26,19 +25,7 @@ window.addEventListener('DOMContentLoaded', () => {
     setupTabs();
 });
 
-// ৰোল চেক কৰা (Admin নে Staff)
-async function checkUserRole(user) {
-    const { data, error } = await supabaseClient.from('user_roles').select('role').eq('id', user.id).single();
-    if (!error && data) {
-        currentUserRole = data.role;
-    } else {
-        currentUserRole = 'staff'; 
-    }
-    document.getElementById('userBadge').innerText = currentUserRole.toUpperCase();
-    showDashboard();
-}
-
-// সুৰক্ষিত লগইন
+// লগ-ইন লজিক
 async function handleLogin() {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
@@ -46,7 +33,7 @@ async function handleLogin() {
 
     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
     if (error) alert('লগইন ব্যৰ্থ: ' + error.message);
-    else checkUserRole(data.user);
+    else showDashboard();
 }
 
 function showDashboard() {
@@ -71,7 +58,7 @@ function showBookingForm() {
 // ==================== PATIENT MANAGEMENT ====================
 async function loadPatients() {
     const { data, error } = await supabaseClient.from('clinic_data').select('*').order('created_at', { ascending: false });
-    if (error) return console.error(error);
+    if (error) return;
     const container = document.getElementById('listPatients');
     container.innerHTML = '';
     data.forEach(p => container.appendChild(createPatientCard(p)));
@@ -87,7 +74,7 @@ function createPatientCard(p) {
                       <p class="text-xs text-gray-500 mt-1"><b>History:</b> ${escapeHTML(p.history || 'None')}</p>`;
     
     const actions = document.createElement('div');
-    actions.className = 'flex flex-wrap gap-2 w-full md:w-auto';
+    actions.className = 'flex gap-2';
 
     const btnPrint = document.createElement('button');
     btnPrint.className = 'bg-gray-700 text-white px-3 py-2 rounded-lg text-xs font-bold';
@@ -104,17 +91,12 @@ function createPatientCard(p) {
     btnEdit.innerHTML = '<i class="fas fa-edit"></i>';
     btnEdit.onclick = () => loadPatientToForm(p);
 
-    actions.append(btnPrint, btnWA, btnEdit);
+    const btnDelete = document.createElement('button');
+    btnDelete.className = 'bg-red-600 text-white px-3 py-2 rounded-lg text-xs font-bold';
+    btnDelete.innerHTML = '<i class="fas fa-trash"></i>';
+    btnDelete.onclick = () => deletePatientRecord(p.id);
 
-    // কেৱল এডমিনে ডিলিট কৰিব পাৰিব
-    if (currentUserRole === 'admin') {
-        const btnDelete = document.createElement('button');
-        btnDelete.className = 'bg-red-600 text-white px-3 py-2 rounded-lg text-xs font-bold';
-        btnDelete.innerHTML = '<i class="fas fa-trash"></i>';
-        btnDelete.onclick = () => deletePatientRecord(p.id);
-        actions.append(btnDelete);
-    }
-
+    actions.append(btnPrint, btnWA, btnEdit, btnDelete);
     card.append(info, actions);
     return card;
 }
@@ -123,9 +105,6 @@ async function savePatientRecord() {
     const name = document.getElementById('pName').value;
     if(!name) return alert('ৰোগীৰ নাম বাধ্যতামূলক।');
 
-    const session = await supabaseClient.auth.getSession();
-    const userId = session.data.session ? session.data.session.user.id : null;
-
     const patientData = {
         name,
         age: document.getElementById('pAgeSex').value,
@@ -133,8 +112,7 @@ async function savePatientRecord() {
         phone: document.getElementById('pPhone').value,
         history: document.getElementById('pHistory').value,
         medicine: document.getElementById('pMedicine').value,
-        fees: parseInt(document.getElementById('pFees').value) || 0,
-        created_by: userId
+        fees: parseInt(document.getElementById('pFees').value) || 0
     };
 
     if (currentEditId) {
@@ -151,21 +129,6 @@ async function savePatientRecord() {
 }
 
 function loadPatientToForm(p) {
-    // চাব-এডমিন সুৰক্ষা: চাব-এডমিনে কেৱল নিজৰ এন্ট্ৰি কৰা ৰোগীহে এডিট কৰিব পাৰিব
-    if (currentUserRole !== 'admin') {
-        supabaseClient.auth.getSession().then(({ data: { session } }) => {
-            if (p.created_by !== session.user.id) {
-                alert('সুৰক্ষা উলংঘন: আপুনি কেৱল নিজৰ এন্ট্ৰি কৰা ৰেকৰ্ডহে এডিট কৰিব পাৰিব!');
-                return;
-            }
-            proceedToForm(p);
-        });
-    } else {
-        proceedToForm(p);
-    }
-}
-
-function proceedToForm(p) {
     currentEditId = p.id;
     document.getElementById('formTitle').innerText = `এডিট: ${p.name}`;
     document.getElementById('pName').value = p.name;
@@ -205,7 +168,7 @@ async function saveExpenseRecord() {
 
 async function loadExpenses() {
     const { data, error } = await supabaseClient.from('clinic_expenses').select('*').order('created_at', { ascending: false });
-    if (error) return;
+    if (error || !data) return;
 
     const container = document.getElementById('listExpenses');
     container.innerHTML = '';
@@ -225,19 +188,11 @@ async function loadExpenses() {
                           </div>
                           <div class="flex items-center gap-3">
                             <span class="font-mono font-bold text-gray-900">₹${e.amount}</span>
+                            <button class="text-red-500 text-xs font-bold hover:text-red-700 ml-2" onclick="deleteExpenseRecord('${e.id}')"><i class="fas fa-trash"></i></button>
                           </div>`;
-
-        if (currentUserRole === 'admin') {
-            const btnDelExp = document.createElement('button');
-            btnDelExp.className = 'text-red-500 text-xs font-bold hover:text-red-700 ml-2';
-            btnDelExp.innerHTML = '<i class="fas fa-trash"></i>';
-            btnDelExp.onclick = () => deleteExpenseRecord(e.id);
-            card.appendChild(btnDelExp);
-        }
         container.appendChild(card);
     });
 
-    // মাহেকীয়া প্ৰতিবেদন আপডেট (Monthly Summary Note)
     document.getElementById('expenseSummaryText').innerHTML = `
         • দৰমহা (Salary): ₹${summary['Salary']}<br>
         • ঘৰ ভাড়া (Rent): ₹${summary['Rent']}<br>
@@ -255,7 +210,7 @@ async function deleteExpenseRecord(id) {
     }
 }
 
-// ==================== BOOKING & WHATSAPP ====================
+// ==================== BOOKING SYSTEM ====================
 async function submitBooking() {
     const name = document.getElementById('bName').value;
     const phone = document.getElementById('bPhone').value;
@@ -265,10 +220,9 @@ async function submitBooking() {
     if(!name || !phone || !txn_id) return alert('সকলো বাধ্যতামূলক পথাৰ পূৰণ কৰক।');
 
     const { error } = await supabaseClient.from('clinic_bookings').insert([{ name, phone, txn_id, problem }]);
-    if (error) alert('বুকিং ব্যৰ্থ হৈছে বা এই Txn ID ইতিমধ্যে ব্যৱহাৰ হৈছে।');
+    if (error) alert('বুকিং ব্যৰ্থ হৈছে।');
     else {
         alert('আপোনাৰ বুকিং অনুৰোধ সফলতাৰে গ্ৰহণ কৰা হৈছে।');
-        // হোৱাটছএপ ফ্লেছ মেচেজ ট্ৰিগ কৰা
         const flashMsg = `🏥 *DR. HARIS CLINIC*\n\nনমস্কাৰ ${name},\nআপোনাৰ অনলাইন বুকিং অনুৰোধটি সফল হৈছে।\nTxn ID: ${txn_id}\n\nপ্ৰশাসকে অতি সোনকালে আপোনাক ভিজিটৰ সময় জনাই দিব। ধন্যবাদ।`;
         window.open(`https://api.whatsapp.com/send?phone=${phone.replace(/\D/g, '')}&text=${encodeURIComponent(flashMsg)}`, '_blank');
         location.reload();
@@ -316,10 +270,8 @@ function setupTabs() {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('text-green-800', 'border-b-2', 'border-green-800'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.add('text-gray-400'));
-            
             btn.classList.remove('text-gray-400');
             btn.classList.add('text-green-800', 'border-b-2', 'border-green-800');
-            
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             document.getElementById(`tab-${btn.dataset.tab}`).classList.remove('hidden');
         });
