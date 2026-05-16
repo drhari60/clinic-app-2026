@@ -214,9 +214,7 @@ Homeopathic Physician & Physiotherapist
 </div>
 
 <div id="consultationForm" class="card no-print" style="display:none; max-width: 500px; margin: 30px auto; padding: 25px;">
-    <h3 style="color: var(--primary); text-align:center; margin-bottom: 20px;">
-        অনলাইন চিকিৎসা পৰামৰ্শ (Online Consultation)
-    </h3>
+    <h3 style="color: var(--primary); text-align:center; margin-bottom: 20px;">অনলাইন চিকিৎসা পৰামৰ্শ (Online Consultation)</h3>
     
     <div id="consStep1">
         <label>ৰোগীৰ নাম (Patient Name):</label>
@@ -225,58 +223,32 @@ Homeopathic Physician & Physiotherapist
         <label>ফোন নম্বৰ (Phone Number):</label>
         <input type="tel" id="consPhone" placeholder="মোবাইল নম্বৰ">
         
-        <button class="btn-primary" style="width:100%; margin-top:15px;" onclick="verifyConsStep1()">
-            পৰৱৰ্তী খোজ (Next)
-        </button>
+        <button class="btn-primary" style="width:100%; margin-top:15px;" onclick="verifyConsStep1()">পৰৱৰ্তী খোজ (Next)</button>
     </div>
 
-    <div id="consStep3" style="display:none;">
-
+    <div id="consStep2" style="display:none; text-align:center;">
         <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ffe0b2;">
-            
-            <p style="margin:0; color:#e65100; font-weight:bold;">
-                পৰামৰ্শ ফীজ: ২৫০ টকা (₹250)
-            </p>
+            <p style="margin:0; color:#e65100; font-weight:bold;">পৰামৰ্শ ফীজ: ২৫০ টকা (₹250)</p>
+            <p style="font-size:13px; margin:5px 0 0 0;">অনুগ্ৰহ কৰি তলৰ UPI ID ত ২৫০ টকা পেমেণ্ট কৰক আৰু Transaction ID টো তলত লিখক।</p>
+            <p style="font-size:16px; font-weight:bold; color:#004d40; margin:10px 0 0 0;">UPI ID: drhari365@apl</p> </div>
 
-            <p style="font-size:13px; margin:5px 0 0 0;">
-                অনুগ্ৰহ কৰি তলৰ UPI ID ত ২৫০ টকা পেমেণ্ট কৰক আৰু Transaction ID টো তলত লিখক।
-            </p>
-
-            <p style="font-size:16px; font-weight:bold; color:#004d40; margin:10px 0 0 0;">
-                UPI ID: 9954340102@okbizaxis
-            </p>
-
-            <img
-                src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=9954340102@okbizaxis%26pn=Haris%20Homoeo%20Hall%26am=250%26cu=INR"
-                style="width:200px; margin-top:15px; border-radius:10px; border:1px solid #ddd;"
-            >
-
-        </div>
-
-        <label style="text-align:left; display:block;">
-            Transaction ID (UPI/UTR No):
-        </label>
-
-        <input
-            type="text"
-            id="consTxn"
-            placeholder="ট্ৰেনজেকচন আইডি লিখক"
-        >
+        <label style="text-align:left; display:block;">Transaction ID (UPI/UTR No):</label>
+        <input type="text" id="consTxn" placeholder="ট্ৰেনজেকচন আইডি লিখক">
         
-        <button
-            class="btn-primary"
-            style="width:100%; margin-top:10px; background:#00796b;"
-            onclick="verifyConsPayment()"
-        >
-            পেমেণ্ট সাবমিট কৰক (Verify Payment)
-        </button>
+        <button class="btn-primary" style="width:100%; margin-top:10px; background:#00796b;" onclick="verifyConsPayment()">পেমেণ্ট সাবমিট কৰক (Verify Payment)</button>
     </div>
 
     <div id="consStep3" style="display:none;">
-
         <div style="background: #e8f5e9; padding: 10px; border-radius: 8px; margin-bottom: 15px; color: #2e7d32; font-weight: bold; text-align: center;">
             ✓ পেমেণ্ট গ্ৰহণ কৰা হৈছে। এতিয়া আপোনাৰ প্ৰশ্নটো লিখক।
         </div>
+        <label>আপোনাৰ স্বাস্থ্যজনিত সমস্যা বা প্ৰশ্নটো বিতংভাৱে লিখক (Write your question):</label>
+        <textarea id="consQuestion" rows="5" placeholder="আপোনাৰ কি সমস্যা হৈছে আৰু আপুনি কি জানিব বিচাৰে ইয়াত লিখক..." style="width:100%; border-radius:8px; padding:10px; border:1px solid #ccc; font-family:inherit;"></textarea>
+        
+        <button class="btn-primary" style="width:100%; margin-top:15px; background:#2e7d32;" onclick="submitConsultation()">পৰামৰ্শ সাবমিট কৰক (Submit Consultation)</button>
+    </div>
+
+    <button class="btn-primary" style="background:#555; width:100%; margin-top:15px;" onclick="hideConsultationForm()">ফিৰি যাওক (Back)</button>
 </div>
 
 <div id="mainApp" style="display:none;">
