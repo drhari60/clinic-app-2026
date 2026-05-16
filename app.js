@@ -7,32 +7,30 @@ let selectedBookingType = 'Book Now';
 
 const healthTips = [
     { title: "প্ৰাকৃতিক সুষম আহাৰ লওক", content: "ফাষ্ট ফুড, জাঙ্ক ফুড বৰ্জন কৰক, সেউজীয়া শাক-পাচলি আৰু ফল-মূল বেছিকৈ খাওক।" },
-    { title: "পৰ্যাপ্ত পানী খাওক", content: "দিনটোত অন্ততঃ ৩-৪ লিটাৰ পানী খাই নিজৰ শৰীৰটো হাইд্ৰেটেড কৰি ৰাখক।" },
+    { title: "পৰ্যাপ্ত পানী খাওক", content: "দিনটোত অন্ততঃ ৩-৪ লিটাৰ পানী খাই নিজৰ শৰীৰটো হাইড্ৰেテッド কৰি ৰাখক।" },
     { title: "দৈনিক শাৰীৰিক ব্যায়াম", content: "হৃদযন্ত্ৰ সুস্থ ৰাখিবলৈ আৰু ফিট থাকিবলৈ দৈনিক ৩০-৪০ মিনিট খোজ কাঢ়ক।" }
 ];
 
+// 🚀 SAFE DOM ELEMENT GETTER TO PREVENT CRASHES
+const safeGet = (id) => document.getElementById(id) || { addEventListener: () => {}, style: {}, classList: { add:()=>{}, remove:()=>{} } };
+
 window.addEventListener('DOMContentLoaded', () => {
+    // Session Recovery
     if(supabaseClient && supabaseClient.auth) {
         supabaseClient.auth.getSession().then(({ data: { session } }) => {
             if (session) showDashboard();
-        }).catch(err => console.log("Session recovery bypassed"));
+        }).catch(err => console.log("Bypassed"));
     }
 
-    // 🔐 Password Reset Trigger
+    // Event Listeners binded safely - No null pointers allowed
     const btnUpdatePass = document.getElementById('btnUpdateInternalPassword');
     if(btnUpdatePass) {
         btnUpdatePass.addEventListener('click', async () => {
-            const newPassword = document.getElementById('newAdminPassword').value.trim();
-            if(!newPassword || newPassword.length < 6) {
-                return alert('ত্রুটি: পাছৱৰ্ড অতি কমেও ৬ টা ডিজিটৰ হ’ব লাগিব।');
-            }
-            const { data, error } = await supabaseClient.auth.updateUser({ password: newPassword });
-            if(error) {
-                alert('পাছৱৰ্ড সলনি কৰিব পৰা নগ’ল: ' + error.message);
-            } else {
-                alert('সফল হৈছে! আপোনাৰ নতুন পাছৱৰ্ড সংৰক্ষিত হ’ল।');
-                document.getElementById('newAdminPassword').value = '';
-            }
+            const newPassword = safeGet('newAdminPassword').value?.trim();
+            if(!newPassword || newPassword.length < 6) return alert('ত্রুটি: পাছৱৰ্ড অতি কমেও ৬ টা ডিজিটৰ হ’ব লাগিব।');
+            const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+            if(error) alert('পাছৱৰ্ড সলনি কৰিব পৰা নগ’ল: ' + error.message);
+            else { alert('সফল হৈছে! আপোনাৰ নতুন পাছৱৰ্ড সংৰক্ষিত হ’W।'); safeGet('newAdminPassword').value = ''; }
         });
     }
 
@@ -91,8 +89,8 @@ function startHealthTipsRotation() {
 }
 
 async function handleLogin() {
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
+    const email = safeGet('loginEmail').value;
+    const password = safeGet('loginPassword').value;
     if(!password) return alert('অনুগ্ৰহ কৰি পাছৱৰ্ডটো লিখক।');
 
     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
@@ -101,9 +99,9 @@ async function handleLogin() {
 }
 
 function showDashboard() {
-    document.getElementById('loginSection').style.display = 'none';
-    document.getElementById('publicBookingSection').classList.add('hidden');
-    document.getElementById('appDashboard').classList.remove('hidden');
+    safeGet('loginSection').style.display = 'none';
+    safeGet('publicBookingSection').classList.add('hidden');
+    safeGet('appDashboard').classList.remove('hidden');
     loadPatients();
     loadBookings();
     loadExpenses();
@@ -116,47 +114,35 @@ async function handleLogout() {
 
 function showBookingForm(type, fee, isDirectPaid) {
     selectedBookingType = type;
-    document.getElementById('loginSection').style.display = 'none';
-    document.getElementById('publicBookingSection').classList.remove('hidden');
+    safeGet('loginSection').style.display = 'none';
+    safeGet('publicBookingSection').classList.remove('hidden');
     
     const bTitle = document.getElementById('bookingFormTitle');
     if(bTitle) bTitle.innerText = `📆 নতুন ${type} ফৰ্ম`;
     
     const qrBadge = document.getElementById('qrBadge');
     if (qrBadge) {
-        if (isDirectPaid) {
-            qrBadge.innerText = `পেমেন্ট সম্পন্ন কৰাৰ পিছত তলত ১২ ডিজিটৰ Transaction ID দিয়ক`;
-        } else {
-            qrBadge.innerText = `${type} ফীজ: ₹${fee}`;
-        }
+        qrBadge.innerText = isDirectPaid ? `পেমেন্ট সম্পন্ন কৰাৰ পিছত তলত ১২ ডিজিটৰ Transaction ID দিয়ক` : `${type} ফীজ: ₹${fee}`;
     }
     
     const upiPayload = `upi://pay?pa=9954340102@okbizaxis&pn=Dr%20Harikanta%20Das&am=${fee}&cu=INR&tn=${encodeURIComponent(type)}`;
     const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiPayload)}&ecc=M`;
     
     const qrImageContainer = document.getElementById('paymentQRCode');
-    if(qrImageContainer) {
-        qrImageContainer.src = qrApiUrl;
-    }
+    if(qrImageContainer) qrImageContainer.src = qrApiUrl;
     
     const upiPayBtn = document.getElementById('upiPayBtn');
-    if(upiPayBtn) {
-        upiPayBtn.href = upiPayload;
-    }
+    if(upiPayBtn) upiPayBtn.href = upiPayload;
 }
 
 async function submitBooking() {
-    const name = document.getElementById('bName').value.trim();
-    const phone = document.getElementById('bPhone').value.trim();
-    const txn_id = document.getElementById('bTxnId').value.trim();
-    const problem = document.getElementById('bProblem').value.trim();
+    const name = safeGet('bName').value?.trim();
+    const phone = safeGet('bPhone').value?.trim();
+    const txn_id = safeGet('bTxnId').value?.trim();
+    const problem = safeGet('bProblem').value?.trim();
 
-    if(!name || !phone || !txn_id) {
-        return alert('ত্রুটি: নাম, ম’বাইল নম্বৰ আৰু ১২ ডিজিটৰ Transaction ID দিয়াটো বাধ্যতামূলক।');
-    }
-    if(txn_id.length < 8) {
-        return alert('অনুগ্ৰহ কৰি এটা সঠিক UPI Transaction ID প্ৰদান কৰক।');
-    }
+    if(!name || !phone || !txn_id) return alert('ত্রুটি: নাম, ম’বাইল নম্বৰ আৰু ১২ ডিজিটৰ Transaction ID দিয়াটো বাধ্যতামূলক।');
+    if(txn_id.length < 8) return alert('অনুগ্ৰহ কৰি বাছনি কৰা সঠিক UPI Transaction ID প্ৰদান কৰক।');
 
     const problemDesc = `[${selectedBookingType}] ${problem}`;
     const { error } = await supabaseClient.from('clinic_bookings').insert([{ name, phone, txn_id, problem: problemDesc }]);
@@ -233,17 +219,17 @@ function createPatientCard(p) {
 }
 
 async function savePatientRecord() {
-    const name = document.getElementById('pName').value;
+    const name = safeGet('pName').value;
     if(!name) return alert('ৰোগীৰ নাম লিখাটো বাধ্যতামূলক।');
 
     const patientData = {
         name,
-        age: document.getElementById('pAgeSex').value,
-        bp: document.getElementById('pBP').value,
-        phone: document.getElementById('pPhone').value,
-        history: document.getElementById('pHistory').value,
-        medicine: document.getElementById('pMedicine').value,
-        fees: parseInt(document.getElementById('pFees').value) || 0
+        age: safeGet('pAgeSex').value,
+        bp: safeGet('pBP').value,
+        phone: safeGet('pPhone').value,
+        history: safeGet('pHistory').value,
+        medicine: safeGet('pMedicine').value,
+        fees: parseInt(safeGet('pFees').value) || 0
     };
 
     if (currentEditId) {
@@ -254,22 +240,23 @@ async function savePatientRecord() {
         alert('নতুন ৰোগীৰ তথ্য সংৰক্ষণ কৰা হ’ল।');
     }
     currentEditId = null;
-    document.getElementById('formTitle').innerText = 'নতুন ৰোগীৰ প্ৰেচক্ৰিপচন এণ্ট্ৰী চেকচন';
+    safeGet('formTitle').innerText = 'নতুন ৰোগীৰ প্ৰেচক্ৰিপচন এণ্ট্ৰী চেকচন';
     clearForm();
     loadPatients();
 }
 
 function loadPatientToForm(p) {
     currentEditId = p.id;
-    document.getElementById('formTitle').innerText = `এডিট মোড: ${p.name}`;
-    document.getElementById('pName').value = p.name;
-    document.getElementById('pAgeSex').value = p.age || '';
-    document.getElementById('pBP').value = p.bp || '';
-    document.getElementById('pPhone').value = p.phone || '';
-    document.getElementById('pHistory').value = p.history || '';
-    document.getElementById('pMedicine').value = p.medicine || '';
-    document.getElementById('pFees').value = p.fees || 0;
-    document.getElementById('prescriptionEntrySection').scrollIntoView({ behavior: 'smooth' });
+    safeGet('formTitle').innerText = `এডিট মোড: ${p.name}`;
+    safeGet('pName').value = p.name;
+    safeGet('pAgeSex').value = p.age || '';
+    safeGet('pBP').value = p.bp || '';
+    safeGet('pPhone').value = p.phone || '';
+    safeGet('pHistory').value = p.history || '';
+    safeGet('pMedicine').value = p.medicine || '';
+    safeGet('pFees').value = p.fees || 0;
+    const target = document.getElementById('prescriptionEntrySection');
+    if(target) target.scrollIntoView({ behavior: 'smooth' });
 }
 
 async function deletePatientRecord(id) {
@@ -280,9 +267,9 @@ async function deletePatientRecord(id) {
 }
 
 async function saveExpenseRecord() {
-    const category = document.getElementById('expCategory').value;
-    const amount = parseFloat(document.getElementById('expAmount').value);
-    const description = document.getElementById('expDesc').value;
+    const category = safeGet('expCategory').value;
+    const amount = parseFloat(safeGet('expAmount').value);
+    const description = safeGet('expDesc').value;
 
     if (!amount || amount <= 0) return alert('সঠিক খৰচৰ পৰিমাণ লিখক।');
 
@@ -290,8 +277,8 @@ async function saveExpenseRecord() {
     if (error) alert('খৰচ সংৰক্ষণ ব্যৰ্থ হৈছে।');
     else {
         alert('খৰচৰ হিচাপ সংৰক্ষণ কৰা হ’ল।');
-        document.getElementById('expAmount').value = '';
-        document.getElementById('expDesc').value = '';
+        safeGet('expAmount').value = '';
+        safeGet('expDesc').value = '';
         loadExpenses();
     }
 }
@@ -359,7 +346,7 @@ function printPrescription(p) {
 
 function escapeHTML(str) { return str ? str.replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t)) : ''; }
 function filterPatients() {
-    const term = document.getElementById('searchBox').value.toLowerCase();
+    const term = safeGet('searchBox').value.toLowerCase();
     document.querySelectorAll('#listPatients > div').forEach(c => c.style.display = c.innerText.toLowerCase().includes(term) ? 'flex' : 'none');
 }
 function clearForm() { ['pName', 'pAgeSex', 'pBP', 'pPhone', 'pHistory', 'pMedicine', 'pFees'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; }); }
