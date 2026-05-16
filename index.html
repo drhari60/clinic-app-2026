@@ -25,6 +25,27 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        /* আপোনাৰ ফটো আৰু নাম থকা মূল ইন্টাৰফেচ */
+        .clinic-profile {
+            text-align: center;
+            padding: 30px 15px;
+            background: var(--white);
+            border-radius: 0 0 35px 35px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .doctor-img {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            border: 4px solid var(--white);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            object-fit: cover;
+            display: block;
+            margin: 0 auto;
+        }
+
         .header { 
             background: linear-gradient(135deg, var(--primary), #00695c); 
             color: white; 
@@ -111,9 +132,14 @@
 </head>
 <body>
 
-<div id="loginArea" class="card no-print" style="max-width: 400px; margin: 40px auto; padding: 20px; text-align:center; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-radius: 20px;">
-    <h2 style="color: var(--primary); margin-bottom: 20px; font-weight: 700;">Dr. Haris Clinic</h2>
-    
+<div class="clinic-profile no-print">
+    <img src="https://oblvgjnyecvvnnnesegl.supabase.co/storage/v1/object/public/profile/drhari_passport_photo.png" alt="Dr. Harikanta Das" class="doctor-img">
+    <h2 style="color: var(--text); margin: 15px 0 5px 0; font-weight: 800; font-size: 1.8rem;">Dr. Harikanta Das</h2>
+    <p style="color: #7f8c8d; margin: 0; font-size: 1.1rem; font-weight: 500;">Homeopathic Physician & Physiotherapist</p>
+    <h1 style="color: var(--primary); margin: 15px 0 0 0; font-weight: 900; font-size: 2.1rem; letter-spacing: -1px;">Dr. Haris Clinic</h1>
+</div>
+
+<div id="loginArea" class="card no-print" style="max-width: 400px; margin: 20px auto; padding: 20px; text-align:center; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-radius: 20px;">
     <input type="password" id="adminPass" placeholder="পাছৱৰ্ড দিয়ক" style="margin-bottom: 15px;">
     
     <div style="display:flex; gap:10px; margin-bottom: 15px;">
@@ -122,11 +148,11 @@
     </div>
 
     <button class="btn-primary" style="background: #e65100; width: 100%; margin-bottom: 20px; font-weight: bold; padding: 12px;" onclick="showConsultationForm()">
-        অনলাইন পৰামৰ্শৰ বাবে ইয়াত ক্লিক কৰক (Online Consultation)
+        অনলাইন পৰামৰ্শ (Online Consultation)
     </button>
 
     <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
-        <p style="margin: 0 0 10px 0; font-size: 13px; font-weight: bold; color: #555;">আমাৰ Social Media ৰ সৈতে জড়িত হওক:</p>
+        <p style="margin: 0 0 10px 0; font-size: 13px; font-weight: bold; color: #555;">Social Media:</p>
         <div style="display: flex; justify-content: center; gap: 20px; font-size: 24px;">
             <a href="https://www.facebook.com/drhari365" target="_blank" style="color: #1877F2;"><i class="fab fa-facebook"></i></a>
             <a href="https://www.youtube.com/@drhari" target="_blank" style="color: #FF0000;"><i class="fab fa-youtube"></i></a>
@@ -150,7 +176,7 @@
             <div style="background: linear-gradient(135deg, #2e7d32, #43a047); color: white; padding: 20px; width: 33.333%; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; flex-shrink: 0;">
                 <i class="fas fa-apple-alt" style="font-size: 26px; margin-bottom: 8px; color: #a5d6a7;"></i>
                 <h4 style="margin: 0 0 5px 0; font-size: 15px;">প্ৰাকৃতিক সুষম আহাৰ লওক</h4>
-                <p style="margin: 0; font-size: 12px; color: #e8f5e9;">ফাষ্ট ফুড, জাঙ্ক ফুড বৰ্জন কৰক, সেউজীয়া শাক-পাচলি আৰু ফল-মূল বেছিকৈ খাওক।</p>
+                <p style="margin: 0; font-size: 12px; color: #e8f5e9;">ফাষ্ট ফুড বৰ্জন কৰক, সেউজীয়া শাক-পাচলি আৰু ফল-মূল বেছিকৈ খাওক।</p>
             </div>
         </div>
     </div>
@@ -162,14 +188,13 @@
         <div class="qr-section">
             <p><b>Scan to Pay ₹100</b></p>
             <a href="upi://pay?pa=9954340102@okbizaxis&pn=Haris%20Homoeo%20Hall&am=100&cu=INR">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi%3A%2F%2Fpay%3Fpa%3D9954340102%40okbizaxis%26pn%3DHaris%2520Homoeo%2520Hall%26am%3D100%26cu%3DINR" alt="GPay QR">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=9954340102@okbizaxis%26pn=Haris%20Homoeo%20Hall%26am=100" alt="GPay QR">
             </a>
             <p><b>Haris Homoeo Hall</b></p>
         </div>
         <input type="text" id="bName" placeholder="ৰোগীৰ নাম">
         <input type="text" id="bPhone" placeholder="মোবাইল নম্বৰ">
         <textarea id="bProblem" placeholder="সমস্যাটো চমুকৈ লিখক..."></textarea>
-        <input type="text" id="bFormTxn" placeholder="Transaction ID (পেমেন্টৰ পাছত)">
         <button class="btn-primary" style="background:var(--accent);" onclick="submitBooking()">CONFIRM BOOKING</button>
         <button onclick="location.reload()" style="background:none; border:none; color:gray; cursor:pointer; margin-top:10px; width:100%;">Cancel</button>
     </div>
@@ -181,30 +206,19 @@
     <div id="consStep1">
         <label>ৰোগীৰ নাম (Patient Name):</label>
         <input type="text" id="consName" placeholder="নাম লিখক">
-        
         <label>ফোন নম্বৰ (Phone Number):</label>
         <input type="tel" id="consPhone" placeholder="মোবাইল নম্বৰ">
-        
         <button class="btn-primary" style="width:100%; margin-top:15px;" onclick="verifyConsStep1()">পৰৱৰ্তী খোজ (Next)</button>
     </div>
 
     <div id="consStep2" style="display:none; text-align:center;">
         <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ffe0b2;">
-            <p style="margin:0; color:#e65100; font-weight:bold; font-size:16px;">পৰামৰ্শ ফীজ: ২৫০ টকা (₹250)</p>
-            <p style="font-size:13px; margin:5px 0 10px 0;">অনুগ্ৰহ কৰি তলৰ QR Code খন স্কেন কৰি বা Google Pay যোগে পেমেণ্ট সম্পন্ন কৰক।</p>
-            <p style="font-size:14px; font-weight:bold; color:#004d40; margin:5px 0 10px 0; background: #e0f2f1; padding: 8px; border-radius: 6px;">GooglePay Business ID: 9954340102@okbizaxis</p>
-            
-            <div class="qr-section" style="margin: 15px 0;">
-                <a href="upi://pay?pa=9954340102@okbizaxis&pn=Haris%20Homoeo%20Hall&am=250&cu=INR">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi%3A%2F%2Fpay%3Fpa%3D9954340102%40okbizaxis%26pn%3DHaris%2520Homoeo%2520Hall%26am%3D250%26cu%3DINR" alt="Consultation QR ₹250" style="width:190px; height:190px; border:3px solid var(--primary); padding:6px; border-radius:12px; background:white;">
-                </a>
-                <p style="font-size:12px; margin:8px 0 0 0; color:#444;"><b>Haris Homoeo Hall</b><br><span style="color:#777;">(স্ক্ৰীনশ্বট লৈ স্কেন কৰক বা ক্লিক কৰক)</span></p>
-            </div>
+            <p style="margin:0; color:#e65100; font-weight:bold;">পৰামৰ্শ ফীজ: ২৫০ টকা (₹250)</p>
+            <p style="font-size:13px; margin:5px 0 0 0;">অনুগ্ৰহ কৰি তলৰ UPI ID ত ২৫০ টকা পেমেণ্ট কৰক আৰু Transaction ID টো তলত লিখক।</p>
+            <p style="font-size:16px; font-weight:bold; color:#004d40; margin:10px 0 0 0;">UPI ID: drhari365@apl</p> 
         </div>
-
-        <label style="text-align:left; display:block; font-weight: bold; color: var(--text);">Transaction ID (UPI/UTR No):</label>
+        <label style="text-align:left; display:block;">Transaction ID (UPI/UTR No):</label>
         <input type="text" id="consTxn" placeholder="ট্ৰেনজেকচন আইডি লিখক">
-        
         <button class="btn-primary" style="width:100%; margin-top:10px; background:#00796b;" onclick="verifyConsPayment()">পেমেণ্ট সাবমিট কৰক (Verify Payment)</button>
     </div>
 
@@ -212,12 +226,10 @@
         <div style="background: #e8f5e9; padding: 10px; border-radius: 8px; margin-bottom: 15px; color: #2e7d32; font-weight: bold; text-align: center;">
             ✓ পেমেণ্ট গ্ৰহণ কৰা হৈছে। এতিয়া আপোনাৰ প্ৰশ্নটো লিখক।
         </div>
-        <label>আপোনাৰ স্বাস্থ্যজনিত সমস্যা বা প্ৰশ্নটো বিতংভাৱে লিখক (Write your question):</label>
+        <label>আপোনাৰ স্বাস্থ্যজনিত সমস্যা বা প্ৰশ্নটো বিতংভাৱে লিখক:</label>
         <textarea id="consQuestion" rows="5" placeholder="আপোনাৰ কি সমস্যা হৈছে আৰু আপুনি কি জানিব বিচাৰে ইয়াত লিখক..." style="width:100%; border-radius:8px; padding:10px; border:1px solid #ccc; font-family:inherit;"></textarea>
-        
         <button class="btn-primary" style="width:100%; margin-top:15px; background:#2e7d32;" onclick="submitConsultation()">পৰামৰ্শ সাবমিট কৰক (Submit Consultation)</button>
     </div>
-
     <button class="btn-primary" style="background:#555; width:100%; margin-top:15px;" onclick="hideConsultationForm()">ফিৰি যাওক (Back)</button>
 </div>
 
@@ -318,65 +330,61 @@
 <div id="paymentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center; padding:20px;">
     <div style="background:white; padding:20px; border-radius:15px; max-width:400px; width:100%; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.3); position:relative;">
         <h3 style="color:#2c3e50; margin-top:0;">পেমেন্ট কৰক</h3>
-        <p style="font-size:14px; color:#555; margin-bottom:15px; line-height: 1.4;">অনুগ্ৰহ কৰি তলৰ QR Code খন স্ক্ৰীনশ্বট লৈ GPay/PhonePe-ৰ Gallery-ৰ পৰা স্কেন কৰি <b>₹১০০</b> পেমেণ্ট কৰক।</p>
-        
-        <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi%3A%2F%2Fpay%3Fpa%3D9954340102%40okbizaxis%26pn%3DHaris%2520Homoeo%2520Hall%26am%3D100%26cu%3DINR" alt="UPI QR Code" style="width:220px; height:220px; margin:10px auto; display:block; border:1px solid #eee; padding:5px; border-radius:10px;">
-        
+        <p style="font-size:14px; color:#555; margin-bottom:15px;">QR Code স্কেন কৰি <b>₹১০০</b> পেমেণ্ট কৰক।</p>
+        <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=9954340102@okbizaxis%26pn=Haris%20Homoeo%20Hall%26am=100%26cu=INR" alt="UPI QR" style="width:220px; height:220px; margin:10px auto; display:block; border:1px solid #eee; padding:5px; border-radius:10px;">
         <div style="font-weight:bold; font-size:18px; color:#e67e22; margin:5px 0;">পৰিমাণ: ₹১০০</div>
-        
         <div style="margin-bottom:12px; text-align:left;">
             <label for="modalTxn" style="font-size:12px; font-weight:bold; color:#e74c3c;">* Transaction ID (বাধ্যতামূলক):</label>
-            <input type="text" id="modalTxn" placeholder="ইউটিআৰ (UTR) বা ট্ৰেনজেকচন নম্বৰটো লিখক" style="width:100%; padding:12px; margin-top:5px; border:2px solid #e74c3c; border-radius:8px; box-sizing:border-box; text-align:center; font-weight:bold;">
+            <input type="text" id="modalTxn" placeholder="ট্ৰেনজেকচন নম্বৰটো লিখক" style="width:100%; padding:12px; margin-top:5px; border:2px solid #e74c3c; border-radius:8px; text-align:center; font-weight:bold;">
         </div>
-        
-        <button onclick="closePaymentModal()" style="width:100%; background:#27ae60; color:white; padding:14px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:15px;">মই পেমেন্ট কৰিলোঁ (Confirm Booking)</button>
+        <button onclick="closePaymentModal()" style="width:100%; background:#27ae60; color:white; padding:14px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">মই পেমেন্ট কৰিলোঁ (Confirm Booking)</button>
     </div>
 </div>
 
 <script>
+    // Supabase Connection Corrected
     const supabaseUrl = 'https://oblvgjnyecvvnnnesegl.supabase.co';
     const supabaseKey = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9';
-    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+    
     let currentEditPatientId = null; 
     let currentEditAccountId = null; 
-    let userRole = 'assistant';
+    let userRole = 'assistant'; 
 
-function checkPass() {
-    const inputPass = document.getElementById('adminPass').value;
-    const savedRole = sessionStorage.getItem('userRole');
+    function checkPass() {
+        const inputPass = document.getElementById('adminPass').value;
+        const savedRole = sessionStorage.getItem('userRole');
 
-    if (savedRole === 'admin' || inputPass === 'drharis1') {
-        userRole = 'admin';
-        sessionStorage.setItem('userRole', 'admin');
-        sessionStorage.setItem('isLoggedIn', 'true');
-        document.getElementById('loginArea').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'block';
-        loadPatients(); loadAccounts(); loadBookings();
-    } else if (savedRole === 'assistant' || inputPass === 'assistant123') { 
-        userRole = 'assistant';
-        sessionStorage.setItem('userRole', 'assistant');
-        sessionStorage.setItem('isLoggedIn', 'true');
-        document.getElementById('loginArea').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'block';
-        loadPatients(); loadAccounts(); loadBookings();
-    } else { 
-        alert("ভুল পাছৱৰ্ড!"); 
+        if (savedRole === 'admin' || inputPass === 'drharis1') {
+            userRole = 'admin';
+            sessionStorage.setItem('userRole', 'admin');
+            sessionStorage.setItem('isLoggedIn', 'true');
+            document.getElementById('loginArea').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            loadPatients(); loadAccounts(); loadBookings();
+        } else if (savedRole === 'assistant' || inputPass === 'assistant123') { 
+            userRole = 'assistant';
+            sessionStorage.setItem('userRole', 'assistant');
+            sessionStorage.setItem('isLoggedIn', 'true');
+            document.getElementById('loginArea').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            loadPatients(); loadAccounts(); loadBookings();
+        } else { 
+            alert("ভুল পাছৱৰ্ড!"); 
+        }
     }
-}
 
-window.onload = function() {
-    if (sessionStorage.getItem('isLoggedIn') === 'true') {
-        checkPass();
-    }
-};
+    window.onload = function() {
+        if (sessionStorage.getItem('isLoggedIn') === 'true') {
+            checkPass();
+        }
+    };
 
     function showTab(tabName) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.getElementById('section-' + tabName).classList.add('active');
-        
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         document.getElementById('nav-' + tabName).classList.add('active');
-        
         window.scrollTo(0,0);
     }
 
@@ -392,51 +400,45 @@ window.onload = function() {
         };
 
         if(currentEditPatientId) {
-            const { error } = await _supabase.from('clinic_data').update(d).eq('id', currentEditPatientId);
-            if(!error) { alert("ৰোগীৰ তথ্য সফলতাৰে শুধৰোৱা হ’ল!"); currentEditPatientId = null; location.reload(); }
+            const { error } = await supabaseClient.from('clinic_data').update(d).eq('id', currentEditPatientId);
+            if(!error) { alert("তথ্য শুধৰোৱা হ’ল!"); location.reload(); }
         } else {
-            const { error } = await _supabase.from('clinic_data').insert([d]);
+            const { error } = await supabaseClient.from('clinic_data').insert([d]);
             if(!error) {
-                if(fees > 0) await _supabase.from('clinic_accounts').insert([{ type: 'Income', amount: fees, note: 'ৰোগী: ' + name }]);
+                if(fees > 0) await supabaseClient.from('clinic_accounts').insert([{ type: 'Income', amount: fees, note: 'ৰোগী: ' + name }]);
                 alert("Saved!"); location.reload();
             }
         }
     }
 
     async function loadPatients() {
-    const { data } = await _supabase.from('clinic_data').select('*').order('created_at', { ascending: false });
-    const currentRole = sessionStorage.getItem('userRole') || userRole;
+        const { data } = await supabaseClient.from('clinic_data').select('*').order('created_at', { ascending: false });
+        const currentRole = sessionStorage.getItem('userRole') || userRole;
 
-    if(data) document.getElementById('listPatients').innerHTML = data.map(p => {
-        const adminControls = currentRole === 'admin' ? `
-            <div style="display:flex; gap:12px;">
-                <button onclick='editPatientInline(${JSON.stringify(p)})' style="background:none; border:none; color:#3498db; font-size:18px; cursor:pointer;"><i class="fas fa-edit"></i></button>
-                <button onclick="deletePatient(${p.id})" style="background:none; border:none; color:#e74c3c; font-size:18px; cursor:pointer;"><i class="fas fa-trash-alt"></i></button>
-            </div>` : '';
+        if(data) document.getElementById('listPatients').innerHTML = data.map(p => {
+            const adminControls = currentRole === 'admin' ? `
+                <div style="display:flex; gap:12px;">
+                    <button onclick='editPatientInline(${JSON.stringify(p)})' style="background:none; border:none; color:#3498db; font-size:18px; cursor:pointer;"><i class="fas fa-edit"></i></button>
+                    <button onclick="deletePatient(${p.id})" style="background:none; border:none; color:#e74c3c; font-size:18px; cursor:pointer;"><i class="fas fa-trash-alt"></i></button>
+                </div>` : '';
 
-        return `
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: start;">
-                    <div>
-                        <b style="font-size: 1.1em; color: var(--primary);">${p.name}</b><br>
-                        <small style="color: #666;">📞 ${p.phone}</small>
+            return `
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <b style="font-size: 1.1em; color: var(--primary);">${p.name}</b><br>
+                            <small style="color: #666;">📞 ${p.phone}</small>
+                        </div>
+                        ${adminControls}
                     </div>
-                    ${adminControls}
-                </div>
-                <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
-                    <button onclick='printPrescription(${JSON.stringify(p)})' style="flex:1; background:#555; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
-                        <i class="fas fa-print"></i> Print
-                    </button>
-                    <button onclick='sendWhatsApp(${JSON.stringify(p)})' style="flex:1; background:#25d366; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
-                        <i class="fab fa-whatsapp"></i> Rx
-                    </button>
-                    <button onclick='sendReminder(${JSON.stringify(p)})' style="flex:1; background:#ff9800; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
-                        <i class="fas fa-bell"></i> Remind
-                    </button>
-                </div>
-            </div>`;
-    }).join('');
-}
+                    <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+                        <button onclick='printPrescription(${JSON.stringify(p)})' style="flex:1; background:#555; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;"><i class="fas fa-print"></i> Print</button>
+                        <button onclick='sendWhatsApp(${JSON.stringify(p)})' style="flex:1; background:#25d366; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;"><i class="fab fa-whatsapp"></i> Rx</button>
+                        <button onclick='sendReminder(${JSON.stringify(p)})' style="flex:1; background:#ff9800; color:white; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:12px;"><i class="fas fa-bell"></i> Remind</button>
+                    </div>
+                </div>`;
+        }).join('');
+    }
 
     function editPatientInline(p) {
         currentEditPatientId = p.id;
@@ -447,22 +449,16 @@ window.onload = function() {
         document.getElementById('pHistory').value = p.history || '';
         document.getElementById('pMedicine').value = p.medicine || '';
         document.getElementById('pFees').value = p.fees || 0;
-        
-        const btn = document.querySelector("#newEntryForm .btn-primary");
-        if(btn) { btn.innerText = "UPDATE Rx"; btn.style.background = "#e67e22"; }
         document.getElementById('newEntryForm').scrollIntoView({behavior: 'smooth'});
     }
 
     async function deletePatient(id) {
-    if (sessionStorage.getItem('userRole') !== 'admin') { 
-        alert("অনুমতি নাই! কেৱল ড° হৰিয়েহে মচিব পাৰিব।"); 
-        return; 
+        if (sessionStorage.getItem('userRole') !== 'admin') { alert("অনুমতি নাই!"); return; }
+        if(confirm("মচি দিব খোজে নেকি?")) {
+            const { error } = await supabaseClient.from('clinic_data').delete().eq('id', id);
+            if(!error) { alert("মচি দিয়া হ’ল!"); loadPatients(); }
+        }
     }
-    if(confirm("আপুনি এই ৰোগীৰ সম্পূৰ্ণ ৰেকৰ্ড মচি দিব খোজে নেকি?")) {
-        const { error } = await _supabase.from('clinic_data').delete().eq('id', id);
-        if(!error) { alert("ৰোগীৰ ৰেকৰ্ড মচি দিয়া হ’ল!"); loadPatients(); }
-    }
-}
 
     function printPrescription(p) {
         document.getElementById('printArea').innerHTML = `
@@ -476,52 +472,33 @@ window.onload = function() {
         window.print();
     }
 
-   function sendWhatsApp(p) {
-    if (!p.phone) { alert("ৰোগীৰ ম’বাইল নম্বৰ নাই!"); return; }
-    const clinicHeader = "🏥 *DR. HARIS HOMEOPATHIC CLINIC*\n📍 গোগামুখ, ধেমাজি, অসম\n📞 ফোন: 9707722511\n----------------------------\n\n";
-    const socialLinks = "\n\n----------------------------\n🔗 *Follow us for Health Tips:*\n📘 Facebook: https://www.facebook.com/drhari365\n📺 YouTube: https://www.youtube.com/@drhari\n📸 Instagram: https://www.instagram.com/drharikanta\n🌐 Website: https://www.drhariswellfuture.com";
-    const fullMessage = clinicHeader + `*Prescription for:* ${p.name}\n` + `*Age/Sex:* ${p.age || 'N/A'}\n` + `*History:* ${p.history || 'N/A'}\n` + `*Rx (Medicines):*\n${p.medicine}` + socialLinks;
-    let cleanPhone = p.phone.replace(/\D/g, '');
-    if (cleanPhone.length === 10) { cleanPhone = '91' + cleanPhone; }
-    window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(fullMessage)}`, '_blank');
-}
+    function sendWhatsApp(p) {
+        if (!p.phone) { alert("মোবাইল নম্বৰ নাই!"); return; }
+        const msg = `🏥 *DR. HARIS HOMEOPATHIC CLINIC*\n*Patient:* ${p.name}\n*Rx:*\n${p.medicine}`;
+        let cleanPhone = p.phone.replace(/\D/g, '');
+        if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
+        window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(msg)}`, '_blank');
+    }
 
     function sendReminder(p) {
-        const text = `নমস্কাৰ ${p.name} ডাঙৰীয়া/আইদেউ,\nড° হৰি ক্লিনিকৰ পৰা আপোনাক মনত পেলাই দিয়া হৈছে যে আপোনাৰ ঔষধ খোৱাৰ সময় হৈছে। সুস্থ থাকক।\n--- 📞 9707722511`;
+        const text = `নमস্কাৰ ${p.name}, ড° হৰি ক্লিনিকৰ পৰা ঔষধ খোৱাৰ সময় মনত পেলাই দিয়া হৈছে।`;
         window.open(`https://wa.me/91${p.phone}?text=${encodeURIComponent(text)}`);
     }
 
     async function loadAccounts() {
-    const { data } = await _supabase.from('clinic_accounts').select('*').order('created_at', { ascending: false });
-    if(data) {
-        let i=0, e=0; data.forEach(d => d.type==='Income'?i+=d.amount:e+=d.amount);
-        document.getElementById('totalInc').innerText = '₹'+i; 
-        document.getElementById('totalExp').innerText = '₹'+e;
-        
-        document.getElementById('expenseList').innerHTML = `<h4 style='margin-top:20px; color:var(--primary);'><i class="fas fa-list"></i> লেনদেনৰ সম্পূৰ্ণ তালিকা:</h4>` + data.map(d => {
-                const isIncome = d.type === 'Income';
-                const borderSide = isIncome ? 'border-left:4px solid #27ae60;' : 'border-left:4px solid #e74c3c;';
-                const badgeColor = isIncome ? '#27ae60' : '#e74c3c';
-                const badgeText = isIncome ? 'উপাৰ্জন (Income)' : 'খৰচ (Expense)';
-                
-                return `
-                <div class="card" style="padding:15px; margin:10px 0; background:#fff; ${borderSide} box-shadow:0 2px 5px rgba(0,0,0,0.05);">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <span style="font-size:12px; color:#7f8c8d;"><i class="far fa-calendar-alt"></i> ${new Date(d.created_at).toLocaleDateString()}</span>
-                        <span style="font-size:11px; background:${badgeColor}; color:white; padding:3px 8px; border-radius:12px; font-weight:bold;">${badgeText}</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                        <span style="font-size:14px; font-weight:600; color:#2c3e50;"><i class="fas fa-tag"></i> ${d.note}</span>
-                        <b style="font-size:16px; color:${badgeColor};">₹${d.amount}</b>
-                    </div>
-                    <div style="display:flex; gap:10px; border-top:1px dashed #eee; padding-top:10px;">
-                        <button onclick='editAccountInline(${JSON.stringify(d)})' style="flex:1; background:#3498db; color:white; border:none; padding:8px; border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;"><i class="fas fa-edit"></i> Edit</button>
-                        <button onclick="deleteAccount(${d.id})" style="flex:1; background:#e74c3c; color:white; border:none; padding:8px; border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;"><i class="fas fa-trash-alt"></i> Moci Diya</button>
-                    </div>
-                </div>`;
-            }).join('');
+        const { data } = await supabaseClient.from('clinic_accounts').select('*').order('created_at', { ascending: false });
+        if(data) {
+            let i=0, e=0; data.forEach(d => d.type==='Income'?i+=d.amount:e+=d.amount);
+            document.getElementById('totalInc').innerText = '₹'+i; 
+            document.getElementById('totalExp').innerText = '₹'+e;
+            
+            document.getElementById('expenseList').innerHTML = data.map(d => `
+                <div class="card" style="padding:15px;">
+                    <small>${new Date(d.created_at).toLocaleDateString()}</small> | <b>${d.note}</b>: ₹${d.amount} (${d.type})
+                    <button onclick="deleteAccount(${d.id})" style="float:right; border:none; background:none; color:red; cursor:pointer;"><i class="fas fa-trash"></i></button>
+                </div>`).join('');
+        }
     }
-}
 
     async function addAccount(type) {
         const amt = parseInt(document.getElementById('accAmount').value);
@@ -529,37 +506,21 @@ window.onload = function() {
         const note = document.getElementById('accNote').value;
         if(!amt) return;
 
-        if(currentEditAccountId) {
-            const { error } = await _supabase.from('clinic_accounts').update({ amount: amt, note: `${cat}: ${note}` }).eq('id', currentEditAccountId);
-            if(!error) { alert("খৰচৰ হিচাপ শুধৰোৱা হ’ল!"); currentEditAccountId = null; }
-        } else {
-            const { error } = await _supabase.from('clinic_accounts').insert([{ type: type, amount: amt, note: `${cat}: ${note}` }]);
-            if(!error) alert("খৰচ সংৰক্ষণ কৰা হ'ল!");
-        }
+        const { error } = await supabaseClient.from('clinic_accounts').insert([{ type: type, amount: amt, note: `${cat}: ${note}` }]);
+        if(!error) alert("Saved!");
         location.reload();
     }
 
-    function editAccountInline(d) {
-        currentEditAccountId = d.id;
-        const parts = d.note.split(': ');
-        const noteContent = parts.length > 1 ? parts.slice(1).join(': ') : d.note;
-        document.getElementById('accAmount').value = d.amount;
-        document.getElementById('accNote').value = noteContent;
-        
-        const btn = document.querySelector("#section-reports .btn-primary");
-        if(btn) { btn.innerText = "UPDATE EXPENSE"; btn.style.background = "#e67e22"; }
-        document.getElementById('accCategory').scrollIntoView({behavior: 'smooth'});
+    async function deleteAccount(id) {
+        if(confirm("নিশ্চিতনে?")) {
+            const { error } = await supabaseClient.from('clinic_accounts').delete().eq('id', id);
+            if(!error) { alert("মচা হ’ল!"); loadAccounts(); }
+        }
     }
 
-   async function deleteAccount(id) {
-    if(confirm("আপুনি নিশ্চিতনে?")) {
-        const { error } = await _supabase.from('clinic_accounts').delete().eq('id', id);
-        if(!error) { alert("মচি দিয়া হ’ল!"); loadAccounts(); }
-    }
-}
     async function loadBookings() {
-        const { data } = await _supabase.from('clinic_bookings').select('*').order('created_at', { ascending: false });
-        if(data) document.getElementById('listBookings').innerHTML = data.map(b => `<div class="card"><b>${b.name}</b> (${b.phone})<br>Problem/Txn: ${b.problem || b.txn_id}</div>`).join('');
+        const { data } = await supabaseClient.from('clinic_bookings').select('*').order('created_at', { ascending: false });
+        if(data) document.getElementById('listBookings').innerHTML = data.map(b => `<div class="card"><b>${b.name}</b> (${b.phone})<br>Txn ID: ${b.txn_id}<br><small>${b.problem || ''}</small></div>`).join('');
     }
 
     function filterPatients() {
@@ -568,91 +529,59 @@ window.onload = function() {
     }
     
     function showBookingForm() { document.getElementById('loginArea').style.display = 'none'; document.getElementById('bookingForm').style.display = 'block'; }
-    
-    async function submitBooking() {
+    function showConsultationForm() { document.getElementById('loginArea').style.display = 'none'; document.getElementById('consultationForm').style.display = 'block'; document.getElementById('consStep1').style.display = 'block'; }
+    function hideConsultationForm() { document.getElementById('consultationForm').style.display = 'none'; document.getElementById('loginArea').style.display = 'block'; }
+
+    function verifyConsStep1() {
+        if(!document.getElementById('consName').value || !document.getElementById('consPhone').value) { alert("নাম আৰু নম্বৰ লিখক।"); return; }
+        document.getElementById('consStep1').style.display = 'none';
+        document.getElementById('consStep2').style.display = 'block';
+    }
+
+    function verifyConsPayment() {
+        if(!document.getElementById('consTxn').value) { alert("Transaction ID লিখক।"); return; }
+        document.getElementById('consStep2').style.display = 'none';
+        document.getElementById('consStep3').style.display = 'block';
+    }
+
+    async function submitConsultation() {
+        const name = document.getElementById('consName').value;
+        const phone = document.getElementById('consPhone').value;
+        const txn = document.getElementById('consTxn').value;
+        const question = document.getElementById('consQuestion').value;
+        
+        if(!question) { alert("প্ৰশ্নটো লিখক।"); return; }
+        const fullProblem = `ONLINE CONSULTATION\nTxn ID: ${txn}\nQuestion: ${question}`;
+
+        const { error } = await supabaseClient.from('clinic_bookings').insert([{ name: name, phone: phone, problem: fullProblem, txn_id: txn }]);
+        if(!error) { alert("সফলতাৰে সম্পন্ন হ’ল!"); location.reload(); }
+    }
+
+    function submitBooking() {
         const name = document.getElementById('bName').value;
         const phone = document.getElementById('bPhone').value;
-        const problem = document.getElementById('bProblem').value;
-        if(!name || !phone) { alert("অনুগ্ৰহ কৰি প্ৰথমে আপোনাৰ নাম আৰু মোবাইল নম্বৰ লিখক।"); return; }
-        window.temporaryBookingData = { name, phone, problem };
+        if(!name || !phone) { alert("নাম আৰু নম্বৰ লিখক।"); return; }
+        window.temporaryBookingData = { name, phone, problem: document.getElementById('bProblem').value };
         document.getElementById('paymentModal').style.display = 'flex';
     }
 
     async function closePaymentModal() {
-        const txn = document.getElementById('modalTxn').value.trim();
-        if(!txn) { alert("অনুগ্ৰহ কৰি Transaction ID টো লিখক। ইয়াৰ অবিহনে বুকিং কনফৰ্ম নাথাকিব।"); return; }
+        const txn = document.getElementById('modalTxn').value;
+        if(!txn) { alert("Transaction ID বাধ্যতামূলক।"); return; }
         
         if(window.temporaryBookingData) {
-            const d = { name: window.temporaryBookingData.name, phone: window.temporaryBookingData.phone, problem: window.temporaryBookingData.problem, txn_id: txn };
-            const { error } = await _supabase.from('clinic_bookings').insert([d]);
-            if(!error) { alert("ধন্যবাদ! আপোনাৰ বুকিং সফলতাৰে সম্পন্ন হ’ল।"); location.reload(); }
+            const { error } = await supabaseClient.from('clinic_bookings').insert([{ name: window.temporaryBookingData.name, phone: window.temporaryBookingData.phone, problem: window.temporaryBookingData.problem, txn_id: txn }]);
+            if(!error) { alert("বুকিং সফল হ’ল!"); location.reload(); }
         }
     }
 
-let currentSlide = 0;
-setInterval(() => {
-    const track = document.getElementById('sliderTrack');
-    if (!track) return;
-    currentSlide = (currentSlide + 1) % 3;
-    let percentage = currentSlide * -33.333;
-    track.style.transform = `translateX(${percentage}%)`;
-}, 4000);
-
-function showConsultationForm() {
-    document.getElementById('loginArea').style.display = 'none';
-    document.getElementById('consultationForm').style.display = 'block';
-    document.getElementById('consStep1').style.display = 'block';
-    document.getElementById('consStep2').style.display = 'none';
-    document.getElementById('consStep3').style.display = 'none';
-}
-
-function hideConsultationForm() {
-    document.getElementById('consultationForm').style.display = 'none';
-    document.getElementById('loginArea').style.display = 'block';
-}
-
-function verifyConsStep1() {
-    const name = document.getElementById('consName').value.trim();
-    const phone = document.getElementById('consPhone').value.trim();
-    if(!name || !phone) { alert("অনুগ্ৰহ কৰি নাম আৰু ফোন নম্বৰ লিখক।"); return; }
-    document.getElementById('consStep1').style.display = 'none';
-    document.getElementById('consStep2').style.display = 'block';
-}
-
-function verifyConsPayment() {
-    const txn = document.getElementById('consTxn').value.trim();
-    if(!txn) { alert("অনুগ্ৰহ কৰি Transaction ID টো লিখক।"); return; }
-    document.getElementById('consStep2').style.display = 'none';
-    document.getElementById('consStep3').style.display = 'block';
-}
-
-async function submitConsultation() {
-    const name = document.getElementById('consName').value.trim();
-    const phone = document.getElementById('consPhone').value.trim();
-    const txn = document.getElementById('consTxn').value.trim();
-    const question = document.getElementById('consQuestion').value.trim();
-    
-    if(!question) { alert("অনুগ্ৰহ কৰি আপোনাৰ প্ৰশ্নটো লিখক।"); return; }
-    
-    const fullProblemDescription = `ONLINE CONSULTATION \nTxn ID: ${txn} \nQuestion: ${question}`;
-
-    try {
-        const { error } = await _supabase.from('clinic_bookings').insert([
-            { name: name, phone: phone, problem: fullProblemDescription }
-        ]);
-        
-        if(!error) { 
-            alert("ধন্যবাদ! আপোনাৰ পেমেণ্ট আৰু প্ৰশ্ন সফলতাৰে সম্পন্ন হ’ল। ডক্টৰে আপোনাক সোনকালেই যোগাযোগ কৰিব।"); 
-            location.reload(); 
-        } else {
-            console.error("Supabase Error:", error);
-            alert("দুঃখিত, ডাটাবেচৰ সৈতে সংযোগ কৰিব পৰা হোৱা নাই।");
-        }
-    } catch (e) {
-        console.error("Runtime Error:", e);
-        alert("কাৰিকৰী বিজুতি ঘটিছে।");
-    }
-}
+    let currentSlide = 0;
+    setInterval(() => {
+        const track = document.getElementById('sliderTrack');
+        if (!track) return;
+        currentSlide = (currentSlide + 1) % 3; 
+        track.style.transform = `translateX(${currentSlide * -33.333}%)`;
+    }, 4000); 
 </script>
 </body>
 </html>
