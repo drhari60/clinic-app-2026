@@ -18,7 +18,7 @@
         
         <div class="text-center w-full mt-6 flex flex-col items-center">
             <div class="w-32 h-32 rounded-full border-4 border-white shadow-xl overflow-hidden mb-4 bg-gray-100 flex items-center justify-center">
-                <img src="doctor.jpg.jpg" alt="Dr. Harikanta Das" class="w-full h-full object-cover">
+                <img src="doctor.jpg" alt="Dr. Harikanta Das" class="w-full h-full object-cover" onerror="this.src='https://ui-avatars.com/api/?name=Dr+Harikanta+Das&background=111827&color=fff&size=128'">
             </div>
             <h1 class="text-xl font-bold text-slate-900">Dr. Harikanta Das</h1>
             <p class="text-xs text-gray-500 font-semibold mt-0.5">Homeopathic Physician & Physiotherapist</p>
@@ -81,7 +81,7 @@
                     <span id="qrBadge" class="text-[10px] bg-blue-600 text-white font-bold px-2.5 py-1 rounded-full uppercase tracking-wider mb-3">Loading QR...</span>
                     
                     <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 mb-3">
-                        <img id="paymentQRCode" src="" alt="UPI QR Code Scanner" class="w-40 h-40 object-contain">
+                        <img id="paymentQRCode" src="" alt="UPI QR Code Scanner" class="w-40 h-40 object-contain" onerror="this.style.display='none'; alert('QR Code generation timed out. Please try again.');">
                     </div>
 
                     <div class="flex justify-center w-full">
