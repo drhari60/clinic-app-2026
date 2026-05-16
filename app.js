@@ -15,37 +15,36 @@ window.addEventListener('DOMContentLoaded', () => {
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
         if (session) showDashboard();
     });
-// প্ৰফাইল টেবৰ পৰা পোনে পোনে পাছৱৰ্ড সলোৱা সুৰক্ষিত লজিক
-document.getElementById('btnUpdateInternalPassword').addEventListener('click', async () => {
-    const newPassword = document.getElementById('newAdminPassword').value.trim();
-    if(!newPassword || newPassword.length < 6) {
-        return alert('ত্রুটি: পাছৱৰ্ড অতি কমেও ৬ টা ডিজিটৰ হ’ব লাগিব।');
-    }
-    
-    // Direct Active Session Update Trigger
-    const { data, error } = await supabaseClient.auth.updateUser({ password: newPassword });
-    if(error) {
-        alert('পাছৱৰ্ড সলনি কৰিব পৰা নগ’ল: ' + error.message);
-    } else {
-        alert('সফল হৈছে! আপোনাৰ নতুন পাছৱৰ্ড সংৰক্ষিত হ’ল। এতিয়া এই পাছৱৰ্ডেৰে কম্পিউটাৰতো লগ-ইন কৰিব পাৰিবা।');
-        document.getElementById('newAdminPassword').value = '';
-    }
-});
+
+    // 🔐 প্ৰফাইল টেবৰ পৰা পোনে পোনে পাছৱৰ্ড সলোৱা সুৰক্ষিত লজিক (শুদ্ধ প্লেচিং)
+    document.getElementById('btnUpdateInternalPassword').addEventListener('click', async () => {
+        const newPassword = document.getElementById('newAdminPassword').value.trim();
+        if(!newPassword || newPassword.length < 6) {
+            return alert('ত্রুটি: পাছৱৰ্ড অতি কমেও ৬ টা ডিজিটৰ হ’ব লাগিব।');
+        }
+        
+        const { data, error } = await supabaseClient.auth.updateUser({ password: newPassword });
+        if(error) {
+            alert('পাছৱৰ্ড সলনি কৰিব পৰা নগ’ল: ' + error.message);
+        } else {
+            alert('সফল হৈছে! আপোনাৰ নতুন পাছৱৰ্ড সংৰক্ষিত হ’ল। এতিয়া এই পাছৱৰ্ডেৰে কম্পিউটাৰতো লগ-ইন কৰিব পাৰিবা।');
+            document.getElementById('newAdminPassword').value = '';
+        }
+    });
+
     document.getElementById('btnStaffLogin').addEventListener('click', handleLogin);
     
     // Regular Book Now (Opens form with ₹100 QR)
     document.getElementById('btnPatientBooking').addEventListener('click', () => showBookingForm('Book Now', 100, false));
     
-    // DIRECT UPI REDIRECT FOR ONLINE CONSULTATION (User Directive Action)
+    // DIRECT UPI REDIRECT FOR ONLINE CONSULTATION
     document.getElementById('btnOnlineConsult').addEventListener('click', () => {
         const fee = 250;
         const type = 'Online Consultation';
         const upiPayload = `upi://pay?pa=9954340102@okbizaxis&pn=Dr%20Harikanta%20Das&am=${fee}&cu=INR&tn=${encodeURIComponent(type)}`;
         
-        // Open UPI app instantly for Mobile Users
         window.location.href = upiPayload;
         
-        // After redirecting, open the form so when they return, the form is ready for Txn ID
         setTimeout(() => {
             showBookingForm(type, fee, true);
         }, 1500);
@@ -97,7 +96,6 @@ async function handleLogout() {
     location.reload();
 }
 
-// ROUTING LOGIC FOR DIRECT PAY AND QR FALLBACK
 function showBookingForm(type, fee, isDirectPaid) {
     selectedBookingType = type;
     document.getElementById('loginSection').style.display = 'none';
@@ -120,7 +118,6 @@ function showBookingForm(type, fee, isDirectPaid) {
     document.getElementById('upiPayBtn').href = upiPayload;
 }
 
-// ==================== BOOKING SUBMISSION ====================
 async function submitBooking() {
     const name = document.getElementById('bName').value.trim();
     const phone = document.getElementById('bPhone').value.trim();
@@ -128,7 +125,7 @@ async function submitBooking() {
     const problem = document.getElementById('bProblem').value.trim();
 
     if(!name || !phone || !txn_id) {
-        return alert('ত্রুটি: নাম, ম’বাইল নম্বৰ আৰু ১২ ডিজিটৰ Transaction ID দিয়াটো বাধ্যতামূলক।');
+        return alert('ত্রুটি: নাম, ম’বাইল নম্বৰ আৰু ১২ ডিজিটৰ Transaction ID দিয়াটো বাধ্যতামূলক।');
     }
     
     if(txn_id.length < 8) {
@@ -141,7 +138,7 @@ async function submitBooking() {
     if (error) alert('বুকিং কৰিব পৰা নগ’ল।');
     else {
         alert(`সফল হৈছে! আপোনাৰ পেমেন্ট আৰু বুকিং ৰেকৰ্ড গ্ৰহণ কৰা হৈছে।`);
-        const flashMsg = `🏥 *DR. HARIS CLINIC*\n\nনমস্কাৰ ${name},\nআপোনাৰ *${selectedBookingType}* ৰ বুকিং অনুৰোধ আৰু পেমেন্ট পঞ্জীয়ন কৰা হৈছে।\nTxn ID: ${txn_id}`;
+        const flashMsg = `🏥 *DR. HARIS CLINIC*\n\nনমস্কাৰ ${name},\nআপোনাৰ *${selectedBookingType}* ৰ বুকিং অনুৰোধ আৰু পেমেন্ট পঞ্জীয়ন কৰা হৈছে।\nTxn ID: ${txn_id}`;
         window.open(`https://api.whatsapp.com/send?phone=91${phone.replace(/\D/g, '')}&text=${encodeURIComponent(flashMsg)}`, '_blank');
         location.reload();
     }
@@ -163,7 +160,6 @@ async function loadBookings() {
     `).join('');
 }
 
-// ==================== PATIENT MANAGEMENT ====================
 async function loadPatients() {
     const { data, error } = await supabaseClient.from('clinic_data').select('*').order('created_at', { ascending: false });
     if (error) return;
@@ -256,7 +252,6 @@ async function deletePatientRecord(id) {
     }
 }
 
-// ==================== EXPENSE LOGIC ====================
 async function saveExpenseRecord() {
     const category = document.getElementById('expCategory').value;
     const amount = parseFloat(document.getElementById('expAmount').value);
