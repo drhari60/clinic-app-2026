@@ -1,6 +1,6 @@
-// ১. Supabase Initialization (তোমাৰ প্ৰকৃত ক্ৰেডেন্সিয়েলছ যোগ কৰা হ’ল)
+// ১. Supabase Initialization (তোমাৰ প্ৰকৃত আৰু সম্পূৰ্ণ ক্ৰেডেন্সিয়েলছ যোগ কৰা হ’ল)
 const SUPABASE_URL = 'https://oblvgjnyecvvnnnesegl.supabase.co'; 
-const SUPABASE_ANON_KEY = 'sb_publishable_ekuwTZtgiCXsGRBWJXqyZQ_T8xUYVpxq5U59b3Wnsh48bU7'; 
+const SUPABASE_ANON_KEY = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9'; 
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentEditId = null;
