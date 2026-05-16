@@ -72,9 +72,26 @@ async function handleLogout() {
     location.reload();
 }
 
-function showBookingForm() {
+// এই নতুন ফাংচনটোৱে পুৰণা showBookingForm() ৰ ঠাই ল'ব
+function showBookingForm(type, fee) {
+    selectedBookingType = type;
     document.getElementById('loginSection').style.display = 'none';
     document.getElementById('publicBookingSection').classList.remove('hidden');
+    
+    document.getElementById('bookingFormTitle').innerText = `📆 নতুন ${type} ফৰ্ম`;
+    document.getElementById('qrBadge').innerText = `${type} ফীজ: ₹${fee}`;
+    
+    const upiPayload = `upi://pay?pa=9954340102@okbizaxis&pn=Dr%20Harikanta%20Das&am=${fee}&cu=INR&tn=${encodeURIComponent(type)}`;
+    const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiPayload)}&ecc=M`;
+    
+    const qrImageContainer = document.getElementById('paymentQRCode');
+    qrImageContainer.src = qrApiUrl;
+    
+    qrImageContainer.onload = () => {
+        document.getElementById('qrBadge').innerText = `${type} ফীজ: ₹${fee} (SCAN NOW)`;
+    };
+    
+    document.getElementById('upiPayBtn').href = upiPayload;
 }
 
 // ==================== PATIENT LOGIC ====================
