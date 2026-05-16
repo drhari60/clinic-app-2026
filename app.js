@@ -1,9 +1,17 @@
-// ১. Supabase Initialization (প্ৰকৃত ক্ৰেডেন্সিয়েলছ সংলগ্ন কৰা হ’ল)
+// Supabase Integration Setup
 const SUPABASE_URL = 'https://oblvgjnyecvvnnnesegl.supabase.co'; 
 const SUPABASE_ANON_KEY = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9'; 
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentEditId = null;
+
+// Dynamic Health Tips Array
+const healthTips = [
+    { title: "প্ৰাকৃতিক সুষম আহাৰ লওক", content: "ফাষ্ট ফুড, জাঙ্ক ফুড বৰ্জন কৰক, সেউজীয়া শাক-পাচলি আৰু ফল-মূল বেছিকৈ খাওক।" },
+    { title: "পৰ্যাপ্ত পানী খাওক", content: "দিনটোত অন্ততঃ ৩-৪ লিটাৰ পানী খাই নিজৰ শৰীৰটো হাইড্ৰেটেড কৰি ৰাখক।" },
+    { title: "দৈনিক শাৰীৰিক ব্যায়াম", content: "হৃদযন্ত্ৰ সুস্থ ৰাখিবলৈ আৰু ফিট থাকিবলৈ দৈনিক ৩০-৪০ মিনিট খোজ কাঢ়ক।" },
+    { title: "মানসিক চাপ মুক্ত থাকক", content: "পৰ্যাপ্ত পৰিমাণে ৭-৮ ঘণ্টা টোপনি লওক আৰু দৈনিক পুৱা যোগাসন কৰক।" }
+];
 
 window.addEventListener('DOMContentLoaded', () => {
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
@@ -17,22 +25,36 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnLogout').addEventListener('click', handleLogout);
     document.getElementById('searchBox').addEventListener('keyup', filterPatients);
     
-    // Auto-Scroll Feature
+    document.getElementById('btnOnlineConsult').addEventListener('click', () => {
+        window.open('https://api.whatsapp.com/send?phone=919435667822&text=Hello%20Doctor,%20I%20want%20to%20book%20an%20Online%20Consultation.', '_blank');
+    });
+
     document.getElementById('btnScrollToEntry').addEventListener('click', () => {
         document.getElementById('prescriptionEntrySection').scrollIntoView({ behavior: 'smooth' });
     });
 
+    startHealthTipsRotation();
     setupTabs();
 });
 
-// লগ-ইন লজিক
+// Auto rotating health tips banner logic
+function startHealthTipsRotation() {
+    let index = 0;
+    setInterval(() => {
+        index = (index + 1) % healthTips.length;
+        document.getElementById('tipTitle').innerText = healthTips[index].title;
+        document.getElementById('tipContent').innerText = healthTips[index].content;
+    }, 6000);
+}
+
+// Password Only Login Handler
 async function handleLogin() {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
-    if(!email || !password) return alert('ইমেইল আৰু পাছৱৰ্ড লিখক।');
+    if(!password) return alert('অনুগ্ৰহ কৰি পাছৱৰ্ডটো লিখক।');
 
     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-    if (error) alert('লগইন ব্যৰ্থ: ' + error.message);
+    if (error) alert('ভুল পাছৱৰ্ড! আকৌ চেষ্টা কৰক।');
     else showDashboard();
 }
 
@@ -55,7 +77,7 @@ function showBookingForm() {
     document.getElementById('publicBookingSection').classList.remove('hidden');
 }
 
-// ==================== PATIENT MANAGEMENT ====================
+// ==================== PATIENT LOGIC ====================
 async function loadPatients() {
     const { data, error } = await supabaseClient.from('clinic_data').select('*').order('created_at', { ascending: false });
     if (error) return;
@@ -69,15 +91,15 @@ function createPatientCard(p) {
     card.className = 'bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4';
     
     const info = document.createElement('div');
-    info.innerHTML = `<h4 class="text-lg font-bold text-green-900">${escapeHTML(p.name)} <span class="text-sm font-normal text-gray-500">(${escapeHTML(p.age || 'N/A')})</span></h4>
-                      <p class="text-sm text-gray-600">📞 ${escapeHTML(p.phone)} | 🩺 BP: ${escapeHTML(p.bp || 'N/A')}</p>
+    info.innerHTML = `<h4 class="text-base font-bold text-slate-900">${escapeHTML(p.name)} <span class="text-xs font-normal text-gray-500">(${escapeHTML(p.age || 'N/A')})</span></h4>
+                      <p class="text-xs text-gray-600 mt-0.5">📞 ${escapeHTML(p.phone)} | 🩺 BP: ${escapeHTML(p.bp || 'N/A')}</p>
                       <p class="text-xs text-gray-500 mt-1"><b>History:</b> ${escapeHTML(p.history || 'None')}</p>`;
     
     const actions = document.createElement('div');
     actions.className = 'flex gap-2';
 
     const btnPrint = document.createElement('button');
-    btnPrint.className = 'bg-gray-700 text-white px-3 py-2 rounded-lg text-xs font-bold';
+    btnPrint.className = 'bg-gray-800 text-white px-3 py-2 rounded-lg text-xs font-bold';
     btnPrint.innerHTML = '<i class="fas fa-print"></i>';
     btnPrint.onclick = () => printPrescription(p);
 
@@ -103,7 +125,7 @@ function createPatientCard(p) {
 
 async function savePatientRecord() {
     const name = document.getElementById('pName').value;
-    if(!name) return alert('ৰোগীৰ নাম বাধ্যতামূলক।');
+    if(!name) return alert('ৰোগীৰ নাম লিখাটো বাধ্যতামূলক।');
 
     const patientData = {
         name,
@@ -117,20 +139,20 @@ async function savePatientRecord() {
 
     if (currentEditId) {
         await supabaseClient.from('clinic_data').update(patientData).eq('id', currentEditId);
-        alert('প্ৰেচক্ৰিপচন আপডেট হ’ল।');
+        alert('প্ৰেচক্ৰিপচন সফলতাৰে আপডেট হ’ল।');
     } else {
         await supabaseClient.from('clinic_data').insert([patientData]);
-        alert('নতুন ৰেকৰ্ড সংৰক্ষণ হ’ল।');
+        alert('নতুন ৰোগীৰ তথ্য সংৰক্ষণ কৰা হ’ল।');
     }
     currentEditId = null;
-    document.getElementById('formTitle').innerText = 'নতুন ৰোগীৰ প্ৰেচক্ৰিপচন এন্ট্ৰি';
+    document.getElementById('formTitle').innerText = 'নতুন ৰোগীৰ প্ৰেচক্ৰিপচন এণ্ট্ৰী চেকচন';
     clearForm();
     loadPatients();
 }
 
 function loadPatientToForm(p) {
     currentEditId = p.id;
-    document.getElementById('formTitle').innerText = `এডিট: ${p.name}`;
+    document.getElementById('formTitle').innerText = `এডিট মোড: ${p.name}`;
     document.getElementById('pName').value = p.name;
     document.getElementById('pAgeSex').value = p.age || '';
     document.getElementById('pBP').value = p.bp || '';
@@ -142,24 +164,24 @@ function loadPatientToForm(p) {
 }
 
 async function deletePatientRecord(id) {
-    if (confirm('আপুনি সঁচাকৈয়ে এই ৰোগীৰ সমগ্ৰ তথ্য মচি পেলাব বিচাৰে?')) {
+    if (confirm('আপুনি সঁচাকৈয়ে এই ৰোগীৰ তথ্য মচিব বিচাৰে?')) {
         await supabaseClient.from('clinic_data').delete().eq('id', id);
         loadPatients();
     }
 }
 
-// ==================== EXPENSE MANAGEMENT ====================
+// ==================== EXPENSE LOGIC ====================
 async function saveExpenseRecord() {
     const category = document.getElementById('expCategory').value;
     const amount = parseFloat(document.getElementById('expAmount').value);
     const description = document.getElementById('expDesc').value;
 
-    if (!amount || amount <= 0) return alert('সঠিক টকাৰ পৰিমাণ লিখক।');
+    if (!amount || amount <= 0) return alert('সঠিক খৰচৰ পৰিমাণ লিখক।');
 
     const { error } = await supabaseClient.from('clinic_expenses').insert([{ category, amount, description }]);
-    if (error) alert('খৰচ এন্ট্ৰি ব্যৰ্থ হৈছে।');
+    if (error) alert('খৰচ সংৰক্ষণ ব্যৰ্থ হৈছে।');
     else {
-        alert('খৰচ সফলতাৰে সংৰক্ষণ হ’ল।');
+        alert('খৰচৰ হিচাপ সংৰক্ষণ কৰা হ’ল।');
         document.getElementById('expAmount').value = '';
         document.getElementById('expDesc').value = '';
         loadExpenses();
@@ -181,14 +203,14 @@ async function loadExpenses() {
         totalExpense += parseFloat(e.amount);
 
         const card = document.createElement('div');
-        card.className = 'p-3 bg-white border border-gray-100 rounded-xl flex justify-between items-center text-sm shadow-sm';
+        card.className = 'p-3 bg-white border border-gray-100 rounded-xl flex justify-between items-center text-xs shadow-sm';
         card.innerHTML = `<div>
                             <span class="font-bold text-red-700">[${escapeHTML(e.category)}]</span> 
-                            <p class="text-xs text-gray-500 mt-0.5">${escapeHTML(e.description || 'No details')}</p>
+                            <p class="text-gray-500 mt-0.5">${escapeHTML(e.description || 'No details')}</p>
                           </div>
                           <div class="flex items-center gap-3">
-                            <span class="font-mono font-bold text-gray-900">₹${e.amount}</span>
-                            <button class="text-red-500 text-xs font-bold hover:text-red-700 ml-2" onclick="deleteExpenseRecord('${e.id}')"><i class="fas fa-trash"></i></button>
+                            <span class="font-bold text-gray-900">₹${e.amount}</span>
+                            <button class="text-red-400 hover:text-red-600" onclick="deleteExpenseRecord('${e.id}')"><i class="fas fa-trash"></i></button>
                           </div>`;
         container.appendChild(card);
     });
@@ -198,32 +220,32 @@ async function loadExpenses() {
         • ঘৰ ভাড়া (Rent): ₹${summary['Rent']}<br>
         • বিজুলী বিল (Electricity): ₹${summary['Electricity Bill']}<br>
         • অন্যান্য খৰচ (Misc): ₹${summary['Miscellaneous Expenses']}<br>
-        <hr class="my-1 border-red-200">
-        <b class="text-base text-red-900">📊 সৰ্বমুঠ মাসিক খৰচ: ₹${totalExpense}</b>
+        <hr class="my-1 border-red-100">
+        <b class="text-xs text-red-900">📊 সৰ্বমুঠ খৰচ: ₹${totalExpense}</b>
     `;
 }
 
 async function deleteExpenseRecord(id) {
-    if (confirm('আপুনি সঁচাকৈয়ে এই খৰচৰ হিচাপ মচিব বিচাৰে?')) {
+    if (confirm('খৰচৰ ৰেকৰ্ড ডিলিট কৰিব বিচাৰে?')) {
         await supabaseClient.from('clinic_expenses').delete().eq('id', id);
         loadExpenses();
     }
 }
 
-// ==================== BOOKING SYSTEM ====================
+// ==================== BOOKING LOGIC ====================
 async function submitBooking() {
     const name = document.getElementById('bName').value;
     const phone = document.getElementById('bPhone').value;
     const txn_id = document.getElementById('bTxnId').value;
     const problem = document.getElementById('bProblem').value;
 
-    if(!name || !phone || !txn_id) return alert('সকলো বাধ্যতামূলক পথাৰ পূৰণ কৰক।');
+    if(!name || !phone || !txn_id) return alert('অনুগ্ৰহ কৰি প্ৰয়োজনীয় অংশসমূহ পূৰণ কৰক।');
 
     const { error } = await supabaseClient.from('clinic_bookings').insert([{ name, phone, txn_id, problem }]);
-    if (error) alert('বুকিং ব্যৰ্থ হৈছে।');
+    if (error) alert('বুকিং কৰিব পৰা নগ’ল।');
     else {
-        alert('আপোনাৰ বুকিং অনুৰোধ সফলতাৰে গ্ৰহণ কৰা হৈছে।');
-        const flashMsg = `🏥 *DR. HARIS CLINIC*\n\nনমস্কাৰ ${name},\nআপোনাৰ অনলাইন বুকিং অনুৰোধটি সফল হৈছে।\nTxn ID: ${txn_id}\n\nপ্ৰশাসকে অতি সোনকালে আপোনাক ভিজিটৰ সময় জনাই দিব। ধন্যবাদ।`;
+        alert('বুকিং অনুৰোধ গ্ৰহণ কৰা হৈছে।');
+        const flashMsg = `🏥 *DR. HARIS CLINIC*\n\nনমস্কাৰ ${name},\nআপোনাৰ অনলাইন বুকিং অনুৰোধটি লাভ কৰিছোঁ।\nTxn ID: ${txn_id}`;
         window.open(`https://api.whatsapp.com/send?phone=${phone.replace(/\D/g, '')}&text=${encodeURIComponent(flashMsg)}`, '_blank');
         location.reload();
     }
@@ -234,20 +256,20 @@ async function loadBookings() {
     if(error) return;
     const container = document.getElementById('listBookings');
     container.innerHTML = data.map(b => `
-        <div class="p-4 border rounded-xl bg-gray-50 flex justify-between items-center shadow-sm">
+        <div class="p-4 border rounded-xl bg-gray-50 flex justify-between items-center shadow-sm text-xs">
             <div>
                 <h5 class="font-bold text-gray-900">${escapeHTML(b.name)} (${escapeHTML(b.phone)})</h5>
-                <p class="text-xs text-red-600 font-mono">Txn ID: ${escapeHTML(b.txn_id)} | 📅 ${new Date(b.created_at).toLocaleDateString('en-IN')}</p>
-                <p class="text-sm text-gray-600 mt-1">${escapeHTML(b.problem || 'No description')}</p>
+                <p class="text-red-600 font-mono mt-0.5">Txn ID: ${escapeHTML(b.txn_id)}</p>
+                <p class="text-gray-600 mt-1">${escapeHTML(b.problem || 'No description')}</p>
             </div>
-            <span class="text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded font-bold">Pending</span>
+            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded font-bold">Pending</span>
         </div>
     `).join('');
 }
 
 function sendWhatsAppRx(p) {
-    if(!p.phone) return alert('মোবাইল নম্বৰ নাই।');
-    const msg = `🏥 *DR. HARIS HOMEOPATHIC CLINIC*\n📍 গোগামুখ, অসম\n\n*Patient:* ${p.name}\n*Age/Sex:* ${p.age || 'N/A'}\n\n*Rx:*\n${p.medicine}\n\n🌐 *Website:* https://drhariswellfuture.com/`;
+    if(!p.phone) return alert('মোবাইল নম্বৰ পোৱা নগ’ল।');
+    const msg = `🏥 *DR. HARIS HOMEOPATHIC CLINIC*\n\n*Patient:* ${p.name}\n\n*Rx:*\n${p.medicine}`;
     window.open(`https://api.whatsapp.com/send?phone=${p.phone.replace(/\D/g, '')}&text=${encodeURIComponent(msg)}`, '_blank');
 }
 
@@ -268,10 +290,10 @@ function clearForm() { ['pName', 'pAgeSex', 'pBP', 'pPhone', 'pHistory', 'pMedic
 function setupTabs() {
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('text-green-800', 'border-b-2', 'border-green-800'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('text-slate-900', 'border-b-2', 'border-slate-900'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.add('text-gray-400'));
             btn.classList.remove('text-gray-400');
-            btn.classList.add('text-green-800', 'border-b-2', 'border-green-800');
+            btn.classList.add('text-slate-900', 'border-b-2', 'border-slate-900');
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             document.getElementById(`tab-${btn.dataset.tab}`).classList.remove('hidden');
         });
