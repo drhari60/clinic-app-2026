@@ -7,16 +7,17 @@ let selectedBookingType = 'Book Now';
 
 const healthTips = [
     { title: "প্ৰাকৃতিক সুষম আহাৰ লওক", content: "ফাষ্ট ফুড, জাঙ্ক ফুড বৰ্জন কৰক, সেউজীয়া শাক-পাচলি আৰু ফল-মূল বেছিকৈ খাওক।" },
-    { title: "পৰ্যাপ্ত পানী খাওক", content: "দিনটোত অন্ততঃ ৩-৪ লিটাৰ পানী খাই নিজৰ শৰীৰটো হাইд্ৰেটেড কৰি ৰাখক।" },
+    { title: "পৰ্যাপ্ত পানী খাওক", content: "দিনটোত অন্ততঃ ৩-৪ লিটাৰ পানী খাই নিজৰ শৰীৰটো হাইд্ৰেテッド কৰি ৰাখক।" },
     { title: "দৈনিক শাৰীৰিক ব্যায়াম", content: "হৃদযন্ত্ৰ সুস্থ ৰাখিবলৈ আৰু ফিট থাকিবলৈ দৈনিক ৩০-৪০ মিনিট খোজ কাঢ়ক।" }
 ];
 
 window.addEventListener('DOMContentLoaded', () => {
-    supabaseClient.auth.getSession().then(({ data: { session } }) => {
-        if (session) showDashboard();
-    });
+    if(supabaseClient && supabaseClient.auth) {
+        supabaseClient.auth.getSession().then(({ data: { session } }) => {
+            if (session) showDashboard();
+        }).catch(err => console.log("Session recovery bypassed"));
+    }
 
-    // 🔐 প্ৰফাইল টেবৰ পৰা পোনে পোনে পাছৱৰ্ড সলোৱা সুৰক্ষিত লজিক (শুদ্ধ প্লেচিং)
     document.getElementById('btnUpdateInternalPassword').addEventListener('click', async () => {
         const newPassword = document.getElementById('newAdminPassword').value.trim();
         if(!newPassword || newPassword.length < 6) {
@@ -33,21 +34,14 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('btnStaffLogin').addEventListener('click', handleLogin);
-    
-    // Regular Book Now (Opens form with ₹100 QR)
     document.getElementById('btnPatientBooking').addEventListener('click', () => showBookingForm('Book Now', 100, false));
     
-    // DIRECT UPI REDIRECT FOR ONLINE CONSULTATION
     document.getElementById('btnOnlineConsult').addEventListener('click', () => {
         const fee = 250;
         const type = 'Online Consultation';
         const upiPayload = `upi://pay?pa=9954340102@okbizaxis&pn=Dr%20Harikanta%20Das&am=${fee}&cu=INR&tn=${encodeURIComponent(type)}`;
-        
         window.location.href = upiPayload;
-        
-        setTimeout(() => {
-            showBookingForm(type, fee, true);
-        }, 1500);
+        setTimeout(() => { showBookingForm(type, fee, true); }, 1500);
     });
     
     document.getElementById('btnSubmitBooking').addEventListener('click', submitBooking);
@@ -67,8 +61,12 @@ function startHealthTipsRotation() {
     let index = 0;
     setInterval(() => {
         index = (index + 1) % healthTips.length;
-        document.getElementById('tipTitle').innerText = healthTips[index].title;
-        document.getElementById('tipContent').innerText = healthTips[index].content;
+        const tEl = document.getElementById('tipTitle');
+        const cEl = document.getElementById('tipContent');
+        if(tEl && cEl) {
+            tEl.innerText = healthTips[index].title;
+            cEl.innerText = healthTips[index].content;
+        }
     }, 6000);
 }
 
@@ -113,8 +111,9 @@ function showBookingForm(type, fee, isDirectPaid) {
     const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiPayload)}&ecc=M`;
     
     const qrImageContainer = document.getElementById('paymentQRCode');
-    qrImageContainer.src = qrApiUrl;
-    
+    if(qrImageContainer) {
+        qrImageContainer.src = qrApiUrl;
+    }
     document.getElementById('upiPayBtn').href = upiPayload;
 }
 
@@ -127,13 +126,11 @@ async function submitBooking() {
     if(!name || !phone || !txn_id) {
         return alert('ত্রুটি: নাম, ম’বাইল নম্বৰ আৰু ১২ ডিজিটৰ Transaction ID দিয়াটো বাধ্যতামূলক।');
     }
-    
     if(txn_id.length < 8) {
         return alert('অনুগ্ৰহ কৰি এটা সঠিক UPI Transaction ID প্ৰদান কৰক।');
     }
 
     const problemDesc = `[${selectedBookingType}] ${problem}`;
-
     const { error } = await supabaseClient.from('clinic_bookings').insert([{ name, phone, txn_id, problem: problemDesc }]);
     if (error) alert('বুকিং কৰিব পৰা নগ’ল।');
     else {
@@ -146,8 +143,9 @@ async function submitBooking() {
 
 async function loadBookings() {
     const { data, error } = await supabaseClient.from('clinic_bookings').select('*').order('created_at', { ascending: false });
-    if(error) return;
+    if(error || !data) return;
     const container = document.getElementById('listBookings');
+    if(!container) return;
     container.innerHTML = data.map(b => `
         <div class="p-4 border rounded-xl bg-gray-50 flex justify-between items-center shadow-sm text-xs">
             <div>
@@ -162,8 +160,9 @@ async function loadBookings() {
 
 async function loadPatients() {
     const { data, error } = await supabaseClient.from('clinic_data').select('*').order('created_at', { ascending: false });
-    if (error) return;
+    if (error || !data) return;
     const container = document.getElementById('listPatients');
+    if(!container) return;
     container.innerHTML = '';
     data.forEach(p => container.appendChild(createPatientCard(p)));
 }
@@ -274,6 +273,7 @@ async function loadExpenses() {
     if (error || !data) return;
 
     const container = document.getElementById('listExpenses');
+    if(!container) return;
     container.innerHTML = '';
 
     let summary = { Salary: 0, Rent: 0, 'Electricity Bill': 0, 'Miscellaneous Expenses': 0 };
@@ -296,14 +296,17 @@ async function loadExpenses() {
         container.appendChild(card);
     });
 
-    document.getElementById('expenseSummaryText').innerHTML = `
-        • দৰমহা (Salary): ₹${summary['Salary']}<br>
-        • ঘৰ ভাড়া (Rent): ₹${summary['Rent']}<br>
-        • বিজুলী বিল (Electricity): ₹${summary['Electricity Bill']}<br>
-        • অন্যান্য খৰচ (Misc): ₹${summary['Miscellaneous Expenses']}<br>
-        <hr class="my-1 border-red-100">
-        <b class="text-xs text-red-900">📊 সৰ্বমুঠ খৰচ: ₹${totalExpense}</b>
-    `;
+    const sEl = document.getElementById('expenseSummaryText');
+    if(sEl) {
+        sEl.innerHTML = `
+            • দৰমহা (Salary): ₹${summary['Salary']}<br>
+            • ঘৰ ভাড়া (Rent): ₹${summary['Rent']}<br>
+            • বিজুলী বিল (Electricity): ₹${summary['Electricity Bill']}<br>
+            • অন্যান্য খৰচ (Misc): ₹${summary['Miscellaneous Expenses']}<br>
+            <hr class="my-1 border-red-100">
+            <b class="text-xs text-red-900">📊 সৰ্বমুঠ খৰচ: ₹${totalExpense}</b>
+        `;
+    }
 }
 
 async function deleteExpenseRecord(id) {
@@ -321,6 +324,7 @@ function sendWhatsAppRx(p) {
 
 function printPrescription(p) {
     const printArea = document.getElementById('printArea');
+    if(!printArea) return;
     printArea.innerHTML = `<h1>DR. HARIS CLINIC</h1><hr><p><b>Name:</b> ${escapeHTML(p.name)}</p><p><b>Rx:</b><br>${escapeHTML(p.medicine).replace(/\n/g, '<br>')}</p>`;
     window.print();
 }
@@ -330,7 +334,7 @@ function filterPatients() {
     const term = document.getElementById('searchBox').value.toLowerCase();
     document.querySelectorAll('#listPatients > div').forEach(c => c.style.display = c.innerText.toLowerCase().includes(term) ? 'flex' : 'none');
 }
-function clearForm() { ['pName', 'pAgeSex', 'pBP', 'pPhone', 'pHistory', 'pMedicine', 'pFees'].forEach(id => document.getElementById(id).value = ''); }
+function clearForm() { ['pName', 'pAgeSex', 'pBP', 'pPhone', 'pHistory', 'pMedicine', 'pFees'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; }); }
 
 function setupTabs() {
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -340,7 +344,8 @@ function setupTabs() {
             btn.classList.remove('text-gray-400');
             btn.classList.add('text-slate-900', 'border-b-2', 'border-slate-900');
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            document.getElementById(`tab-${btn.dataset.tab}`).classList.remove('hidden');
+            const tEl = document.getElementById(`tab-${btn.dataset.tab}`);
+            if(tEl) tEl.classList.remove('hidden');
         });
     });
 }
