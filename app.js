@@ -1,16 +1,14 @@
-// Supabase Integration Setup
 const SUPABASE_URL = 'https://oblvgjnyecvvnnnesegl.supabase.co'; 
 const SUPABASE_ANON_KEY = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9'; 
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentEditId = null;
+let selectedBookingType = 'Book Now';
 
-// Dynamic Health Tips Array
 const healthTips = [
     { title: "প্ৰাকৃতিক সুষম আহাৰ লওক", content: "ফাষ্ট ফুড, জাঙ্ক ফুড বৰ্জন কৰক, সেউজীয়া শাক-পাচলি আৰু ফল-মূল বেছিকৈ খাওক।" },
-    { title: "পৰ্যাপ্ত পানী খাওক", content: "দিনটোত অন্ততঃ ৩-৪ লিটাৰ পানী খাই নিজৰ শৰীৰটো হাইড্ৰেটেড কৰি ৰাখক।" },
-    { title: "দৈনিক শাৰীৰিক ব্যায়াম", content: "হৃদযন্ত্ৰ সুস্থ ৰাখিবলৈ আৰু ফিট থাকিবলৈ দৈনিক ৩০-৪০ মিনিট খোজ কাঢ়ক।" },
-    { title: "মানসিক চাপ মুক্ত থাকক", content: "পৰ্যাপ্ত পৰিমাণে ৭-৮ ঘণ্টা টোপনি লওক আৰু দৈনিক পুৱা যোগাসন কৰক।" }
+    { title: "পৰ্যাপ্ত পানী খাওক", content: "দিনটোত অন্ততঃ ৩-৪ লিটাৰ পানী খাই নিজৰ শৰীৰটো হাইд্ৰেটেড কৰি ৰাখক।" },
+    { title: "দৈনিক শাৰীৰিক ব্যায়াম", content: "হৃদযন্ত্ৰ সুস্থ ৰাখিবলৈ আৰু ফিট থাকিবলৈ দৈনিক ৩০-৪০ মিনিট খোজ কাঢ়ক।" }
 ];
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -19,16 +17,30 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('btnStaffLogin').addEventListener('click', handleLogin);
-    document.getElementById('btnPatientBooking').addEventListener('click', showBookingForm);
+    
+    // Regular Book Now (Opens form with ₹100 QR)
+    document.getElementById('btnPatientBooking').addEventListener('click', () => showBookingForm('Book Now', 100, false));
+    
+    // DIRECT UPI REDIRECT FOR ONLINE CONSULTATION (User Directive Action)
+    document.getElementById('btnOnlineConsult').addEventListener('click', () => {
+        const fee = 250;
+        const type = 'Online Consultation';
+        const upiPayload = `upi://pay?pa=9954340102@okbizaxis&pn=Dr%20Harikanta%20Das&am=${fee}&cu=INR&tn=${encodeURIComponent(type)}`;
+        
+        // Open UPI app instantly for Mobile Users
+        window.location.href = upiPayload;
+        
+        // After redirecting, open the form so when they return, the form is ready for Txn ID
+        setTimeout(() => {
+            showBookingForm(type, fee, true);
+        }, 1500);
+    });
+    
     document.getElementById('btnSubmitBooking').addEventListener('click', submitBooking);
     document.getElementById('btnSavePatient').addEventListener('click', savePatientRecord);
     document.getElementById('btnLogout').addEventListener('click', handleLogout);
     document.getElementById('searchBox').addEventListener('keyup', filterPatients);
     
-    document.getElementById('btnOnlineConsult').addEventListener('click', () => {
-        window.open('https://api.whatsapp.com/send?phone=919435667822&text=Hello%20Doctor,%20I%20want%20to%20book%20an%20Online%20Consultation.', '_blank');
-    });
-
     document.getElementById('btnScrollToEntry').addEventListener('click', () => {
         document.getElementById('prescriptionEntrySection').scrollIntoView({ behavior: 'smooth' });
     });
@@ -37,7 +49,6 @@ window.addEventListener('DOMContentLoaded', () => {
     setupTabs();
 });
 
-// Auto rotating health tips banner logic
 function startHealthTipsRotation() {
     let index = 0;
     setInterval(() => {
@@ -47,7 +58,6 @@ function startHealthTipsRotation() {
     }, 6000);
 }
 
-// Password Only Login Handler
 async function handleLogin() {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
@@ -72,14 +82,19 @@ async function handleLogout() {
     location.reload();
 }
 
-// এই নতুন ফাংচনটোৱে পুৰণা showBookingForm() ৰ ঠাই ল'ব
-function showBookingForm(type, fee) {
+// ROUTING LOGIC FOR DIRECT PAY AND QR FALLBACK
+function showBookingForm(type, fee, isDirectPaid) {
     selectedBookingType = type;
     document.getElementById('loginSection').style.display = 'none';
     document.getElementById('publicBookingSection').classList.remove('hidden');
     
     document.getElementById('bookingFormTitle').innerText = `📆 নতুন ${type} ফৰ্ম`;
-    document.getElementById('qrBadge').innerText = `${type} ফীজ: ₹${fee}`;
+    
+    if (isDirectPaid) {
+        document.getElementById('qrBadge').innerText = `পেমেন্ট সম্পন্ন কৰাৰ পিছত তলত ১২ ডিজিটৰ Transaction ID দিয়ক`;
+    } else {
+        document.getElementById('qrBadge').innerText = `${type} ফীজ: ₹${fee}`;
+    }
     
     const upiPayload = `upi://pay?pa=9954340102@okbizaxis&pn=Dr%20Harikanta%20Das&am=${fee}&cu=INR&tn=${encodeURIComponent(type)}`;
     const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiPayload)}&ecc=M`;
@@ -87,14 +102,53 @@ function showBookingForm(type, fee) {
     const qrImageContainer = document.getElementById('paymentQRCode');
     qrImageContainer.src = qrApiUrl;
     
-    qrImageContainer.onload = () => {
-        document.getElementById('qrBadge').innerText = `${type} ফীজ: ₹${fee} (SCAN NOW)`;
-    };
-    
     document.getElementById('upiPayBtn').href = upiPayload;
 }
 
-// ==================== PATIENT LOGIC ====================
+// ==================== BOOKING SUBMISSION ====================
+async function submitBooking() {
+    const name = document.getElementById('bName').value.trim();
+    const phone = document.getElementById('bPhone').value.trim();
+    const txn_id = document.getElementById('bTxnId').value.trim();
+    const problem = document.getElementById('bProblem').value.trim();
+
+    if(!name || !phone || !txn_id) {
+        return alert('ত্রুটি: নাম, ম’বাইল নম্বৰ আৰু ১২ ডিজিটৰ Transaction ID দিয়াটো বাধ্যতামূলক।');
+    }
+    
+    if(txn_id.length < 8) {
+        return alert('অনুগ্ৰহ কৰি এটা সঠিক UPI Transaction ID প্ৰদান কৰক।');
+    }
+
+    const problemDesc = `[${selectedBookingType}] ${problem}`;
+
+    const { error } = await supabaseClient.from('clinic_bookings').insert([{ name, phone, txn_id, problem: problemDesc }]);
+    if (error) alert('বুকিং কৰিব পৰা নগ’ল।');
+    else {
+        alert(`সফল হৈছে! আপোনাৰ পেমেন্ট আৰু বুকিং ৰেকৰ্ড গ্ৰহণ কৰা হৈছে।`);
+        const flashMsg = `🏥 *DR. HARIS CLINIC*\n\nনমস্কাৰ ${name},\nআপোনাৰ *${selectedBookingType}* ৰ বুকিং অনুৰোধ আৰু পেমেন্ট পঞ্জীয়ন কৰা হৈছে।\nTxn ID: ${txn_id}`;
+        window.open(`https://api.whatsapp.com/send?phone=91${phone.replace(/\D/g, '')}&text=${encodeURIComponent(flashMsg)}`, '_blank');
+        location.reload();
+    }
+}
+
+async function loadBookings() {
+    const { data, error } = await supabaseClient.from('clinic_bookings').select('*').order('created_at', { ascending: false });
+    if(error) return;
+    const container = document.getElementById('listBookings');
+    container.innerHTML = data.map(b => `
+        <div class="p-4 border rounded-xl bg-gray-50 flex justify-between items-center shadow-sm text-xs">
+            <div>
+                <h5 class="font-bold text-gray-900">${escapeHTML(b.name)} (${escapeHTML(b.phone)})</h5>
+                <p class="text-emerald-600 font-mono mt-0.5 font-bold">Txn ID: ${escapeHTML(b.txn_id)}</p>
+                <p class="text-gray-600 mt-1">${escapeHTML(b.problem || 'No description')}</p>
+            </div>
+            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded font-bold">Verified</span>
+        </div>
+    `).join('');
+}
+
+// ==================== PATIENT MANAGEMENT ====================
 async function loadPatients() {
     const { data, error } = await supabaseClient.from('clinic_data').select('*').order('created_at', { ascending: false });
     if (error) return;
@@ -106,11 +160,11 @@ async function loadPatients() {
 function createPatientCard(p) {
     const card = document.createElement('div');
     card.className = 'bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4';
-    
-    const info = document.createElement('div');
-    info.innerHTML = `<h4 class="text-base font-bold text-slate-900">${escapeHTML(p.name)} <span class="text-xs font-normal text-gray-500">(${escapeHTML(p.age || 'N/A')})</span></h4>
-                      <p class="text-xs text-gray-600 mt-0.5">📞 ${escapeHTML(p.phone)} | 🩺 BP: ${escapeHTML(p.bp || 'N/A')}</p>
-                      <p class="text-xs text-gray-500 mt-1"><b>History:</b> ${escapeHTML(p.history || 'None')}</p>`;
+    card.innerHTML = `<div>
+                        <h4 class="text-base font-bold text-slate-900">${escapeHTML(p.name)} <span class="text-xs font-normal text-gray-500">(${escapeHTML(p.age || 'N/A')})</span></h4>
+                        <p class="text-xs text-gray-600 mt-0.5">📞 ${escapeHTML(p.phone)} | 🩺 BP: ${escapeHTML(p.bp || 'N/A')}</p>
+                        <p class="text-xs text-gray-500 mt-1"><b>History:</b> ${escapeHTML(p.history || 'None')}</p>
+                      </div>`;
     
     const actions = document.createElement('div');
     actions.className = 'flex gap-2';
@@ -136,7 +190,7 @@ function createPatientCard(p) {
     btnDelete.onclick = () => deletePatientRecord(p.id);
 
     actions.append(btnPrint, btnWA, btnEdit, btnDelete);
-    card.append(info, actions);
+    card.append(actions);
     return card;
 }
 
@@ -249,45 +303,10 @@ async function deleteExpenseRecord(id) {
     }
 }
 
-// ==================== BOOKING LOGIC ====================
-async function submitBooking() {
-    const name = document.getElementById('bName').value;
-    const phone = document.getElementById('bPhone').value;
-    const txn_id = document.getElementById('bTxnId').value;
-    const problem = document.getElementById('bProblem').value;
-
-    if(!name || !phone || !txn_id) return alert('অনুগ্ৰহ কৰি প্ৰয়োজনীয় অংশসমূহ পূৰণ কৰক।');
-
-    const { error } = await supabaseClient.from('clinic_bookings').insert([{ name, phone, txn_id, problem }]);
-    if (error) alert('বুকিং কৰিব পৰা নগ’ল।');
-    else {
-        alert('বুকিং অনুৰোধ গ্ৰহণ কৰা হৈছে।');
-        const flashMsg = `🏥 *DR. HARIS CLINIC*\n\nনমস্কাৰ ${name},\nআপোনাৰ অনলাইন বুকিং অনুৰোধটি লাভ কৰিছোঁ।\nTxn ID: ${txn_id}`;
-        window.open(`https://api.whatsapp.com/send?phone=${phone.replace(/\D/g, '')}&text=${encodeURIComponent(flashMsg)}`, '_blank');
-        location.reload();
-    }
-}
-
-async function loadBookings() {
-    const { data, error } = await supabaseClient.from('clinic_bookings').select('*').order('created_at', { ascending: false });
-    if(error) return;
-    const container = document.getElementById('listBookings');
-    container.innerHTML = data.map(b => `
-        <div class="p-4 border rounded-xl bg-gray-50 flex justify-between items-center shadow-sm text-xs">
-            <div>
-                <h5 class="font-bold text-gray-900">${escapeHTML(b.name)} (${escapeHTML(b.phone)})</h5>
-                <p class="text-red-600 font-mono mt-0.5">Txn ID: ${escapeHTML(b.txn_id)}</p>
-                <p class="text-gray-600 mt-1">${escapeHTML(b.problem || 'No description')}</p>
-            </div>
-            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded font-bold">Pending</span>
-        </div>
-    `).join('');
-}
-
 function sendWhatsAppRx(p) {
     if(!p.phone) return alert('মোবাইল নম্বৰ পোৱা নগ’ল।');
     const msg = `🏥 *DR. HARIS HOMEOPATHIC CLINIC*\n\n*Patient:* ${p.name}\n\n*Rx:*\n${p.medicine}`;
-    window.open(`https://api.whatsapp.com/send?phone=${p.phone.replace(/\D/g, '')}&text=${encodeURIComponent(msg)}`, '_blank');
+    window.open(`https://api.whatsapp.com/send?phone=91${p.phone.replace(/\D/g, '')}&text=${encodeURIComponent(msg)}`, '_blank');
 }
 
 function printPrescription(p) {
@@ -296,7 +315,6 @@ function printPrescription(p) {
     window.print();
 }
 
-// Helpers
 function escapeHTML(str) { return str ? str.replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t)) : ''; }
 function filterPatients() {
     const term = document.getElementById('searchBox').value.toLowerCase();
