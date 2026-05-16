@@ -60,14 +60,38 @@
 
     <div id="publicBookingSection" class="hidden min-h-screen p-4 flex justify-center items-center">
         <div class="w-full max-w-md bg-white p-6 rounded-2xl shadow-xl border border-gray-100">
-            <h2 class="text-xl font-bold text-gray-900 mb-4 text-center">📆 নতুন অনলাইন বুকিং ফৰ্ম</h2>
+            <h2 id="bookingFormTitle" class="text-xl font-bold text-gray-900 mb-1 text-center">📆 অনলাইন বুকিং</h2>
+            
+            <p class="text-center text-xs font-bold text-red-600 mb-4 bg-red-50 p-3 rounded-xl border border-red-200 leading-normal">
+                Book Now: ₹100, আৰু Online Consultation: ₹250 টকা Pay কৰি Transaction ID ভৰাওক।
+            </p>
+            
             <div class="space-y-3">
-                <input type="text" id="bName" placeholder="ৰোগীৰ সম্পূৰ্ণ নাম" class="w-full p-3.5 border border-gray-200 rounded-xl focus:outline-none focus:border-slate-800 bg-gray-50/50">
-                <input type="text" id="bPhone" placeholder="ম'বাইল নম্বৰ" class="w-full p-3.5 border border-gray-200 rounded-xl focus:outline-none focus:border-slate-800 bg-gray-50/50">
-                <input type="text" id="bTxnId" placeholder="Payment Transaction ID" class="w-full p-3.5 border border-gray-200 rounded-xl focus:outline-none focus:border-slate-800 bg-gray-50/50 font-mono">
-                <textarea id="bProblem" placeholder="প্ৰধান স্বাস্থ্য সমস্যাসমূহ (চমুকৈ)" class="w-full p-3.5 border border-gray-200 rounded-xl focus:outline-none focus:border-slate-800 bg-gray-50/50 h-24"></textarea>
-                <button id="btnSubmitBooking" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md hover:bg-blue-700 text-sm">বুকিং সাবমিট কৰক</button>
-                <button onclick="location.reload()" class="w-full bg-gray-100 text-gray-600 font-bold py-2.5 rounded-xl text-xs uppercase mt-2">উভতি যাওক</button>
+                <input type="text" id="bName" placeholder="ৰোগীৰ সম্পূৰ্ণ নাম" class="w-full p-3.5 border border-gray-200 rounded-xl bg-gray-50/50 text-sm">
+                <input type="text" id="bPhone" placeholder="ম'বাইল নম্বৰ" class="w-full p-3.5 border border-gray-200 rounded-xl bg-gray-50/50 text-sm">
+                <textarea id="bProblem" placeholder="প্ৰধান স্বাস্থ্য সমস্যাসমূহ (চমুকৈ)" class="w-full p-3.5 border border-gray-200 rounded-xl bg-gray-50/50 h-20 text-sm"></textarea>
+                
+                <div class="border border-gray-200 rounded-2xl p-4 text-center bg-slate-50/50 my-3 flex flex-col items-center">
+                    <span id="qrBadge" class="text-[10px] bg-blue-600 text-white font-bold px-2.5 py-1 rounded-full uppercase tracking-wider mb-3">Loading QR...</span>
+                    
+                    <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 mb-3">
+                        <img id="paymentQRCode" src="" alt="UPI QR Code Scanner" class="w-40 h-40 object-contain">
+                    </div>
+
+                    <div class="flex justify-center w-full">
+                        <a id="upiPayBtn" href="#" class="inline-flex items-center gap-2 bg-[#111827] hover:bg-slate-800 text-white px-5 py-3 rounded-xl text-xs font-bold shadow transition w-full justify-center">
+                            <i class="fas fa-wallet"></i> MOBILE-OT PAY কৰক
+                        </a>
+                    </div>
+                    <p class="text-[10px] text-gray-400 font-medium mt-2">UPI ID: <span class="font-mono font-bold text-gray-700">9954340102@okbizaxis</span></p>
+                </div>
+
+                <div class="space-y-1">
+                    <input type="text" id="bTxnId" placeholder="12-Digit UPI Transaction ID দিয়ক" class="w-full p-3.5 border-2 border-slate-900 rounded-xl focus:outline-none bg-white font-mono text-sm font-bold text-center tracking-widest placeholder-gray-400">
+                </div>
+
+                <button id="btnSubmitBooking" class="w-full bg-emerald-600 text-white font-bold py-3.5 rounded-xl shadow-md hover:bg-emerald-700 text-sm mt-2">বুকিং নিশ্চিত কৰক (Confirm)</button>
+                <button onclick="location.reload()" class="w-full bg-gray-100 text-gray-600 font-bold py-2.5 rounded-xl text-xs uppercase mt-1">উভতি যাওক</button>
             </div>
         </div>
     </div>
@@ -84,7 +108,7 @@
         <div class="p-4 max-w-4xl mx-auto">
             <div id="tab-home" class="tab-content space-y-4">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                    <input type="text" id="searchBox" placeholder="🔍 নাম বা মোবাইল নম্বৰেৰে ৰোগী সন্ধান কৰক..." class="w-full p-3.5 border border-gray-200 rounded-xl focus:outline-none focus:border-slate-800 bg-gray-50/50 text-sm">
+                    <input type="text" id="searchBox" placeholder="🔍 নাম বা মোবাইল নম্বৰেৰে ৰোগী সন্ধান কৰক..." class="w-full p-3.5 border border-gray-200 rounded-xl bg-gray-50/50 text-sm">
                     <button id="btnScrollToEntry" class="w-full mt-3 bg-[#111827] text-white font-bold py-3.5 px-4 rounded-xl shadow-sm text-center block text-sm">
                         <i class="fas fa-user-plus mr-2"></i> নতুন ৰোগী সংযোগ কৰক
                     </button>
@@ -121,7 +145,6 @@
                         <button id="btnSaveExpense" onclick="saveExpenseRecord()" class="w-full bg-red-600 text-white font-bold py-3.5 rounded-xl shadow text-sm">খৰচ সংৰক্ষণ কৰক</button>
                     </div>
                 </div>
-
                 <div class="bg-red-50 p-4 rounded-2xl border border-red-100">
                     <h4 class="text-xs font-bold text-red-900 mb-2"><i class="fas fa-calculator mr-1"></i> মাহেকীয়া প্ৰতিবেদন (Financial Summary)</h4>
                     <div id="expenseSummaryText" class="text-xs text-red-800 space-y-1">হিচাপ লোড হৈ আছে...</div>
