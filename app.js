@@ -15,7 +15,22 @@ window.addEventListener('DOMContentLoaded', () => {
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
         if (session) showDashboard();
     });
-
+// প্ৰফাইল টেবৰ পৰা পোনে পোনে পাছৱৰ্ড সলোৱা সুৰক্ষিত লজিক
+document.getElementById('btnUpdateInternalPassword').addEventListener('click', async () => {
+    const newPassword = document.getElementById('newAdminPassword').value.trim();
+    if(!newPassword || newPassword.length < 6) {
+        return alert('ত্রুটি: পাছৱৰ্ড অতি কমেও ৬ টা ডিজিটৰ হ’ব লাগিব।');
+    }
+    
+    // Direct Active Session Update Trigger
+    const { data, error } = await supabaseClient.auth.updateUser({ password: newPassword });
+    if(error) {
+        alert('পাছৱৰ্ড সলনি কৰিব পৰা নগ’ল: ' + error.message);
+    } else {
+        alert('সফল হৈছে! আপোনাৰ নতুন পাছৱৰ্ড সংৰক্ষিত হ’ল। এতিয়া এই পাছৱৰ্ডেৰে কম্পিউটাৰতো লগ-ইন কৰিব পাৰিবা।');
+        document.getElementById('newAdminPassword').value = '';
+    }
+});
     document.getElementById('btnStaffLogin').addEventListener('click', handleLogin);
     
     // Regular Book Now (Opens form with ₹100 QR)
