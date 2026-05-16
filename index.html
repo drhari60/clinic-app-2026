@@ -148,7 +148,7 @@
     </div>
 
     <button class="btn-primary" style="background: #e65100; width: 100%; margin-bottom: 20px; font-weight: bold; padding: 12px;" onclick="showConsultationForm()">
-        অনлайн পৰামৰ্শ (Online Consultation)
+        অনলাইন পৰামৰ্শ (Online Consultation)
     </button>
 
     <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
@@ -165,7 +165,7 @@
         <div id="sliderTrack" style="display: flex; width: 300%; height: 100%; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);">
             <div style="background: linear-gradient(135deg, #004d40, #00796b); color: white; padding: 20px; width: 33.333%; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; flex-shrink: 0;">
                 <i class="fas fa-heartbeat" style="font-size: 26px; margin-bottom: 8px; color: #a7ffeb;"></i>
-                <h4 style="margin: 0 0 5px 0; font-size: 15px;">প্ৰতিদিনে পুৱา-গধূলি অন্তত ৩০/৪০ মিনিট খোজ কাঢ়ক</h4>
+                <h4 style="margin: 0 0 5px 0; font-size: 15px;">প্ৰতিদিনে পুৱা-গধূলি অন্তত ৩০/৪০ মিনিট খোজ কাঢ়ক</h4>
                 <p style="margin: 0; font-size: 12px; color: #e0f2f1;">হৃদযন্ত্ৰ সুস্থ ৰাখিবলৈ দৈনিক ৪০ মিনিট খোজ কাঢ়াটো অতি জৰুৰী।</p>
             </div>
             <div style="background: linear-gradient(135deg, #1565c0, #1e88e5); color: white; padding: 20px; width: 33.333%; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; flex-shrink: 0;">
@@ -226,7 +226,7 @@
         
         <label style="text-align:left; display:block; font-weight:bold; color:#e74c3c;">* Transaction ID (UPI/UTR No):</label>
         <input type="text" id="consTxn" placeholder="ট্ৰেনজেকচন আইডি লিখক" style="border:2px solid #e74c3c; text-align:center; font-weight:bold;">
-        <button class="btn-primary" style="width:100%; margin-top:10px; background:#00796b;" onclick="verifyConsPayment()">পেমেণ্ট সাবমিট কৰক (Verify Payment)</button>
+        <button class="btn-primary" style="width:100%; margin-top:10px; background:#00796b;" onclick="verifyConsPayment()">পেমেণ্ট চাবমিট কৰক (Verify Payment)</button>
     </div>
 
     <div id="consStep3" style="display:none;">
@@ -235,9 +235,9 @@
         </div>
         <label>আপোনাৰ স্বাস্থ্যজনিত সমস্যা বা প্ৰশ্নটো বিতংভাৱে লিখক:</label>
         <textarea id="consQuestion" rows="5" placeholder="আপোনাৰ কি সমস্যা হৈছে আৰু আপুনি কি জানিব বিচাৰে ইয়াত লিখক..." style="width:100%; border-radius:8px; padding:10px; border:1px solid #ccc; font-family:inherit;"></textarea>
-        <button class="btn-primary" style="width:100%; margin-top:15px; background:#2e7d32;" onclick="submitConsultation()">পৰামৰ্শ সাবমিট কৰক (Submit Consultation)</button>
+        <button class="btn-primary" style="width:100%; margin-top:15px; background:#2e7d32;" onclick="submitConsultation()">পৰামৰ্শ চাবমিট কৰক (Submit Consultation)</button>
     </div>
-    <button class="btn-primary" style="background:#555; width:100%; margin-top:15px;" onclick="hideConsultationForm()">ফিৰি যাওক (Back)</button>
+    <button class="btn-primary" style="background:#555; width:100%; margin-top:15px;" onclick="hideConsultationForm()">ঘুৰি যাওক (Back)</button>
 </div>
 
 <div id="mainApp" style="display:none;">
@@ -491,7 +491,7 @@
     }
 
     function sendReminder(p) {
-        const text = `নমস্কাৰ ${p.name} ডাঙৰীয়া/আইদেউ,\nড° হৰি ক্লিনিকৰ পৰা আপোনাক মনত পেলাই দিয়া হৈছে যে আপোনাৰ ঔষধ খোৱাৰ সময় হৈছে। সুস্থ থাকক।\n--- 📞 9707722511`;
+        const text = `নমস্কাৰ ${p.name} ডাঙৰীয়া/আইদেউ,\nড° হৰি ক্লিনিকৰ পৰা আপোনাক মনত পেলাই দিয়া হৈছে যে আপোনাৰ ঔষধ খোৱাৰ সময় হৈছে। সজাগ হওক সুস্থ থাকক।\n--- 📞 9707722511`;
         window.open(`https://wa.me/91${p.phone}?text=${encodeURIComponent(text)}`);
     }
 
