@@ -7,7 +7,7 @@ let selectedBookingType = 'Book Now';
 
 const healthTips = [
     { title: "প্ৰাকৃতিক সুষম আহাৰ লওক", content: "ফাষ্ট ফুড, জাঙ্ক ফুড বৰ্জন কৰক, সেউজীয়া শাক-পাচলি আৰু ফল-মূল বেছিকৈ খাওক।" },
-    { title: "পৰ্যাপ্ত পানী খাওক", content: "দিনটোত অন্ততঃ ৩-৪ লিটাৰ পানী খাই নিজৰ শৰীৰটো হাইд্ৰেテッド কৰি ৰাখক।" },
+    { title: "পৰ্যাপ্ত পানী খাওক", content: "দিনটোত অন্ততঃ ৩-৪ লিটাৰ পানী খাই নিজৰ শৰীৰটো হাইд্ৰেটেড কৰি ৰাখক।" },
     { title: "দৈনিক শাৰীৰিক ব্যায়াম", content: "হৃদযন্ত্ৰ সুস্থ ৰাখিবলৈ আৰু ফিট থাকিবলৈ দৈনিক ৩০-৪০ মিনিট খোজ কাঢ়ক।" }
 ];
 
@@ -18,40 +18,60 @@ window.addEventListener('DOMContentLoaded', () => {
         }).catch(err => console.log("Session recovery bypassed"));
     }
 
-    document.getElementById('btnUpdateInternalPassword').addEventListener('click', async () => {
-        const newPassword = document.getElementById('newAdminPassword').value.trim();
-        if(!newPassword || newPassword.length < 6) {
-            return alert('ত্রুটি: পাছৱৰ্ড অতি কমেও ৬ টা ডিজিটৰ হ’ব লাগিব।');
-        }
-        
-        const { data, error } = await supabaseClient.auth.updateUser({ password: newPassword });
-        if(error) {
-            alert('পাছৱৰ্ড সলনি কৰিব পৰা নগ’ল: ' + error.message);
-        } else {
-            alert('সফল হৈছে! আপোনাৰ নতুন পাছৱৰ্ড সংৰক্ষিত হ’ল। এতিয়া এই পাছৱৰ্ডেৰে কম্পিউটাৰতো লগ-ইন কৰিব পাৰিবা।');
-            document.getElementById('newAdminPassword').value = '';
-        }
-    });
+    // 🔐 Password Reset Trigger
+    const btnUpdatePass = document.getElementById('btnUpdateInternalPassword');
+    if(btnUpdatePass) {
+        btnUpdatePass.addEventListener('click', async () => {
+            const newPassword = document.getElementById('newAdminPassword').value.trim();
+            if(!newPassword || newPassword.length < 6) {
+                return alert('ত্রুটি: পাছৱৰ্ড অতি কমেও ৬ টা ডিজিটৰ হ’ব লাগিব।');
+            }
+            const { data, error } = await supabaseClient.auth.updateUser({ password: newPassword });
+            if(error) {
+                alert('পাছৱৰ্ড সলনি কৰিব পৰা নগ’ল: ' + error.message);
+            } else {
+                alert('সফল হৈছে! আপোনাৰ নতুন পাছৱৰ্ড সংৰক্ষিত হ’ল।');
+                document.getElementById('newAdminPassword').value = '';
+            }
+        });
+    }
 
-    document.getElementById('btnStaffLogin').addEventListener('click', handleLogin);
-    document.getElementById('btnPatientBooking').addEventListener('click', () => showBookingForm('Book Now', 100, false));
+    const btnStaffLogin = document.getElementById('btnStaffLogin');
+    if(btnStaffLogin) btnStaffLogin.addEventListener('click', handleLogin);
+
+    const btnPatientBooking = document.getElementById('btnPatientBooking');
+    if(btnPatientBooking) btnPatientBooking.addEventListener('click', () => showBookingForm('Book Now', 100, false));
     
-    document.getElementById('btnOnlineConsult').addEventListener('click', () => {
-        const fee = 250;
-        const type = 'Online Consultation';
-        const upiPayload = `upi://pay?pa=9954340102@okbizaxis&pn=Dr%20Harikanta%20Das&am=${fee}&cu=INR&tn=${encodeURIComponent(type)}`;
-        window.location.href = upiPayload;
-        setTimeout(() => { showBookingForm(type, fee, true); }, 1500);
-    });
+    const btnOnlineConsult = document.getElementById('btnOnlineConsult');
+    if(btnOnlineConsult) {
+        btnOnlineConsult.addEventListener('click', () => {
+            const fee = 250;
+            const type = 'Online Consultation';
+            const upiPayload = `upi://pay?pa=9954340102@okbizaxis&pn=Dr%20Harikanta%20Das&am=${fee}&cu=INR&tn=${encodeURIComponent(type)}`;
+            window.location.href = upiPayload;
+            setTimeout(() => { showBookingForm(type, fee, true); }, 1500);
+        });
+    }
     
-    document.getElementById('btnSubmitBooking').addEventListener('click', submitBooking);
-    document.getElementById('btnSavePatient').addEventListener('click', savePatientRecord);
-    document.getElementById('btnLogout').addEventListener('click', handleLogout);
-    document.getElementById('searchBox').addEventListener('keyup', filterPatients);
+    const btnSubmitBooking = document.getElementById('btnSubmitBooking');
+    if(btnSubmitBooking) btnSubmitBooking.addEventListener('click', submitBooking);
+
+    const btnSavePatient = document.getElementById('btnSavePatient');
+    if(btnSavePatient) btnSavePatient.addEventListener('click', savePatientRecord);
+
+    const btnLogout = document.getElementById('btnLogout');
+    if(btnLogout) btnLogout.addEventListener('click', handleLogout);
+
+    const searchBox = document.getElementById('searchBox');
+    if(searchBox) searchBox.addEventListener('keyup', filterPatients);
     
-    document.getElementById('btnScrollToEntry').addEventListener('click', () => {
-        document.getElementById('prescriptionEntrySection').scrollIntoView({ behavior: 'smooth' });
-    });
+    const btnScroll = document.getElementById('btnScrollToEntry');
+    if(btnScroll) {
+        btnScroll.addEventListener('click', () => {
+            const entrySec = document.getElementById('prescriptionEntrySection');
+            if(entrySec) entrySec.scrollIntoView({ behavior: 'smooth' });
+        });
+    }
 
     startHealthTipsRotation();
     setupTabs();
@@ -99,12 +119,16 @@ function showBookingForm(type, fee, isDirectPaid) {
     document.getElementById('loginSection').style.display = 'none';
     document.getElementById('publicBookingSection').classList.remove('hidden');
     
-    document.getElementById('bookingFormTitle').innerText = `📆 নতুন ${type} ফৰ্ম`;
+    const bTitle = document.getElementById('bookingFormTitle');
+    if(bTitle) bTitle.innerText = `📆 নতুন ${type} ফৰ্ম`;
     
-    if (isDirectPaid) {
-        document.getElementById('qrBadge').innerText = `পেমেন্ট সম্পন্ন কৰাৰ পিছত তলত ১২ ডিজিটৰ Transaction ID দিয়ক`;
-    } else {
-        document.getElementById('qrBadge').innerText = `${type} ফীজ: ₹${fee}`;
+    const qrBadge = document.getElementById('qrBadge');
+    if (qrBadge) {
+        if (isDirectPaid) {
+            qrBadge.innerText = `পেমেন্ট সম্পন্ন কৰাৰ পিছত তলত ১২ ডিজিটৰ Transaction ID দিয়ক`;
+        } else {
+            qrBadge.innerText = `${type} ফীজ: ₹${fee}`;
+        }
     }
     
     const upiPayload = `upi://pay?pa=9954340102@okbizaxis&pn=Dr%20Harikanta%20Das&am=${fee}&cu=INR&tn=${encodeURIComponent(type)}`;
@@ -114,7 +138,11 @@ function showBookingForm(type, fee, isDirectPaid) {
     if(qrImageContainer) {
         qrImageContainer.src = qrApiUrl;
     }
-    document.getElementById('upiPayBtn').href = upiPayload;
+    
+    const upiPayBtn = document.getElementById('upiPayBtn');
+    if(upiPayBtn) {
+        upiPayBtn.href = upiPayload;
+    }
 }
 
 async function submitBooking() {
