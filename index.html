@@ -80,6 +80,7 @@
             </div>
             
             <button id="btnSubmitBooking" class="w-full bg-emerald-600 text-white font-bold py-3.5 rounded-xl shadow-md hover:bg-emerald-700 text-xs uppercase transition tracking-wider">বুকিং নিশ্চিত কৰক (Confirm)</button>
+           
         </div>
 
         <div class="w-full text-center border-t border-gray-100 pt-4 mt-3">
@@ -216,7 +217,7 @@
             if(supabaseClient && supabaseClient.auth) {
                 supabaseClient.auth.getSession().then(({ data: { session } }) => {
                     if (session) {
-                        checkRole(session.user.email);
+                        await checkRole();
                         showDashboard();
                     }
                 }).catch(err => console.log("Session bypassed"));
@@ -274,14 +275,46 @@
             setupTabs();
         });
 
-        function checkRole(email) {
-            isDoctor = (email && email.toLowerCase() === 'doctor@email.com');
-            const badge = document.getElementById('accessBadge');
-            if(badge) {
-                badge.innerText = isDoctor ? "Doctor (Full Access)" : "Staff Mode (Restricted)";
-                badge.className = isDoctor ? "text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider" : "text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider";
-            }
+        async function checkRole() {
+    try {
+        const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+
+        if (userError || !user) {
+            isDoctor = false;
+            return;
         }
+
+        const { data, error } = await supabaseClient
+            .from('user_roles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+
+        if (error || !data) {
+            console.log('Role fetch failed');
+            isDoctor = false;
+            return;
+        }
+
+        isDoctor = data.role === 'doctor';
+
+        const badge = document.getElementById('accessBadge');
+
+        if (badge) {
+            badge.innerText = isDoctor
+                ? 'Doctor (Full Access)'
+                : 'Staff Mode (Restricted)';
+
+            badge.className = isDoctor
+                ? 'text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider'
+                : 'text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider';
+        }
+
+    } catch (err) {
+        console.error(err);
+        isDoctor = false;
+    }
+}
 
         function generateLiveQR() {
             const qrBadge = document.getElementById('qrBadge');
@@ -312,16 +345,26 @@
         }
 
         async function handleLogin() {
-            const email = safeGet('loginEmail').value;
-            const password = safeGet('loginPassword').value;
-            if(!password || !email) return alert('অনুগ্ৰহ কৰি ইমেইল আৰু পাছৱৰ্ড দুয়োটা লিখক।');
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) alert('ভুল আইডি বা পাছৱৰ্ড!');
-            else {
-                checkRole(email);
-                showDashboard();
-            }
-        }
+    const email = safeGet('loginEmail').value.trim();
+    const password = safeGet('loginPassword').value.trim();
+
+    if (!email || !password) {
+        return alert('অনুগ্ৰহ কৰি ইমেইল আৰু পাছৱৰ্ড লিখক।');
+    }
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+    });
+
+    if (error) {
+        alert('ভুল ইমেইল বা পাছৱৰ্ড।');
+        return;
+    }
+
+    await checkRole();
+    showDashboard();
+}
 
         function showDashboard() {
             safeGet('loginSection').style.display = 'none';
@@ -353,6 +396,10 @@
                 const flashMsg = `🏥 *DR. HARIS CLINIC*\n\nনমস্কাৰ ${name},\nআপোনাৰ *${selectedBookingType}* ৰ বুকিং পঞ্জীয়ন কৰা হৈছে।\nTxn ID: ${txn_id}`;
                 window.open(`https://api.whatsapp.com/send?phone=91${phone.replace(/\D/g, '')}&text=${encodeURIComponent(flashMsg)}`, '_blank');
                 location.reload();
+
+                if (phone.length < 10) {
+                return alert('সঠিক ম’বাইল নম্বৰ দিয়ক');
+              }
             }
         }
 
@@ -465,11 +512,28 @@
         }
 
         async function deletePatientRecord(id) {
-            if (confirm('আপুনি সঁচাকৈয়ে এই ৰোগীৰ তথ্য মচিব বিচাৰে?')) {
-                await supabaseClient.from('clinic_data').delete().eq('id', id);
-                loadPatients();
-            }
-        }
+
+    if (!isDoctor) {
+        return alert('Doctor access required');
+    }
+
+    if (!confirm('আপুনি সঁচাকৈয়ে এই তথ্য delete কৰিব বিচাৰে?')) {
+        return;
+    }
+
+    const { error } = await supabaseClient
+        .from('clinic_data')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        console.log(error);
+        alert('Delete failed');
+        return;
+    }
+
+    loadPatients();
+}
 
         async function saveExpenseRecord() {
             const category = safeGet('expCategory').value;
@@ -530,12 +594,28 @@
             }
         }
 
-        async function deleteExpenseRecord(id) {
-            if (confirm('খৰচৰ ৰেকৰ্ড ডিলিট কৰিব বিচাৰে?')) {
-                await supabaseClient.from('clinic_expenses').delete().eq('id', id);
-                loadExpenses();
-            }
-        }
+       async function deleteExpenseRecord(id) {
+
+    if (!isDoctor) {
+        return alert('Doctor access required');
+    }
+
+    if (!confirm('খৰচৰ ৰেকৰ্ড delete কৰিব বিচাৰে?')) {
+        return;
+    }
+
+    const { error } = await supabaseClient
+        .from('clinic_expenses')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        alert('Delete failed');
+        return;
+    }
+
+    loadExpenses();
+}
 
         function sendWhatsAppRx(p) {
             if(!p.phone) return alert('মোবাইল নম্বৰ পোৱা নগ’ল।');
