@@ -12,13 +12,18 @@
 body {
   font-family: 'Hind Siliguri', 'Poppins', sans-serif;
   overflow-x: hidden;
-  padding-bottom: 70px; /* Space for fixed bottom nav */
+  padding-bottom: 80px;
 }
 input, textarea, select, button, p, h1, h2, h3, h4, h5, label, span, div, a {
   font-family: 'Hind Siliguri', 'Poppins', sans-serif;
 }
 .font-mono {
   font-family: 'Courier New', monospace !important;
+}
+@media print {
+  body * { visibility: hidden; }
+  #printArea, #printArea * { visibility: visible; }
+  #printArea { position: absolute; left: 0; top: 0; width: 100%; }
 }
 </style>
 </head>
@@ -41,10 +46,10 @@ input, textarea, select, button, p, h1, h2, h3, h4, h5, label, span, div, a {
 
   <main class="p-4">
     
-    <div id="tab-clinic" class="tab-content block animate-fadeIn">
+    <div id="tab-clinic" class="tab-content block">
       <div class="relative mb-4">
         <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-gray-400 text-sm"></i>
-        <input type="text" id="searchBox" oninput="filterPatients()" placeholder="ৰোগীৰ নাম বা ফোন নম্বৰ দি বিচাৰক..." class="w-full bg-slate-100 pl-9 pr-4 py-2.5 rounded-xl text-sm border border-transparent focus:bg-white focus:border-slate-300 focus:outline-none transition">
+        <input type="text" id="searchBox" placeholder="ৰোগীৰ নাম বা ফোন নম্বৰ দি বিচাৰক..." class="w-full bg-slate-100 pl-9 pr-4 py-2.5 rounded-xl text-sm border border-transparent focus:bg-white focus:border-slate-300 focus:outline-none transition">
       </div>
 
       <div id="doctorDashboard" class="hidden mb-5 bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-4 shadow-lg">
@@ -66,52 +71,51 @@ input, textarea, select, button, p, h1, h2, h3, h4, h5, label, span, div, a {
 
       <div class="mb-4 flex justify-between items-center">
         <h3 class="font-bold text-slate-800 text-md flex items-center gap-1.5"><i class="fa-solid fa-users text-slate-500"></i> ৰোগীৰ তালিকা</h3>
-        <button id="openFormBtn" class="hidden text-xs bg-slate-900 hover:bg-slate-800 text-white px-3 py-2 rounded-xl font-medium shadow transition active:scale-95 items-center gap-1"><i class="fa-solid fa-plus text-[10px]"></i> নতুন ৰোগী</button>
+        <button id="openFormBtn" class="hidden text-xs bg-slate-900 hover:bg-slate-800 text-white px-3 py-2 rounded-xl font-medium shadow transition active:scale-95 flex items-center gap-1">
+          <i class="fa-solid fa-plus text-[10px]"></i> নতুন ৰোগী
+        </button>
       </div>
       <div id="listPatients" class="space-y-3 min-h-[150px]"></div>
     </div>
 
-    <div id="tab-booking" class="tab-content hidden animate-fadeIn">
+    <div id="tab-booking" class="tab-content hidden">
       <div class="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm mb-4">
-        <h3 class="font-bold text-lg text-slate-900 mb-1 flex items-center gap-2"><i class="fa-solid fa-calendar-check text-emerald-500"></i> অনলাইন বুকিং (Online Appointment)</h3>
-        <p class="text-xs text-gray-500 mb-4">ঘৰত বহিয়েই আপোনাৰ নাম বুক কৰক আৰু নিশ্চিত সময় লাভ কৰক।</p>
+        <h3 class="font-bold text-lg text-slate-900 mb-1 flex items-center gap-2"><i class="fa-solid fa-calendar-check text-emerald-500"></i> অনলাইন বুকিং</h3>
+        <p class="text-xs text-gray-500 mb-4">ঘৰত বহিয়েই আপোনাৰ নাম বুক কৰক।</p>
         
         <form id="appointmentForm" class="space-y-3.5">
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1">ৰোগীৰ সম্পূৰ্ণ নাম (Full Name) *</label>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">ৰোগীৰ সম্পূৰ্ণ নাম *</label>
             <input type="text" id="bName" required class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-slate-400 transition" placeholder="নাম লিখক...">
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-semibold text-gray-600 mb-1">বয়স (Age) *</label>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">বয়স *</label>
               <input type="number" id="bAge" required class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-slate-400 transition" placeholder="বয়স...">
             </div>
             <div>
-              <label class="block text-xs font-semibold text-gray-600 mb-1">লিংগ (Sex) *</label>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">লিংগ *</label>
               <select id="bSex" required class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-slate-400 transition">
-                <option value="Male">পুৰুষ (Male)</option>
-                <option value="Female">মহিলা (Female)</option>
-                <option value="Other">অন্যান্য (Other)</option>
+                <option value="Male">পুৰুষ</option>
+                <option value="Female">মহিলা</option>
+                <option value="Other">অন্যান্য</option>
               </select>
             </div>
           </div>
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1">ফোন নম্বৰ (Phone Number) *</label>
-            <input type="tel" id="bPhone" required class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-slate-400 transition" placeholder="১০ টা সংখ্যাৰ নম্বৰ...">
+            <label class="block text-xs font-semibold text-gray-600 mb-1">ফোন নম্বৰ *</label>
+            <input type="tel" id="bPhone" required class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-slate-400 transition" placeholder="ফোন নম্বৰ...">
           </div>
           
           <div class="bg-slate-50 rounded-xl p-3 border border-dashed border-slate-200 text-center my-4">
-            <p class="text-xs font-bold text-slate-700 mb-2">বুকিং ফীজ: ₹১০০ (GPay / PhonePe / Paytm)</p>
-            <div class="w-32 h-32 bg-white mx-auto border rounded-lg flex items-center justify-center font-mono text-xs text-gray-400 shadow-sm relative">
-               <span class="p-2 text-center text-[10px]">QR Code Placeholder<br>(UPI ID: haris@upi)</span>
-            </div>
+            <p class="text-xs font-bold text-slate-700 mb-2">বুকিং ফীজ: ₹১০০ (UPI ID: haris@upi)</p>
             <div class="mt-3">
-              <label class="block text-left text-xs font-semibold text-gray-600 mb-1">Transaction ID / UTR (পইচা পঠোৱা নম্বৰ) *</label>
-              <input type="text" id="bTxn" required class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:border-slate-400 transition" placeholder="১২ টা সংখ্যাৰ নম্বৰটো ইয়াত দিয়ক...">
+              <label class="block text-left text-xs font-semibold text-gray-600 mb-1">Transaction ID / UTR *</label>
+              <input type="text" id="bTxn" required class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:border-slate-400 transition" placeholder="১২ টা সংখ্যাৰ নম্বৰ...">
             </div>
           </div>
 
-          <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 rounded-xl shadow-md transition active:scale-98 text-sm flex items-center justify-center gap-2">
+          <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2">
             <i class="fa-solid fa-paper-plane"></i> বুকিং নিশ্চিত কৰক
           </button>
         </form>
@@ -123,24 +127,23 @@ input, textarea, select, button, p, h1, h2, h3, h4, h5, label, span, div, a {
       </div>
     </div>
 
-    <div id="tab-expenses" class="tab-content hidden animate-fadeIn">
+    <div id="tab-expenses" class="tab-content hidden">
       <div id="expenseDoctorGate" class="text-center py-12 bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
         <i class="fa-solid fa-lock text-4xl text-slate-300 mb-3"></i>
-        <h3 class="font-bold text-slate-800 text-md">কেৱল চিকিৎসকৰ বাবে সংৰক্ষিত</h3>
-        <p class="text-xs text-gray-500 mt-1">এই অংশটো চাবলৈ অনুগ্ৰহ কৰি ওপৰৰ 'Doctor Mode' সক্ৰিয় কৰক।</p>
+        <h3 class="font-bold text-slate-800 text-md">কেৱল चिकित्सकৰ বাবে সংৰক্ষিত</h3>
       </div>
 
       <div id="expenseMainContent" class="hidden space-y-4">
         <div class="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm">
-          <h3 class="font-bold text-md text-slate-900 mb-3 flex items-center gap-1.5"><i class="fa-solid fa-folder-plus text-slate-500"></i> খৰচৰ এণ্ট্ৰী (Add New Expense)</h3>
+          <h3 class="font-bold text-md text-slate-900 mb-3 flex items-center gap-1.5"><i class="fa-solid fa-folder-plus text-slate-500"></i> খৰচৰ এণ্ট্ৰী</h3>
           <form id="expenseForm" class="space-y-3">
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1">পৰিমাণ (Amount) *</label>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">পৰিমাণ *</label>
                 <input type="number" id="eAmount" required class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-slate-400 transition" placeholder="₹">
               </div>
               <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1">শিতান (Category) *</label>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">শিতান *</label>
                 <select id="eCategory" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-slate-400 transition">
                   <option value="Salary">দৰমহা (Salary)</option>
                   <option value="Rent">ভাৰা (Rent)</option>
@@ -151,120 +154,105 @@ input, textarea, select, button, p, h1, h2, h3, h4, h5, label, span, div, a {
               </div>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-gray-600 mb-1">বিৱৰণ (Details)</label>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">বিৱৰণ</label>
               <input type="text" id="eNote" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-slate-400 transition" placeholder="চমু টোকা...">
             </div>
-            <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-xl shadow transition text-sm">সংৰক্ষিত কৰক</button>
+            <button type="submit" class="w-full bg-slate-900 text-white font-semibold py-2.5 rounded-xl shadow text-sm">সংৰক্ষিত কৰক</button>
           </form>
         </div>
 
         <div class="bg-slate-900 text-white rounded-2xl p-4 shadow-md">
-          <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">এই মাহৰ খৰচৰ খতিয়ান</h4>
+          <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">এই মাহৰ খৰচ</h4>
           <p id="expenseTotalCalculated" class="text-2xl font-bold text-red-400">₹0</p>
           <div id="expenseBreakdown" class="text-xs text-slate-300 mt-2 space-y-1 pt-2 border-t border-white/10"></div>
         </div>
-
-        <div class="space-y-2">
-          <h3 class="font-bold text-slate-800 text-md flex items-center gap-1.5"><i class="fa-solid fa-list-check text-slate-500"></i> খৰচৰ তালিকা</h3>
-          <div id="listExpenses" class="space-y-2"></div>
-        </div>
+        <div id="listExpenses" class="space-y-2"></div>
       </div>
     </div>
 
-    <div id="tab-profile" class="tab-content hidden animate-fadeIn">
+    <div id="tab-profile" class="tab-content hidden">
       <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm text-center">
-        <div class="w-20 h-20 bg-slate-100 rounded-full mx-auto flex items-center justify-center mb-3 shadow-inner border border-slate-200">
+        <div class="w-20 h-20 bg-slate-100 rounded-full mx-auto flex items-center justify-center mb-3 border">
           <i class="fa-solid fa-user-doctor text-4xl text-slate-700"></i>
         </div>
         <h2 class="font-bold text-lg text-slate-900">Dr. Harikanta Das</h2>
-        <p class="text-xs text-slate-500 font-medium">Alternative Medicine & Rehabilitation Specialist</p>
-        <span class="inline-block mt-2 bg-slate-100 text-slate-700 text-[11px] font-bold px-2.5 py-1 rounded-full border border-slate-200">Gogamukh, Dhemaji, Assam</span>
-        
-        <div class="grid grid-cols-2 gap-3 mt-6 pt-5 border-t border-slate-100">
-          <a href="tel:+910000000000" class="flex flex-col items-center justify-center p-3 bg-slate-50 hover:bg-slate-100 rounded-xl transition border border-slate-100">
-            <i class="fa-solid fa-phone text-slate-600 mb-1 text-md"></i>
-            <span class="text-xs font-semibold text-slate-800">কল কৰক</span>
-          </a>
-          <a href="https://maps.google.com" target="_blank" class="flex flex-col items-center justify-center p-3 bg-slate-50 hover:bg-slate-100 rounded-xl transition border border-slate-100">
-            <i class="fa-solid fa-location-dot text-slate-600 mb-1 text-md"></i>
-            <span class="text-xs font-semibold text-slate-800">অৱস্থান (Map)</span>
-          </a>
-        </div>
+        <p class="text-xs text-slate-500">Homeopathic Physician & Physiotherapist</p>
+        <span class="inline-block mt-2 bg-slate-100 text-slate-700 text-[11px] font-bold px-2.5 py-1 rounded-full border">Gogamukh, Dhemaji, Assam</span>
       </div>
     </div>
 
   </main>
 
   <div id="formModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white w-full max-w-md rounded-2xl max-h-[90vh] overflow-y-auto shadow-2xl p-4 animate-scaleUp">
-      <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+    <div class="bg-white w-full max-w-md rounded-2xl max-h-[90vh] overflow-y-auto shadow-2xl p-4">
+      <div class="flex justify-between items-center mb-4 pb-2 border-b">
         <h3 id="modalTitle" class="font-bold text-slate-900 text-md">ৰোগীৰ তথ্য সংৰক্ষণ</h3>
-        <button id="closeFormBtn" class="w-7 h-7 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-full flex items-center justify-center text-sm transition"><i class="fa-solid fa-xmark"></i></button>
+        <button type="button" id="closeFormBtnTop" class="w-7 h-7 bg-slate-100 text-slate-500 rounded-full flex items-center justify-center text-sm"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <form id="patientForm" class="space-y-3">
         <input type="hidden" id="pId">
         <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">ৰোগীৰ নাম (Patient Name) *</label>
-          <input type="text" id="pName" required class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-slate-400 transition">
+          <label class="block text-xs font-semibold text-gray-600 mb-1">ৰোগীৰ নাম *</label>
+          <input type="text" id="pName" required class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1">বয়স (Age) *</label>
-            <input type="number" id="pAge" required class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-slate-400 transition" placeholder="আঁক">
+            <label class="block text-xs font-semibold text-gray-600 mb-1">বয়স *</label>
+            <input type="number" id="pAge" required class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none" placeholder="Age">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1">লিংগ (Sex) *</label>
-            <select id="pSex" required class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-slate-400 transition">
-              <option value="Male">পুৰুষ (Male)</option>
-              <option value="Female">মহিলা (Female)</option>
-              <option value="Other">অন্যান্য (Other)</option>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">লিংগ *</label>
+            <select id="pSex" required class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none">
+              <option value="Male">পুৰুষ</option>
+              <option value="Female">মহিলা</option>
+              <option value="Other">অন্যান্য</option>
             </select>
           </div>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-gray-600 mb-1">ৰক্তচাপ (BP)</label>
-            <input type="text" id="pBP" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-slate-400 transition" placeholder="120/80">
+            <input type="text" id="pBP" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none" placeholder="120/80">
           </div>
           <div>
             <label class="block text-xs font-semibold text-gray-600 mb-1">ফোন নম্বৰ</label>
-            <input type="tel" id="pPhone" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-slate-400 transition">
+            <input type="tel" id="pPhone" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none">
           </div>
         </div>
         <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">ৰোগৰ লক্ষণ / পুৰণি ইতিহাস (Case History)</label>
-          <textarea id="pHistory" rows="2" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-slate-400 transition"></textarea>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Case History</label>
+          <textarea id="pHistory" rows="2" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none"></textarea>
         </div>
         <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">প্ৰেছক্ৰিপচন / দৰব (Prescription / Medicine)</label>
-          <textarea id="pMedicine" rows="2" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-slate-400 transition" placeholder="Rx..."></textarea>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Prescription / Medicine</label>
+          <textarea id="pMedicine" rows="2" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none" placeholder="Rx..."></textarea>
         </div>
         <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">ফীজ (Fees Charged) *</label>
-          <input type="number" id="pFees" required class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-slate-400 transition" placeholder="₹">
+          <label class="block text-xs font-semibold text-gray-600 mb-1">ফীজ *</label>
+          <input type="number" id="pFees" required class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none">
         </div>
         <div class="pt-2 flex gap-2">
-          <button type="submit" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-xl shadow transition text-sm">সংৰক্ষণ কৰক</button>
-          <button type="button" id="deletePatientBtn" class="hidden bg-red-50 hover:bg-red-100 text-red-600 font-semibold px-4 rounded-xl border border-red-200 transition text-sm"><i class="fa-solid fa-trash-can"></i></button>
+          <button type="submit" class="flex-1 bg-slate-900 text-white font-semibold py-2.5 rounded-xl text-sm">সংৰক্ষণ কৰক</button>
+          <button type="button" id="deletePatientBtn" class="hidden bg-red-50 text-red-600 font-semibold px-4 rounded-xl border border-red-200 text-sm"><i class="fa-solid fa-trash-can"></i></button>
         </div>
       </form>
     </div>
   </div>
 
   <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 flex justify-around items-center h-16 z-50 shadow-lg">
-    <button data-tab="clinic" class="tab-btn flex flex-col items-center justify-center w-full h-full text-slate-900 border-b-2 border-slate-900 transition">
+    <button data-tab="clinic" class="tab-btn flex flex-col items-center justify-center w-full h-full text-slate-900 border-b-2 border-slate-900">
       <i class="fa-solid fa-house-medical text-lg"></i>
       <span class="text-[10px] font-bold mt-1">ক্লিনিক</span>
     </button>
-    <button data-tab="booking" class="tab-btn flex flex-col items-center justify-center w-full h-full text-gray-400 transition">
+    <button data-tab="booking" class="tab-btn flex flex-col items-center justify-center w-full h-full text-gray-400">
       <i class="fa-solid fa-calendar-plus text-lg"></i>
       <span class="text-[10px] font-bold mt-1">বুকিং</span>
     </button>
-    <button data-tab="expenses" class="tab-btn flex flex-col items-center justify-center w-full h-full text-gray-400 transition">
+    <button data-tab="expenses" class="tab-btn flex flex-col items-center justify-center w-full h-full text-gray-400">
       <i class="fa-solid fa-wallet text-lg"></i>
       <span class="text-[10px] font-bold mt-1">খৰচ</span>
     </button>
-    <button data-tab="profile" class="tab-btn flex flex-col items-center justify-center w-full h-full text-gray-400 transition">
+    <button data-tab="profile" class="tab-btn flex flex-col items-center justify-center w-full h-full text-gray-400">
       <i class="fa-solid fa-id-card text-lg"></i>
       <span class="text-[10px] font-bold mt-1">প্ৰফাইল</span>
     </button>
@@ -275,12 +263,6 @@ input, textarea, select, button, p, h1, h2, h3, h4, h5, label, span, div, a {
 <div id="printArea" class="hidden"></div>
 
 <script>
-// Supabase Configuration
-const SUPABASE_URL = "YOUR_SUPABASE_URL"; 
-const SUPABASE_KEY = "YOUR_SUPABASE_ANON_KEY"; 
-const supabase = (SUPABASE_URL !== "YOUR_SUPABASE_URL") ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
-
-// Application State
 let isDoctor = false;
 let patientsCache = [];
 let bookingsCache = [];
@@ -288,27 +270,34 @@ let expensesCache = [];
 
 function safeGet(id) { return document.getElementById(id); }
 
-// Toggle Doctor/Patient Mode Securely
+// Navigation Functionality
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.remove('text-slate-900', 'border-b-2', 'border-slate-900');
+            b.classList.add('text-gray-400');
+        });
+        btn.classList.remove('text-gray-400');
+        btn.classList.add('text-slate-900', 'border-b-2', 'border-slate-900');
+
+        const targetTab = btn.getAttribute('data-tab');
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+        safeGet(`tab-${targetTab}`).classList.remove('hidden');
+    });
+});
+
+// Doctor Mode Switcher
 safeGet('doctorToggle').addEventListener('click', () => {
     isDoctor = !isDoctor;
-    const label = safeGet('roleLabel');
-    const toggleBtn = safeGet('doctorToggle');
+    safeGet('roleLabel').innerText = isDoctor ? "Doctor Mode" : "Patient Mode";
     
     if(isDoctor) {
-        label.innerText = "Doctor Mode";
-        toggleBtn.classList.remove('bg-slate-800', 'text-slate-300');
-        toggleBtn.classList.add('bg-emerald-600', 'text-white', 'border-emerald-500');
-        
         safeGet('doctorDashboard').classList.remove('hidden');
         safeGet('openFormBtn').classList.remove('hidden');
         safeGet('doctorBookingsSection').classList.remove('hidden');
         safeGet('expenseDoctorGate').classList.add('hidden');
         safeGet('expenseMainContent').classList.remove('hidden');
     } else {
-        label.innerText = "Patient Mode";
-        toggleBtn.classList.remove('bg-emerald-600', 'text-white', 'border-emerald-500');
-        toggleBtn.classList.add('bg-slate-800', 'text-slate-300');
-        
         safeGet('doctorDashboard').classList.add('hidden');
         safeGet('openFormBtn').classList.add('hidden');
         safeGet('doctorBookingsSection').classList.add('hidden');
@@ -318,67 +307,25 @@ safeGet('doctorToggle').addEventListener('click', () => {
     renderAll();
 });
 
-// Navigation Flow
-function setupTabs() {
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.tab-btn').forEach(b => {
-                b.classList.remove('text-slate-900', 'border-b-2', 'border-slate-900');
-                b.classList.add('text-gray-400');
-            });
-            btn.classList.remove('text-gray-400');
-            btn.classList.add('text-slate-900', 'border-b-2', 'border-slate-900');
-
-            const targetTab = btn.getAttribute('data-tab');
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.add('hidden');
-            });
-            safeGet(`tab-${targetTab}`).classList.remove('hidden');
-        });
-    });
-}
-
-// Data Handling & Renderers
-async function syncData() {
-    if (!supabase) { loadMockData(); return; }
-    // Add real database syncing queries here if needed
-}
-
-function loadMockData() {
-    patientsCache = [
-        { id: '1', name: 'ৰমেন বৰুৱা', age: 45, sex: 'Male', bp: '130/85', phone: '9876543210', history: 'কঁকালৰ বিষ', medicine: 'Rhus Tox 200, Daily twice', fees: 300, created_at: new Date().toISOString() }
-    ];
-    bookingsCache = [
-        { id: '101', name: 'মিতালী শইকীয়া', age: 32, sex: 'Female', phone: '8877665544', txn_id: 'TXN123456789012', status: 'Pending' }
-    ];
-    expensesCache = [
-        { id: '201', amount: 5000, category: 'Salary', note: 'সহায়কৰ দৰমহা', created_at: new Date().toISOString() }
-    ];
-    renderAll();
-}
-
-function renderAll() {
-    renderPatients();
-    renderBookings();
-    renderExpenses();
-    calculateStats();
-}
-
+// Render Patients List with Print Feature Restored
 function renderPatients() {
     const list = safeGet('listPatients');
     list.innerHTML = '';
     patientsCache.forEach(p => {
         const div = document.createElement('div');
-        div.className = "bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex justify-between items-start transition hover:border-slate-300";
+        div.className = "bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex justify-between items-start";
         div.innerHTML = `
             <div>
-                <h4 class="font-bold text-slate-900 text-sm">${escapeHTML(p.name)} <span class="text-xs text-gray-400 font-normal">(${p.age} yrs, ${p.sex})</span></h4>
+                <h4 class="font-bold text-slate-900 text-sm">${escapeHTML(p.name)} <span class="text-xs text-gray-400 font-normal">(${p.age} Yrs, ${p.sex})</span></h4>
                 <p class="text-xs text-slate-500 mt-1"><i class="fa-solid fa-notes-medical"></i> ${escapeHTML(p.history || 'No history')}</p>
                 ${isDoctor ? `<p class="text-xs text-emerald-600 font-semibold mt-1"><i class="fa-solid fa-prescription"></i> ${escapeHTML(p.medicine || 'No Rx')}</p>` : ''}
             </div>
             <div class="flex flex-col items-end gap-2">
                 <span class="text-xs bg-slate-100 text-slate-800 font-bold px-2 py-0.5 rounded-md">₹${p.fees}</span>
-                ${isDoctor ? `<button onclick="openEditPatient('${p.id}')" class="text-xs text-slate-500 hover:text-slate-900 bg-slate-50 px-2 py-1 rounded-md border border-slate-200"><i class="fa-solid fa-pen-to-square"></i> চাবক</button>` : ''}
+                <div class="flex gap-1">
+                    ${isDoctor ? `<button onclick="openEditPatient('${p.id}')" class="text-[11px] text-slate-600 bg-slate-50 px-2 py-1 rounded border"><i class="fa-solid fa-pen"></i></button>` : ''}
+                    <button onclick="printPrescription('${p.id}')" class="text-[11px] text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-200"><i class="fa-solid fa-print"></i></button>
+                </div>
             </div>
         `;
         list.appendChild(div);
@@ -394,12 +341,9 @@ function renderBookings() {
         div.innerHTML = `
             <div>
                 <h4 class="font-bold text-slate-900 text-sm">${escapeHTML(b.name)} <span class="text-xs text-gray-400 font-normal">(${b.age}, ${b.sex})</span></h4>
-                <p class="text-xs text-gray-500 font-mono mt-0.5">Txn: ${escapeHTML(b.txn_id)}</p>
-                <p class="text-xs text-slate-600 mt-1"><i class="fa-solid fa-phone"></i> ${escapeHTML(b.phone)}</p>
+                <p class="text-xs text-gray-500 font-mono">Txn: ${escapeHTML(b.txn_id)}</p>
             </div>
-            <div class="flex gap-2">
-                <button onclick="approveBooking('${b.id}')" class="bg-emerald-50 text-emerald-600 border border-emerald-200 text-xs px-2.5 py-1.5 rounded-xl font-medium shadow-sm"><i class="fa-solid fa-check"></i> Approve</button>
-            </div>
+            <button onclick="approveBooking('${b.id}')" class="bg-emerald-50 text-emerald-600 border border-emerald-200 text-xs px-2.5 py-1 rounded-xl">Approve</button>
         `;
         list.appendChild(div);
     });
@@ -411,82 +355,65 @@ function renderExpenses() {
     expensesCache.forEach(e => {
         const div = document.createElement('div');
         div.className = "bg-white border border-slate-100 rounded-xl p-3 flex justify-between items-center";
-        div.innerHTML = `
-            <div>
-                <span class="text-[10px] font-bold uppercase tracking-wide bg-red-50 text-red-600 px-2 py-0.5 rounded-md border border-red-100">${e.category}</span>
-                <p class="text-xs font-semibold text-slate-800 mt-1">${escapeHTML(e.note || 'No note')}</p>
-            </div>
-            <span class="text-sm font-bold text-red-600">-₹${e.amount}</span>
-        `;
+        div.innerHTML = `<div><span class="text-[10px] font-bold bg-red-50 text-red-600 px-2 py-0.5 rounded">${e.category}</span><p class="text-xs font-semibold text-slate-800 mt-1">${escapeHTML(e.note || '')}</p></div><span class="text-sm font-bold text-red-600">-₹${e.amount}</span>`;
         list.appendChild(div);
     });
 }
 
 function calculateStats() {
-    const totalPatients = patientsCache.length;
     const totalEarnings = patientsCache.reduce((sum, p) => sum + (Number(p.fees) || 0), 0);
-    
-    safeGet('dashTotalPatients').innerText = totalPatients;
+    safeGet('dashTotalPatients').innerText = patientsCache.length;
     safeGet('dashTotalEarnings').innerText = `₹${totalEarnings}`;
 
-    // Expense Calculation safely handling keys
-    let expenseSummary = { Salary: 0, Rent: 0, Medicines: 0, Electricity: 0, Other: 0 };
-    let totalExpenses = 0;
-    
+    let summary = { Salary: 0, Rent: 0, Medicines: 0, Electricity: 0, Other: 0 };
+    let totalExp = 0;
     expensesCache.forEach(e => {
-        const amt = Number(e.amount) || 0;
-        totalExpenses += amt;
-        if (expenseSummary[e.category] !== undefined) {
-            expenseSummary[e.category] += amt;
-        } else {
-            expenseSummary['Other'] += amt;
-        }
+        totalExp += Number(e.amount) || 0;
+        if(summary[e.category] !== undefined) summary[e.category] += Number(e.amount) || 0;
+        else summary['Other'] += Number(e.amount) || 0;
     });
-
-    safeGet('expenseTotalCalculated').innerText = `₹${totalExpenses}`;
-    
+    safeGet('expenseTotalCalculated').innerText = `₹${totalExp}`;
     safeGet('expenseBreakdown').innerHTML = `
-        <div class="flex justify-between"><span>দৰমহা (Salary):</span> <span>₹${expenseSummary.Salary}</span></div>
-        <div class="flex justify-between"><span>ভাৰা (Rent):</span> <span>₹${expenseSummary.Rent}</span></div>
-        <div class="flex justify-between"><span>দৰব (Medicines):</span> <span>₹${expenseSummary.Medicines}</span></div>
-        <div class="flex justify-between"><span>বিদ্যুত বিল (Electricity):</span> <span>₹${expenseSummary.Electricity}</span></div>
-        <div class="flex justify-between"><span>অন্যান্য (Other):</span> <span>₹${expenseSummary.Other}</span></div>
+        <div class="flex justify-between"><span>দৰমহা (Salary):</span> <span>₹${summary.Salary}</span></div>
+        <div class="flex justify-between"><span>ভাৰা (Rent):</span> <span>₹${summary.Rent}</span></div>
+        <div class="flex justify-between"><span>দৰব (Medicines):</span> <span>₹${summary.Medicines}</span></div>
+        <div class="flex justify-between"><span>বিদ্যুত বিল (Electricity):</span> <span>₹${summary.Electricity}</span></div>
+        <div class="flex justify-between"><span>অন্যান্য (Other):</span> <span>₹${summary.Other}</span></div>
     `;
 }
 
-// Modal Interactivity & Form Actions
+// Modal Form Actions
 safeGet('openFormBtn').addEventListener('click', () => {
     clearForm();
     safeGet('modalTitle').innerText = "ৰোগীৰ তথ্য সংৰক্ষণ";
     safeGet('deletePatientBtn').classList.add('hidden');
     safeGet('formModal').classList.remove('hidden');
 });
-
-safeGet('closeFormBtn').addEventListener('click', () => { safeGet('formModal').classList.add('hidden'); });
+safeGet('closeFormBtnTop').addEventListener('click', () => safeGet('formModal').classList.add('hidden'));
 
 function openEditPatient(id) {
     const p = patientsCache.find(item => item.id === id);
     if(!p) return;
     safeGet('pId').value = p.id;
     safeGet('pName').value = p.name;
-    safeGet('pAge').value = p.age || '';
-    safeGet('pSex').value = p.sex || 'Male';
+    safeGet('pAge').value = p.age;
+    safeGet('pSex').value = p.sex;
     safeGet('pBP').value = p.bp || '';
     safeGet('pPhone').value = p.phone || '';
     safeGet('pHistory').value = p.history || '';
     safeGet('pMedicine').value = p.medicine || '';
     safeGet('pFees').value = p.fees || 0;
     
-    safeGet('modalTitle').innerText = "তথ্য সংশোধন কৰক";
+    safeGet('modalTitle').innerText = "তথ্য সংশোধন";
     safeGet('deletePatientBtn').classList.remove('hidden');
     safeGet('formModal').classList.remove('hidden');
 }
 
-// Patient Submit (Add/Edit)
+// Submit Patient Data
 safeGet('patientForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const id = safeGet('pId').value;
-    const patientData = {
+    const data = {
         id: id || String(Date.now()),
         name: safeGet('pName').value,
         age: parseInt(safeGet('pAge').value) || 0,
@@ -495,71 +422,58 @@ safeGet('patientForm').addEventListener('submit', (e) => {
         phone: safeGet('pPhone').value,
         history: safeGet('pHistory').value,
         medicine: safeGet('pMedicine').value,
-        fees: parseInt(safeGet('pFees').value) || 0,
-        created_at: new Date().toISOString()
+        fees: parseInt(safeGet('pFees').value) || 0
     };
-
     if(id) {
-        const index = patientsCache.findIndex(p => p.id === id);
-        if(index !== -1) patientsCache[index] = patientData;
+        const idx = patientsCache.findIndex(p => p.id === id);
+        if(idx !== -1) patientsCache[idx] = data;
     } else {
-        patientsCache.unshift(patientData);
+        patientsCache.unshift(data);
     }
-    
     safeGet('formModal').classList.add('hidden');
     renderAll();
 });
 
-// Delete Patient (Requires Doctor Authorization Validation)
+// Delete Patient Data
 safeGet('deletePatientBtn').addEventListener('click', () => {
-    if (!isDoctor) { alert('Doctor access required'); return; }
     const id = safeGet('pId').value;
-    if(confirm('আচৰিতনে? আপুনি এই ৰেকৰ্ডটো মচি পেলাব বিচাৰে?')) {
+    if(confirm('আপুনি নিশ্চিতনে এই ৰেকৰ্ডটো মচিব বিচাৰে?')) {
         patientsCache = patientsCache.filter(p => p.id !== id);
         safeGet('formModal').classList.add('hidden');
         renderAll();
     }
 });
 
-// Appointment Form Submit
+// Submit Appointment Online
 safeGet('appointmentForm').addEventListener('submit', (e) => {
     e.preventDefault();
-    const txnId = safeGet('bTxn').value.trim();
-    
-    // Server-side imitation validation for Duplicate UTR
-    const isDuplicate = bookingsCache.some(b => b.txn_id === txnId);
-    if(isDuplicate) {
-        alert("এই UTR / Transaction ID টো ইতিমধ্যে ব্যৱহাৰ কৰা হৈছে! অনুগ্ৰহ কৰি সঠিক নম্বৰ দিয়ক।");
+    const txn = safeGet('bTxn').value.trim();
+    if(bookingsCache.some(b => b.txn_id === txn)) {
+        alert('এই Transaction ID টো ইতিমধ্যে ব্যৱহাৰ কৰা হৈছে!');
         return;
     }
-
-    const newBooking = {
+    bookingsCache.push({
         id: String(Date.now()),
         name: safeGet('bName').value,
         age: parseInt(safeGet('bAge').value) || 0,
         sex: safeGet('bSex').value,
         phone: safeGet('bPhone').value,
-        txn_id: txnId,
-        status: 'Pending'
-    };
-    
-    bookingsCache.push(newBooking);
-    alert('আপোনাৰ বুকিং অনুৰোধ প্ৰাপ্ত হৈছে। চিকিৎসকৰ অনুমোদনৰ বাবে অপেক্ষা কৰক।');
+        txn_id: txn
+    });
+    alert('বুকিং অনুৰোধ প্ৰেৰণ কৰা হ’ল।');
     safeGet('appointmentForm').reset();
     renderAll();
 });
 
-// Expense Form Submit
+// Submit Expense
 safeGet('expenseForm').addEventListener('submit', (e) => {
     e.preventDefault();
-    const newExpense = {
+    expensesCache.unshift({
         id: String(Date.now()),
         amount: parseInt(safeGet('eAmount').value) || 0,
         category: safeGet('eCategory').value,
-        note: safeGet('eNote').value,
-        created_at: new Date().toISOString()
-    };
-    expensesCache.unshift(newExpense);
+        note: safeGet('eNote').value
+    });
     safeGet('expenseForm').reset();
     renderAll();
 });
@@ -567,9 +481,7 @@ safeGet('expenseForm').addEventListener('submit', (e) => {
 function approveBooking(id) {
     const b = bookingsCache.find(item => item.id === id);
     if(!b) return;
-    
-    // Transfer to Patient List
-    const convertedPatient = {
+    patientsCache.unshift({
         id: String(Date.now()),
         name: b.name,
         age: b.age,
@@ -578,28 +490,54 @@ function approveBooking(id) {
         phone: b.phone,
         history: 'অনলাইন বুকিং',
         medicine: '',
-        fees: 100, // Pre-paid Booking Amount
-        created_at: new Date().toISOString()
-    };
-    
-    patientsCache.unshift(convertedPatient);
+        fees: 100
+    });
     bookingsCache = bookingsCache.filter(item => item.id !== id);
-    alert('বুকিং অনুমোদন কৰা হ’ল আৰু ৰোগীৰ তালিকাত যোগ কৰা হ’ল।');
     renderAll();
 }
 
-function filterPatients() {
+// Restored Print Prescription Functionality
+function printPrescription(id) {
+    const p = patientsCache.find(item => item.id === id);
+    if (!p) return;
+    
+    safeGet('printArea').innerHTML = `
+    <div style="padding:30px; font-family:'Hind Siliguri', sans-serif; min-height:500px; position:relative;">
+      <h2 style="text-align:center; margin:0; font-size:22px; color:#1e293b;">Dr. Haris Homeopathic & Physiotherapy Clinic</h2>
+      <p style="text-align:center; margin:2px 0 20px 0; font-size:12px; color:#64748b;">Gogamukh, Dhemaji, Assam | Mo: 0000000000</p>
+      <hr style="border:0; border-top:1px solid #cbd5e1;">
+      <div style="margin:15px 0; font-size:14px; display:flex; justify-content:space-between;">
+        <span><b>ৰোগীৰ নাম:</b> ${escapeHTML(p.name)}</span>
+        <span><b>বয়স/লিংগ:</b> ${p.age} Yrs / ${p.sex}</span>
+      </div>
+      <div style="margin:10px 0; font-size:14px;"><b>ৰক্তচাপ (BP):</b> ${escapeHTML(p.bp || 'N/A')}</div>
+      <div style="margin:15px 0; font-size:14px; min-height:60px;"><b>Case History:</b><br>${escapeHTML(p.history || 'N/A')}</div>
+      <hr style="border:0; border-top:1px solid #e2e8f0; margin:20px 0;">
+      <div style="font-size:16px; min-height:200px;"><b>Rx / Treatment:</b><br><br><span style="color:#059669; font-weight:bold;">${escapeHTML(p.medicine || 'No medicine prescribed.')}</span></div>
+      <p style="position:absolute; bottom:30px; left:30px; right:30px; font-size:11px; text-align:center; color:#94a3b8; border-top:1px solid #e2e8f0; pt-10">ধন্যবাদ | drhariswellfuture.com</p>
+    </div>`;
+    window.print();
+}
+
+// Search Filter Input Fix
+safeGet('searchBox').addEventListener('input', () => {
     const term = safeGet('searchBox').value.toLowerCase();
     document.querySelectorAll('#listPatients > div').forEach(c => {
         c.style.display = c.innerText.toLowerCase().includes(term) ? 'flex' : 'none';
     });
+});
+
+function renderAll() {
+    renderPatients();
+    renderBookings();
+    renderExpenses();
+    calculateStats();
 }
 
 function clearForm() {
     safeGet('pId').value = '';
     ['pName', 'pAge', 'pBP', 'pPhone', 'pHistory', 'pMedicine', 'pFees'].forEach(id => {
-        const el = safeGet(id);
-        if(el) el.value = '';
+        if(safeGet(id)) safeGet(id).value = '';
     });
     safeGet('pSex').value = 'Male';
 }
@@ -608,10 +546,12 @@ function escapeHTML(str) {
     return str ? str.replace(/[&<>'\"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t)) : ''; 
 }
 
-// Initial Kickstart
+// Local Mock Data Loader
 window.onload = () => {
-    setupTabs();
-    syncData();
+    patientsCache = [{ id: '1', name: 'ৰমেন বৰুৱা', age: 45, sex: 'Male', bp: '130/85', phone: '9876543210', history: 'কঁকালৰ বিষ', medicine: 'Rhus Tox 200, Daily twice', fees: 300 }];
+    bookingsCache = [{ id: '101', name: 'মিতালী শইকীয়া', age: 32, sex: 'Female', phone: '8877665544', txn_id: 'TXN123456789012' }];
+    expensesCache = [{ id: '201', amount: 5000, category: 'Salary', note: 'সহায়কৰ দৰমহা' }];
+    renderAll();
 };
 </script>
 </body>
