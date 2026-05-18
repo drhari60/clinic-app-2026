@@ -213,15 +213,20 @@
 
         const safeGet = (id) => document.getElementById(id) || { addEventListener: () => {}, style: {}, classList: { add:()=>{}, remove:()=>{} }, value: '' };
 
-       window.addEventListener('DOMContentLoaded', async () => {
-            if(supabaseClient && supabaseClient.auth) {
-                supabaseClient.auth.getSession().then(({ data: { session } }) => {
-                    if (session) {
-                        await checkRole();
-                        showDashboard();
-                    }
-                }).catch(err => console.log("Session bypassed"));
-            }
+      window.addEventListener('DOMContentLoaded', async () => {
+
+    try {
+
+        const { data: { session } } = await supabaseClient.auth.getSession();
+
+        if (session) {
+            await checkRole();
+            showDashboard();
+        }
+
+    } catch (err) {
+        console.log('Session bypassed');
+    }
 
             const btnRegular = document.getElementById('btnSelectRegular');
             const btnOnline = document.getElementById('btnSelectOnline');
