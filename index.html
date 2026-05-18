@@ -456,12 +456,21 @@
             btnWA.innerHTML = '<i class="fab fa-whatsapp"></i> Rx';
             btnWA.onclick = () => sendWhatsAppRx(p);
 
-            const btnEdit = document.createElement('button');
-            btnEdit.className = 'bg-blue-600 text-white px-3 py-2 rounded-lg text-xs font-bold';
-            btnEdit.innerHTML = '<i class="fas fa-edit"></i>';
-            btnEdit.onclick = () => loadPatientToForm(p);
+            actions.append(btnPrint, btnWA);
 
-            actions.append(btnPrint, btnWA, btnEdit);
+if (isDoctor) {
+
+    const btnEdit = document.createElement('button');
+
+    btnEdit.className =
+        'bg-blue-600 text-white px-3 py-2 rounded-lg text-xs font-bold';
+
+    btnEdit.innerHTML = '<i class="fas fa-edit"></i>';
+
+    btnEdit.onclick = () => loadPatientToForm(p);
+
+    actions.append(btnEdit);
+}
 
             // RESTRICTED ACCESS LOGIC FOR STAFF (DELETE BUTTON ONLY SHOWN TO DOCTOR)
             if (isDoctor) {
