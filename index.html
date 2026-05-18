@@ -199,7 +199,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 try {
 const { data: { session } } = await supabaseClient.auth.getSession();
 if (session) {
-await checkRole();
+await checkRole(session.user.email);
 showDashboard();
 }
 } catch (err) {
@@ -252,24 +252,19 @@ startHealthTipsRotation();
 setupTabs();
 });
 
-async function checkRole() {
+async function checkRole(userEmail) {
 try {
-const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-if (userError || !user) {
+if (!userEmail) {
+const { data: { user } } = await supabaseClient.auth.getUser();
+userEmail = user ? user.email : '';
+}
+if (!userEmail) {
 isDoctor = false;
 return;
 }
-const { data, error } = await supabaseClient
-.from('user_roles')
-.select('role')
-.eq('id', user.id)
-.single();
-if (error || !data) {
-console.log('Role fetch failed');
-isDoctor = false;
-return;
-}
-isDoctor = data.role === 'doctor';
+// 🎯 DIRECT SECURITY BY USER'S ACTUAL EMAILS
+isDoctor = (userEmail.toLowerCase() === 'das.harikanta60@gmail.com');
+
 const badge = document.getElementById('accessBadge');
 if (badge) {
 badge.innerText = isDoctor ? 'Doctor (Full Access)' : 'Staff Mode (Restricted)';
@@ -320,7 +315,7 @@ if (error) {
 alert('ভুল ইমেইল বা পাছৱৰ্ড।');
 return;
 }
-await checkRole();
+await checkRole(email);
 showDashboard();
 }
 
@@ -545,7 +540,6 @@ loadExpenses();
 
 function sendWhatsAppRx(p) {
 if(!p.phone) return alert('মোবাইল নম্বৰ পোৱা নগ’ল।');
-// INCLUDES DOCTOR'S SOCIAL LINKS INSIDE PATIENT PRESCRIPTION MESSAGE FOR WHATSAPP
 const msg = `🏥 *DR. HARIS HOMEOPATHIC CLINIC*\n\n*Patient Name:* ${p.name}\n\n*Rx (Prescription):*\n${p.medicine}\n\n-------------------------\nআমাদের স্বাস্থ্য বিষয়ক লিখনি আৰু গুৰুত্বপূৰ্ণ ভিডিঅ'সমূহ চাবলৈ তলৰ লিংকসমূহত ক্লিক কৰক:\n\n🌐 ৱেবচাইট: https://drhariswellfuture.com/\n🔵 ফেচবুক: https://www.facebook.com/drhari365\n🔴 ইউটিঊব: https://www.youtube.com/@drhari\n📸 ইনষ্টাগ্ৰাম: https://www.instagram.com/drharikanta`;
 window.open(`https://api.whatsapp.com/send?phone=91${p.phone.replace(/\D/g, '')}&text=${encodeURIComponent(msg)}`, '_blank');
 }
