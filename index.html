@@ -213,7 +213,7 @@
 
         const safeGet = (id) => document.getElementById(id) || { addEventListener: () => {}, style: {}, classList: { add:()=>{}, remove:()=>{} }, value: '' };
 
-        window.addEventListener('DOMContentLoaded', () => {
+       window.addEventListener('DOMContentLoaded', async () => {
             if(supabaseClient && supabaseClient.auth) {
                 supabaseClient.auth.getSession().then(({ data: { session } }) => {
                     if (session) {
