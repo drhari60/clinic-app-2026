@@ -390,8 +390,15 @@
             const txn_id = safeGet('bTxnId').value?.trim();
             const problem = safeGet('bProblem').value?.trim();
 
-            if(!name || !phone || !txn_id) return alert('Transaction ID নোভৰোৱাকৈ বুকিং কৰিব নোৱাৰি। অনুগ্ৰহ কৰি সঠিক ১২ ডিজিটৰ ID প্ৰদান কৰক।');
-            if(txn_id.length < 10) return alert('অনুগ্ৰহ কৰি সঠিক আৰু সম্পূৰ্ণ UPI Transaction ID দিয়ক।');
+            if (!name || !phone || !txn_id) {
+    return alert('Transaction ID দিব লাগিব।');
+}
+
+const txnPattern = /^[A-Za-z0-9]{10,30}$/;
+
+if (!txnPattern.test(txn_id)) {
+    return alert('সঠিক UPI Transaction ID দিয়ক।');
+}
 
             const problemDesc = `[${selectedBookingType}] ${problem}`;
             const { error } = await supabaseClient.from('clinic_bookings').insert([{ name, phone, txn_id, problem: problemDesc }]);
