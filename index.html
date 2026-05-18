@@ -389,7 +389,33 @@
             const phone = safeGet('bPhone').value?.trim();
             const txn_id = safeGet('bTxnId').value?.trim();
             const problem = safeGet('bProblem').value?.trim();
+// NAME VALIDATION
+const namePattern = /^[A-Za-zÀ-ÿ\u0980-\u09FF\s.]{3,50}$/;
 
+if (!namePattern.test(name)) {
+    return alert('সঠিক ৰোগীৰ নাম দিয়ক।');
+}
+
+// PHONE VALIDATION (Indian Mobile)
+const phonePattern = /^[6-9]\d{9}$/;
+
+if (!phonePattern.test(phone)) {
+    return alert('সঠিক 10 ডিজিট ম’বাইল নম্বৰ দিয়ক।');
+}
+
+// PROBLEM VALIDATION
+if (!problem || problem.length < 5) {
+    return alert('স্বাস্থ্য সমস্যাটো সঠিককৈ লিখক।');
+}
+
+// TRANSACTION VALIDATION
+const txnPattern = /^[A-Za-z0-9]{10,30}$/;
+
+if (!txnPattern.test(txn_id)) {
+    return alert('সঠিক Transaction ID দিয়ক।');
+}
+
+            
             if (!name || !phone || !txn_id) {
     return alert('Transaction ID দিব লাগিব।');
 }
