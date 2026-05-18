@@ -37,7 +37,7 @@ body { font-family: 'Poppins', sans-serif; }
 </div>
 
 <div id="bookingStep1" class="w-full bg-slate-50 p-5 rounded-2xl border border-gray-100 space-y-3">
-<h3 class="text-sm font-bold text-center text-gray-900"> 🏥  পোনপটীয়া অনলাইন বুকিং ফৰ্ম</h3>
+<h3 class="text-sm font-bold text-center text-gray-900"> 🏥 পোনপটীয়া অনলাইন বুকিং ফৰ্ম</h3>
 
 <div class="flex gap-2 justify-center my-1">
 <button id="btnSelectRegular" class="text-xs font-bold px-4 py-2 bg-slate-900 text-white rounded-xl transition">Regular Appointment</button>
@@ -56,7 +56,7 @@ body { font-family: 'Poppins', sans-serif; }
 <i class="fas fa-arrow-left"></i> তথ্য সলনি কৰক
 </button>
 
-<h3 class="text-sm font-bold text-center text-emerald-700"> 💰  অনুগ্ৰহ কৰি ইয়াত পেমেন্ট কৰক</h3>
+<h3 class="text-sm font-bold text-center text-emerald-700"> 💰 অনুগ্ৰহ কৰি ইয়াত পেমেন্ট কৰক</h3>
 
 <div class="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center bg-white flex flex-col items-center shadow-inner">
 <span id="qrBadge" class="text-[11px] bg-slate-900 text-white font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2">ফীজ: ₹100</span>
@@ -101,7 +101,7 @@ body { font-family: 'Poppins', sans-serif; }
 <div class="p-4 max-w-4xl mx-auto">
 <div id="tab-home" class="tab-content space-y-4">
 <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-<input type="text" id="searchBox" placeholder=" 🔍  নাম বা মোবাইল নম্বৰেৰে ৰোগী সন্ধান কৰক..." class="w-full p-3.5 border border-gray-200 rounded-xl bg-gray-50/50 text-sm">
+<input type="text" id="searchBox" placeholder=" 🔍 নাম বা মোবাইল নম্বৰেৰে ৰোগী সন্ধান কৰক..." class="w-full p-3.5 border border-gray-200 rounded-xl bg-gray-50/50 text-sm">
 <button id="btnScrollToEntry" class="w-full mt-3 bg-[#111827] text-white font-bold py-3.5 px-4 rounded-xl shadow-sm text-center block text-sm">
 <i class="fas fa-user-plus mr-2"></i> নতুন ৰোগী সংযোগ কৰক
 </button>
@@ -145,7 +145,7 @@ body { font-family: 'Poppins', sans-serif; }
 <h3 id="formTitle" class="text-sm font-bold text-slate-900 border-b border-gray-100 pb-2">নতুন ৰোগীৰ প্ৰেচক্ৰিপচন এণ্ট্ৰী চেকচন</h3>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
 <input type="text" id="pName" placeholder="ৰোগীৰ নাম" class="p-3.5 border border-gray-200 rounded-xl text-sm">
-<input type="text" id="pAgeSex" placeholder="বয়স / লিংগ" class="p-3.5 border border-gray-200 rounded-xl text-sm">
+<input type="text" id="pAgeSex" placeholder="বয়স / লিংგ" class="p-3.5 border border-gray-200 rounded-xl text-sm">
 <input type="text" id="pBP" placeholder="ৰক্তচাপ (BP)" class="p-3.5 border border-gray-200 rounded-xl text-sm">
 <input type="text" id="pPhone" placeholder="ম'বাইল নম্বৰ" class="p-3.5 border border-gray-200 rounded-xl text-sm">
 </div>
@@ -360,7 +360,6 @@ if (error) alert('বুকিং ব্যৰ্থ হৈছে।');
 else {
 alert(`সফল হৈছে! বুকিং গ্ৰহণ কৰা হৈছে।`);
 
-// AUTOMATIC WHATSAPP TEXT WITH RELEVANT SOCIAL LINKS INCLUDED FOR THE PATIENT
 const flashMsg = `🏥 *DR. HARIS CLINIC*\n\nনমস্কাৰ ${name},\nআপোনাৰ *${selectedBookingType}* ৰ বুকিং পঞ্জীয়ন কৰা হৈছে।\nTxn ID: ${txn_id}\n\nআমাদের স্বাস্থ্য বিষয়ক লিখনি আৰু গুৰুত্বপূৰ্ণ ভিডিঅ'সমূহ চাবলৈ তলৰ লিংকসমূহত ক্লিক কৰক:\n\n🌐 ৱেবচাইট: https://drhariswellfuture.com/\n🔵 ফেচবুক: https://www.facebook.com/drhari365\n🔴 ইউটিঊব: https://www.youtube.com/@drhari\n📸 ইনষ্টাগ্ৰাম: https://www.instagram.com/drharikanta`;
 
 window.open(`https://api.whatsapp.com/send?phone=91${phone.replace(/\D/g, '')}&text=${encodeURIComponent(flashMsg)}`, '_blank');
@@ -399,7 +398,7 @@ const card = document.createElement('div');
 card.className = 'bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4';
 card.innerHTML = `<div>
 <h4 class="text-base font-bold text-slate-900">${escapeHTML(p.name)} <span class="text-xs font-normal text-gray-500">(${escapeHTML(p.age || 'N/A')})</span></h4>
-<p class="text-xs text-gray-600 mt-0.5"> 📞  ${escapeHTML(p.phone)} |  🩺  BP: ${escapeHTML(p.bp || 'N/A')}</p>
+<p class="text-xs text-gray-600 mt-0.5"> 📞 ${escapeHTML(p.phone)} | 🩺 BP: ${escapeHTML(p.bp || 'N/A')}</p>
 <p class="text-xs text-gray-500 mt-1"><b>History:</b> ${escapeHTML(p.history || 'None')}</p>
 </div>`;
 
@@ -528,7 +527,7 @@ sEl.innerHTML = `
 • বিজুলী বিল (Electricity): ₹${summary['Electricity Bill']}<br>
 • অন্যান্য খৰচ (Misc): ₹${summary['Miscellaneous Expenses']}<br>
 <hr class="my-1 border-red-100">
-<b class="text-xs text-red-900"> 📊  সৰ্বমুঠ খৰচ: ₹${totalExpense}</b>
+<b class="text-xs text-red-900"> 📊 সৰ্বমুঠ খৰচ: ₹${totalExpense}</b>
 `;
 }
 }
@@ -546,7 +545,8 @@ loadExpenses();
 
 function sendWhatsAppRx(p) {
 if(!p.phone) return alert('মোবাইল নম্বৰ পোৱা নগ’ল।');
-const msg = ` 🏥  *DR. HARIS HOMEOPATHIC CLINIC*\n\n*Patient:* ${p.name}\n\n*Rx:*\n${p.medicine}`;
+// INCLUDES DOCTOR'S SOCIAL LINKS INSIDE PATIENT PRESCRIPTION MESSAGE FOR WHATSAPP
+const msg = `🏥 *DR. HARIS HOMEOPATHIC CLINIC*\n\n*Patient Name:* ${p.name}\n\n*Rx (Prescription):*\n${p.medicine}\n\n-------------------------\nআমাদের স্বাস্থ্য বিষয়ক লিখনি আৰু গুৰুত্বপূৰ্ণ ভিডিঅ'সমূহ চাবলৈ তলৰ লিংকসমূহত ক্লিক কৰক:\n\n🌐 ৱেবচাইট: https://drhariswellfuture.com/\n🔵 ফেচবুক: https://www.facebook.com/drhari365\n🔴 ইউটিঊব: https://www.youtube.com/@drhari\n📸 ইনষ্টাগ্ৰাম: https://www.instagram.com/drharikanta`;
 window.open(`https://api.whatsapp.com/send?phone=91${p.phone.replace(/\D/g, '')}&text=${encodeURIComponent(msg)}`, '_blank');
 }
 
