@@ -9,27 +9,27 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
-body { font-family: 'Poppins', sans-serif; }
+body { font-family: 'Poppins', sans-serif; overflow-x: hidden; }
 </style>
 </head>
-<body class="bg-slate-50 text-gray-800">
+<body class="bg-slate-50 text-gray-800 antialiased">
 
-<div id="mainPatientSection" class="min-h-screen flex flex-col justify-between items-center p-6 bg-white max-w-md mx-auto shadow-2xl relative rounded-2xl">
+<div id="mainPatientSection" class="w-full max-w-md mx-auto bg-white shadow-2xl rounded-2xl p-4 sm:p-6 my-2 min-h-full overflow-y-auto">
 
-    <div class="text-center w-full mt-4 flex flex-col items-center">
-        <div class="w-32 h-32 rounded-full border-4 border-slate-900 shadow-xl overflow-hidden mb-3 bg-slate-100 flex items-center justify-center">
+    <div class="text-center w-full mt-2 flex flex-col items-center">
+        <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 border-slate-900 shadow-xl overflow-hidden mb-3 bg-slate-100 flex items-center justify-center">
             <img src="doctor.jpg.jpeg" alt="Dr. Harikanta Das" class="w-full h-full object-cover" onerror="this.src='https://img.icons8.com/illustrations/lexicon/96/null/doctor-male.png'">
         </div>
         <h1 class="text-xl font-bold text-slate-900">Dr. Harikanta Das</h1>
         <p class="text-xs text-gray-500 font-semibold mt-0.5">Homeopathic Physician & Physiotherapist</p>
-        <h2 class="text-2xl font-black text-slate-900 mt-4 tracking-tight">Dr. Haris Clinic</h2>
+        <h2 class="text-2xl font-black text-slate-900 mt-3 tracking-tight">Dr. Haris Clinic</h2>
     </div>
 
-    <div id="bookingStep1" class="w-full bg-slate-50 p-5 rounded-2xl border border-gray-100 space-y-3 mt-4">
+    <div id="bookingStep1" class="w-full bg-slate-50 p-4 sm:p-5 rounded-2xl border border-gray-100 space-y-3 mt-4">
         <h3 class="text-sm font-bold text-center text-gray-900"> 🏥 পোনপটীয়া অনলাইন বুকিং ফৰ্ম</h3>
-        <div class="flex gap-2 justify-center my-1">
-            <button id="btnSelectRegular" class="text-xs font-bold px-4 py-2 bg-slate-900 text-white rounded-xl transition">Regular Appointment</button>
-            <button id="btnSelectOnline" class="text-xs font-bold px-4 py-2 bg-gray-200 text-gray-700 rounded-xl transition">Online Consultation</button>
+        <div class="flex flex-wrap gap-2 justify-center my-1">
+            <button id="btnSelectRegular" class="text-[11px] sm:text-xs font-bold px-3 py-2 bg-slate-900 text-white rounded-xl transition">Regular Appointment</button>
+            <button id="btnSelectOnline" class="text-[11px] sm:text-xs font-bold px-3 py-2 bg-gray-200 text-gray-700 rounded-xl transition">Online Consultation</button>
         </div>
         <input type="text" id="bName" placeholder="ৰোগীৰ সম্পূৰ্ণ নাম" class="w-full p-3 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-slate-900">
         <input type="text" id="bPhone" placeholder="ম'বাইল নম্বৰ" class="w-full p-3 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-slate-900">
@@ -39,15 +39,15 @@ body { font-family: 'Poppins', sans-serif; }
         </button>
     </div>
 
-    <div id="bookingStep2" class="w-full bg-slate-50 p-5 rounded-2xl border border-gray-100 space-y-3 hidden mt-4">
+    <div id="bookingStep2" class="w-full bg-slate-50 p-4 sm:p-5 rounded-2xl border border-gray-100 space-y-3 hidden mt-4">
         <button id="btnBackToStep1" class="text-xs font-bold text-gray-500 hover:text-slate-900 flex items-center gap-1 mb-1">
             <i class="fas fa-arrow-left"></i> তথ্য সলনি কৰক
         </button>
-        <h3 class="text-sm font-bold text-center text-emerald-700"> 💰 অনুগ্ৰহ কৰি ইয়াত পেমেন্ট কৰক</h3>
+        <h3 class="text-sm font-bold text-center text-emerald-700"> 💰 boxing নিশ্চিত কৰিবলৈ পেমেন্ট কৰক</h3>
         <div class="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center bg-white flex flex-col items-center shadow-inner">
             <span id="qrBadge" class="text-[11px] bg-slate-900 text-white font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2">ফীজ: ₹100</span>
             <div class="bg-white p-2 rounded-lg border border-gray-200 mb-2">
-                <img id="paymentQRCode" src="" alt="UPI QR Code Scanner" class="w-44 h-44 object-contain">
+                <img id="paymentQRCode" src="" alt="UPI QR Code Scanner" class="w-40 h-40 sm:w-44 sm:h-44 object-contain">
             </div>
             <a id="upiPayBtn" href="#" class="inline-flex items-center gap-2 bg-[#E05300] hover:bg-orange-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow transition w-full justify-center">
                 <i class="fas fa-wallet"></i> মোবাইলৰ পৰা পেমেন্ট কৰক
@@ -61,46 +61,46 @@ body { font-family: 'Poppins', sans-serif; }
         <button id="btnSubmitBooking" class="w-full bg-emerald-600 text-white font-bold py-3.5 rounded-xl shadow-md hover:bg-emerald-700 text-xs uppercase transition tracking-wider">বুকিং নিশ্চিত কৰক (Confirm)</button>
     </div>
 
-    <div class="w-full space-y-3 my-6 border-t border-b border-gray-100 py-4">
-        <p class="text-center text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">ক্লিনিক মেনেজমেণ্ট কণ্ট্ৰ’ল</p>
-        <div>
-            <input type="email" id="loginEmail" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-slate-800 bg-slate-50/50 text-xs" placeholder="ইমেইল ঠিকনা">
-        </div>
-        <div class="flex gap-2">
-            <input type="password" id="loginPassword" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-slate-800 bg-slate-50/50 text-xs" placeholder="পাছৱৰ্ড">
-            <button id="btnStaffLogin" class="bg-[#111827] hover:bg-slate-800 text-white font-bold px-4 rounded-xl transition text-[10px] tracking-wider uppercase whitespace-nowrap">LOGIN</button>
-        </div>
-    </div>
-
-    <div class="w-full text-center border-t border-gray-100 pt-4 mt-1">
-        <div class="flex justify-center gap-6 text-2xl">
-            <a href="https://www.facebook.com/drhari365" target="_blank" class="w-11 h-11 rounded-full bg-slate-100 text-[#1877F2] flex items-center justify-center border border-gray-200 transition hover:scale-110"><i class="fab fa-facebook-f"></i></a>
-            <a href="https://www.youtube.com/@drhari" target="_blank" class="w-11 h-11 rounded-full bg-slate-100 text-[#FF0000] flex items-center justify-center border border-gray-200 transition hover:scale-110"><i class="fab fa-youtube"></i></a>
-            <a href="https://www.instagram.com/drharikanta" target="_blank" class="w-11 h-11 rounded-full bg-slate-100 text-[#E1306C] flex items-center justify-center border border-gray-200 transition hover:scale-110"><i class="fab fa-instagram"></i></a>
-            <a href="https://drhariswellfuture.com/" target="_blank" class="w-11 h-11 rounded-full bg-slate-100 text-[#008080] flex items-center justify-center border border-gray-200 transition hover:scale-110"><i class="fas fa-globe"></i></a>
+    <div class="w-full space-y-3 my-4 border-t border-b border-gray-100 py-4">
+        <p class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">ক্লিনিক মেনেজমেণ্ট কণ্ট্ৰ’ল</p>
+        <div class="grid grid-cols-1 gap-2">
+            <input type="email" id="loginEmail" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-slate-800 bg-slate-50/50 text-xs" placeholder="ইমেইল ঠিকনা">
+            <div class="flex gap-2">
+                <input type="password" id="loginPassword" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-slate-800 bg-slate-50/50 text-xs" placeholder="পাছৱৰ্ড">
+                <button id="btnStaffLogin" class="bg-[#111827] hover:bg-slate-800 text-white font-bold px-4 rounded-xl transition text-[10px] tracking-wider uppercase">LOGIN</button>
+            </div>
         </div>
     </div>
 
-    <div class="w-full bg-[#1e5a22] text-white p-4 rounded-xl border border-green-800 mt-4 text-center flex flex-col items-center justify-center min-h-[90px] shadow-md">
+    <div class="w-full text-center border-t border-gray-100 pt-3">
+        <div class="flex justify-center gap-5 text-xl sm:text-2xl">
+            <a href="https://www.facebook.com/drhari365" target="_blank" class="w-10 h-10 rounded-full bg-slate-100 text-[#1877F2] flex items-center justify-center border border-gray-200 transition hover:scale-110"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.youtube.com/@drhari" target="_blank" class="w-10 h-10 rounded-full bg-slate-100 text-[#FF0000] flex items-center justify-center border border-gray-200 transition hover:scale-110"><i class="fab fa-youtube"></i></a>
+            <a href="https://www.instagram.com/drharikanta" target="_blank" class="w-10 h-10 rounded-full bg-slate-100 text-[#E1306C] flex items-center justify-center border border-gray-200 transition hover:scale-110"><i class="fab fa-instagram"></i></a>
+            <a href="https://drhariswellfuture.com/" target="_blank" class="w-10 h-10 rounded-full bg-slate-100 text-[#008080] flex items-center justify-center border border-gray-200 transition hover:scale-110"><i class="fas fa-globe"></i></a>
+        </div>
+    </div>
+
+    <div class="w-full bg-[#1e5a22] text-white p-3 sm:p-4 rounded-xl border border-green-800 mt-4 text-center flex flex-col items-center justify-center min-h-[80px] shadow-md">
         <h4 class="text-xs font-bold tracking-wide mb-1 text-yellow-300 uppercase" id="tipTitle">হৃদযন্ত্ৰ সুস্থ ৰাখক</h4>
         <p class="text-[11px] text-green-50 font-medium leading-relaxed" id="tipContent">দৈনিক পুৱা ৩০ মিনিট খোজ কাঢ়ক।</p>
     </div>
 </div>
 
 <div id="appDashboard" class="hidden min-h-screen pb-24 bg-slate-50">
-    <div class="bg-white border-b border-gray-100 px-6 py-4 sticky top-0 z-50 shadow-sm flex justify-between items-center max-w-4xl mx-auto">
+    <div class="bg-white border-b border-gray-100 px-4 sm:px-6 py-4 sticky top-0 z-50 shadow-sm flex justify-between items-center max-w-4xl mx-auto">
         <div>
-            <h2 class="text-base font-bold text-slate-900">DR. HARIS CLINIC</h2>
-            <span id="accessBadge" class="text-[10px] bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Access</span>
+            <h2 class="text-sm sm:text-base font-bold text-slate-900">DR. HARIS CLINIC</h2>
+            <span id="accessBadge" class="text-[9px] sm:text-[10px] bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Access</span>
         </div>
         <button id="btnLogout" class="text-red-500 hover:text-red-700 text-xs font-bold uppercase tracking-wider"><i class="fas fa-sign-out-alt"></i> লগ-আউট</button>
     </div>
 
-    <div class="p-4 max-w-4xl mx-auto">
+    <div class="p-3 sm:p-4 max-w-4xl mx-auto overflow-x-hidden">
         <div id="tab-home" class="tab-content space-y-4">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                <input type="text" id="searchBox" placeholder=" 🔍 নাম বা মোবাইল নম্বৰেৰে ৰোগী সন্ধান কৰক..." class="w-full p-3.5 border border-gray-200 rounded-xl bg-gray-50/50 text-sm">
-                <button id="btnScrollToEntry" class="w-full mt-3 bg-[#111827] text-white font-bold py-3.5 px-4 rounded-xl shadow-sm text-center block text-sm">
+                <input type="text" id="searchBox" placeholder=" 🔍 নাম বা মোবাইল নম্বৰেৰে ৰোগী সন্ধান কৰক..." class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50/50 text-sm">
+                <button id="btnScrollToEntry" class="w-full mt-3 bg-[#111827] text-white font-bold py-3 px-4 rounded-xl shadow-sm text-center block text-sm">
                     <i class="fas fa-user-plus mr-2"></i> নতুন ৰোগী সংযোগ কৰক
                 </button>
             </div>
@@ -122,53 +122,53 @@ body { font-family: 'Poppins', sans-serif; }
         </div>
 
         <div id="tab-expenses" class="tab-content hidden space-y-4">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+            <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100">
                 <h3 class="text-sm font-bold text-gray-900 mb-3">নতুন দৈনিক খৰচৰ এণ্ট্ৰী</h3>
                 <div class="space-y-3">
-                    <select id="expCategory" class="w-full p-3.5 border border-gray-200 rounded-xl bg-gray-50 text-sm">
+                    <select id="expCategory" class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm">
                         <option value="Salary">দৰমহা (Salary)</option>
                         <option value="Rent">ঘৰ ভাড়া (Rent)</option>
                         <option value="Electricity Bill">বিজুলীৰ বিল (Electricity Bill)</option>
                         <option value="Miscellaneous Expenses">অন্যান্য খৰচ (Miscellaneous Expenses)</option>
                     </select>
-                    <input type="number" id="expAmount" placeholder="টকাৰ পৰিমাণ (₹)" class="w-full p-3.5 border border-gray-200 rounded-xl text-sm">
-                    <input type="text" id="expDesc" placeholder="বিৱৰণ (Description)" class="w-full p-3.5 border border-gray-200 rounded-xl text-sm">
-                    <button id="btnSaveExpense" class="w-full bg-red-600 text-white font-bold py-3.5 rounded-xl shadow text-sm">খৰচ সংৰক্ষণ কৰক</button>
+                    <input type="number" id="expAmount" placeholder="টকাৰ পৰিমাণ (₹)" class="w-full p-3 border border-gray-200 rounded-xl text-sm">
+                    <input type="text" id="expDesc" placeholder="বিৱৰণ (Description)" class="w-full p-3 border border-gray-200 rounded-xl text-sm">
+                    <button id="btnSaveExpense" class="w-full bg-red-600 text-white font-bold py-3 rounded-xl shadow text-sm">খৰচ সংৰক্ষণ কৰক</button>
                 </div>
             </div>
-            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-2">
-                <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider border-b pb-1.5 flex items-center gap-1"><i class="fas fa-chart-pie text-slate-700"></i> ক্লিিনকৰ আয়-ব্যয় প্ৰতিবেদন (Financial Statement)</h4>
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm space-y-2">
+                <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider border-b pb-1.5 flex items-center gap-1"><i class="fas fa-chart-pie text-slate-700"></i> ক্লিিনকৰ আয়-ব্যয় প্ৰতিবেদন</h4>
                 <div id="expenseSummaryText" class="text-xs space-y-1.5 text-gray-700">হিচাপ লোড হৈ আছে...</div>
             </div>
             <div id="listExpenses" class="space-y-2"></div>
         </div>
 
-        <div id="prescriptionEntrySection" class="mt-8 bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
+        <div id="prescriptionEntrySection" class="mt-6 bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
             <h3 id="formTitle" class="text-sm font-bold text-slate-900 border-b border-gray-100 pb-2">নতুন ৰোগীৰ প্ৰেচক্ৰিপচন এণ্ট্ৰী চেকচন</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <input type="text" id="pName" placeholder="ৰোগীৰ নাম" class="p-3.5 border border-gray-200 rounded-xl text-sm">
-                <input type="text" id="pAgeSex" placeholder="বয়স / লিংგ" class="p-3.5 border border-gray-200 rounded-xl text-sm">
-                <input type="text" id="pBP" placeholder="ৰক্তচাপ (BP)" class="p-3.5 border border-gray-200 rounded-xl text-sm">
-                <input type="text" id="pPhone" placeholder="ম'বাইল নম্বৰ" class="p-3.5 border border-gray-200 rounded-xl text-sm">
+                <input type="text" id="pName" placeholder="ৰোগীৰ নাম" class="p-3 border border-gray-200 rounded-xl text-sm">
+                <input type="text" id="pAgeSex" placeholder="বয়স / লিংგ" class="p-3 border border-gray-200 rounded-xl text-sm">
+                <input type="text" id="pBP" placeholder="ৰক্তচাপ (BP)" class="p-3 border border-gray-200 rounded-xl text-sm">
+                <input type="text" id="pPhone" placeholder="ম'বাইল নম্বৰ" class="p-3 border border-gray-200 rounded-xl text-sm">
             </div>
-            <textarea id="pHistory" placeholder="ৰোগৰ ইতিবৃত্ত (Case History)" class="w-full p-3.5 border border-gray-200 rounded-xl h-20 text-sm"></textarea>
-            <textarea id="pMedicine" placeholder="ঔষধৰ নাম আৰু ব্যৱহাৰৰ নিয়ম (Rx)" class="w-full p-3.5 border border-gray-200 rounded-xl h-28 text-sm"></textarea>
-            <input type="number" id="pFees" placeholder="ভিジット ফীজ (Fees ₹)" class="w-full p-3.5 border border-gray-200 rounded-xl text-sm">
-            <button id="btnSavePatient" class="w-full bg-[#111827] text-white font-bold py-3.5 rounded-xl shadow-md text-sm">ৰেকৰ্ড সংৰক্ষণ কৰক</button>
+            <textarea id="pHistory" placeholder="ৰোগৰ ইতিবৃত্ত (Case History)" class="w-full p-3 border border-gray-200 rounded-xl h-20 text-sm"></textarea>
+            <textarea id="pMedicine" placeholder="ঔষধৰ নাম আৰু ব্যৱহাৰৰ নিয়ম (Rx)" class="w-full p-3 border border-gray-200 rounded-xl h-28 text-sm"></textarea>
+            <input type="number" id="pFees" placeholder="ভিジット ফীজ (Fees ₹)" class="w-full p-3 border border-gray-200 rounded-xl text-sm">
+            <button id="btnSavePatient" class="w-full bg-[#111827] text-white font-bold py-3 rounded-xl shadow-md text-sm">ৰেকৰ্ড সংৰক্ষণ কৰক</button>
         </div>
     </div>
 
-    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg px-6 py-2 flex justify-between items-center z-50 max-w-4xl mx-auto rounded-t-xl">
-        <button data-tab="home" class="tab-btn flex flex-col items-center gap-1 text-slate-900 border-b-2 border-slate-900 px-3 py-1 text-xs font-bold transition">
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg px-4 py-2 flex justify-between items-center z-50 max-w-4xl mx-auto rounded-t-xl">
+        <button data-tab="home" class="tab-btn flex flex-col items-center gap-1 text-slate-900 border-b-2 border-slate-900 px-2 py-1 text-xs font-bold transition">
             <i class="fas fa-home text-base"></i>হোম
         </button>
-        <button data-tab="booking" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition">
+        <button data-tab="booking" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-2 py-1 text-xs font-bold transition">
             <i class="fas fa-calendar-alt text-base"></i>বুকিং
         </button>
-        <button data-tab="expenses" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition">
+        <button data-tab="expenses" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-2 py-1 text-xs font-bold transition">
             <i class="fas fa-wallet text-base"></i>খৰচ
         </button>
-        <button data-tab="profile" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition">
+        <button data-tab="profile" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-2 py-1 text-xs font-bold transition">
             <i class="fas fa-user text-base"></i>প্ৰফাইল
         </button>
     </div>
@@ -364,35 +364,46 @@ async function loadPatients() {
     data.forEach(p => container.appendChild(createPatientCard(p)));
 }
 
+// 1st & 2nd Requirement: Added Social Links and Medicine Reminder to Patient Cards
 function createPatientCard(p) {
     const card = document.createElement('div');
-    card.className = 'bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4';
-    card.innerHTML = `<div>
-        <h4 class="text-base font-bold text-slate-900">${escapeHTML(p.name)} <span class="text-xs font-normal text-gray-500">(${escapeHTML(p.age || 'N/A')})</span></h4>
-        <p class="text-xs text-gray-600 mt-0.5"> 📞 ${escapeHTML(p.phone)} | 🩺 BP: ${escapeHTML(p.bp || 'N/A')} | 💰 Fees: ₹${p.fees || 0}</p>
-        <p class="text-xs text-gray-500 mt-1"><b>History:</b> ${escapeHTML(p.history || 'None')}</p>
+    card.className = 'bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-3';
+    card.innerHTML = `<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        <div>
+            <h4 class="text-base font-bold text-slate-900">${escapeHTML(p.name)} <span class="text-xs font-normal text-gray-500">(${escapeHTML(p.age || 'N/A')})</span></h4>
+            <p class="text-xs text-gray-600 mt-0.5"> 📞 ${escapeHTML(p.phone)} | 🩺 BP: ${escapeHTML(p.bp || 'N/A')} | 💰 Fees: ₹${p.fees || 0}</p>
+            <p class="text-xs text-gray-500 mt-1"><b>History:</b> ${escapeHTML(p.history || 'None')}</p>
+        </div>
     </div>`;
 
     const actions = document.createElement('div');
-    actions.className = 'flex gap-2';
+    actions.className = 'flex flex-wrap gap-1.5 border-t pt-2 mt-1 justify-end';
+    
     const btnPrint = document.createElement('button');
-    btnPrint.className = 'bg-gray-800 text-white px-3 py-2 rounded-lg text-xs font-bold';
+    btnPrint.className = 'bg-gray-800 text-white px-2.5 py-2 rounded-lg text-xs font-bold';
     btnPrint.innerHTML = '<i class="fas fa-print"></i>';
     btnPrint.onclick = () => printPrescription(p);
+    
     const btnWA = document.createElement('button');
-    btnWA.className = 'bg-green-600 text-white px-3 py-2 rounded-lg text-xs font-bold';
+    btnWA.className = 'bg-green-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1';
     btnWA.innerHTML = '<i class="fab fa-whatsapp"></i> Rx';
     btnWA.onclick = () => sendWhatsAppRx(p);
-    actions.append(btnPrint, btnWA);
+
+    const btnReminder = document.createElement('button');
+    btnReminder.className = 'bg-orange-500 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1';
+    btnReminder.innerHTML = '<i class="fas fa-clock"></i> Send Reminder';
+    btnReminder.onclick = () => sendMedicineReminder(p);
+
+    actions.append(btnPrint, btnWA, btnReminder);
 
     if (isDoctor) {
         const btnEdit = document.createElement('button');
-        btnEdit.className = 'bg-blue-600 text-white px-3 py-2 rounded-lg text-xs font-bold';
+        btnEdit.className = 'bg-blue-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold';
         btnEdit.innerHTML = '<i class="fas fa-edit"></i>';
         btnEdit.onclick = () => loadPatientToForm(p);
         actions.append(btnEdit);
         const btnDelete = document.createElement('button');
-        btnDelete.className = 'bg-red-600 text-white px-3 py-2 rounded-lg text-xs font-bold';
+        btnDelete.className = 'bg-red-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold';
         btnDelete.innerHTML = '<i class="fas fa-trash"></i>';
         btnDelete.onclick = () => deletePatientRecord(p.id);
         actions.append(btnDelete);
@@ -506,11 +517,11 @@ async function loadExpenses() {
         if(sEl) {
             sEl.innerHTML = `
             <div class="grid grid-cols-2 gap-2 border-b pb-2 mb-2 text-xs font-semibold">
-              <div class="text-emerald-600">💵 সৰ্বমুঠ আয় (Income): ₹${totalIncome}</div>
-              <div class="text-red-600">📉 সৰ্বমুঠ খৰচ (Expense): ₹${totalExpense}</div>
+              <div class="text-emerald-600">💵 সৰ্বমুঠ আয়: ₹${totalIncome}</div>
+              <div class="text-red-600">📉 সৰ্বমুঠ খৰচ: ₹${totalExpense}</div>
             </div>
             <div class="p-2 rounded-lg bg-slate-50 border text-center text-xs font-bold mb-2">
-              হিচাপৰ নাটনি/লাভ (Net Balance): <span class="${balanceClass}">₹${netBalance}</span>
+              হিচাপৰ নাটনি/লাভ: <span class="${balanceClass}">₹${netBalance}</span>
             </div>
             <div class="space-y-1 text-[11px] text-gray-600">
               • দৰমহা (Salary): ₹${summary['Salary']}<br>
@@ -531,10 +542,18 @@ async function deleteExpenseRecord(id) {
     loadExpenses();
 }
 
+// 1st Fix: Appends your original social media links to WhatsApp message
 function sendWhatsAppRx(p) {
     if(!p.phone) return alert('মোবাইল নম্বৰ পোৱা নগ’ল।');
-    const msg = `🏥 *DR. HARIS HOMEOPATHIC CLINIC*\n\n*Patient Name:* ${p.name}\n\n*Rx (Prescription):*\n${p.medicine}`;
+    const msg = `🏥 *DR. HARIS HOMEOPATHIC CLINIC*\n\n*Patient Name:* ${p.name}\n\n*Rx (Prescription):*\n${p.medicine}\n\n---\n🌐 *Connect with Us:*\n• Facebook: https://www.facebook.com/drhari365\n• YouTube: https://www.youtube.com/@drhari\n• Instagram: https://www.instagram.com/drharikanta\n• Website: https://drhariswellfuture.com/`;
     window.open(`https://api.whatsapp.com/send?phone=91${p.phone.replace(/\D/g, '')}&text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// 2nd Fix: Medicine Reminder WhatsApp Trigger
+function sendMedicineReminder(p) {
+    if(!p.phone) return alert('মোবাইল নম্বৰ পোৱা নগ’ল।');
+    const reminderMsg = `⏰ *MEDICINE REMINDER | DR. HARIS CLINIC*\n\nনমস্কাৰ ${p.name},\nআপোনাক জনোৱা হৈছে যে আপোনাৰ ঔষধ খোৱাৰ সময় হৈছে। অনুগ্ৰহ কৰি প্ৰেচক্ৰিপচন অনুসৰি সঠিক সময়ত ঔষধ গ্ৰহণ কৰক। সুস্থ থাকক, কুশলে থাকক।\n\n🏥 *ডাঃ হৰিচ হোমিয়োপেথিক এণ্ড ফিজিওথেৰাপী ক্লিনিক*, গোগামুখ।`;
+    window.open(`https://api.whatsapp.com/send?phone=91${p.phone.replace(/\D/g, '')}&text=${encodeURIComponent(reminderMsg)}`, '_blank');
 }
 
 function printPrescription(p) {
