@@ -415,17 +415,6 @@ if (!txnPattern.test(txn_id)) {
     return alert('সঠিক Transaction ID দিয়ক।');
 }
 
-            
-            if (!name || !phone || !txn_id) {
-    return alert('Transaction ID দিব লাগিব।');
-}
-
-const txnPattern = /^[A-Za-z0-9]{10,30}$/;
-
-if (!txnPattern.test(txn_id)) {
-    return alert('সঠিক UPI Transaction ID দিয়ক।');
-}
-
             const problemDesc = `[${selectedBookingType}] ${problem}`;
             const { error } = await supabaseClient.from('clinic_bookings').insert([{ name, phone, txn_id, problem: problemDesc }]);
             if (error) alert('বুকিং ব্যৰ্থ হৈছে।');
