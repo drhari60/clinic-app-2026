@@ -30,7 +30,7 @@
         </div>
 
         <div class="w-full text-center bg-slate-50 p-3 rounded-2xl border border-slate-200/60 shadow-sm mb-4">
-            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5">আমাৰ সৈতে সংযোগ কৰক</p>
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5">আমাৰ সৈতে সংযোগ হওক</p>
             <div class="flex justify-center gap-4 text-xl">
                 <a href="https://www.facebook.com/drhari365" target="_blank" class="w-10 h-10 rounded-xl bg-white text-[#1877F2] flex items-center justify-center border border-gray-200 shadow-sm transition hover:scale-110 hover:shadow-md"><i class="fab fa-facebook-f"></i></a>
                 <a href="https://www.youtube.com/@drhari" target="_blank" class="w-10 h-10 rounded-xl bg-white text-[#FF0000] flex items-center justify-center border border-gray-200 shadow-sm transition hover:scale-110 hover:shadow-md"><i class="fab fa-youtube"></i></a>
@@ -97,7 +97,7 @@
         </div>
 
         <div class="w-full space-y-3 my-5 border-t border-b border-gray-200/60 py-4">
-            <p class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">ক্লিনিক মেনেজমেণ্ট কণ্ট্ৰ’ল</p>
+            <p class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">ক্লিনিক মেনেজমেণ্ট কন্ট্ৰ’ল</p>
             <div class="grid grid-cols-1 gap-2">
                 <input type="email" id="loginEmail" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-slate-800 bg-slate-50 text-xs shadow-inner" placeholder="ইমেইল ঠিকনা">
                 <div class="flex gap-2">
@@ -110,7 +110,7 @@
         <div class="w-full bg-[#1e5a22] text-white p-4 rounded-2xl border border-green-800 mt-1 text-center flex flex-col items-center justify-center min-h-[90px] shadow-lg relative overflow-hidden">
             <div class="absolute -right-4 -bottom-4 opacity-10 text-5xl text-white"><i class="fas fa-heartbeat"></i></div>
             <h4 class="text-xs font-bold tracking-wide mb-1 text-yellow-300 uppercase flex items-center gap-1" id="tipTitle">হৃদযন্ত্ৰ সুস্থ ৰাখক</h4>
-            <p class="text-[11px] text-green-50 font-medium leading-relaxed max-w-[90%]" id="tipContent">দৈনিক পুৱা ৩০ মিনিট খোজ কাঢ়ক।</p>
+            <p class="text-[11px] text-green-50 font-medium leading-relaxed max-w-[90%]" id="tipContent">দৈনিক পুৱা-গধূলি ৩০-৪০ মিনিট খোজ কাঢ়ক।</p>
         </div>
     </div>
 
@@ -153,7 +153,7 @@
 
             <div id="tab-expenses" class="tab-content hidden space-y-4">
                 <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100">
-                    <h3 class="text-sm font-bold text-gray-900 mb-3 border-b pb-2 flex items-center gap-1.5"><i class="fas fa-plus-circle text-red-500"></i> নতুন দৈনিক খৰচৰ এণ্ট্ৰী</h3>
+                    <h3 class="text-sm font-bold text-gray-900 mb-3 border-b pb-2 flex items-center gap-1.5"><i class="fas fa-plus-circle text-red-500"></i> নতুন দৈনিক খৰচৰ লিখক</h3>
                     <div class="space-y-3">
                         <select id="expCategory" class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm focus:outline-none">
                             <option value="Salary">দৰমহা (Salary)</option>
@@ -168,14 +168,14 @@
                 </div>
 
                 <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm space-y-2">
-                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider border-b pb-1.5 flex items-center gap-1"><i class="fas fa-chart-pie text-slate-700"></i> ক্লিিনকৰ আয়-ব্যয় প্ৰতিবেদন</h4>
+                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider border-b pb-1.5 flex items-center gap-1"><i class="fas fa-chart-pie text-slate-700"></i> ক্লিনিকৰ আয়-ব্যয় প্ৰতিবেদন</h4>
                     <div id="expenseSummaryText" class="text-xs space-y-1.5 text-gray-700">হিচাপ লোড হৈ আছে...</div>
                 </div>
                 <div id="listExpenses" class="space-y-2"></div>
             </div>
 
             <div id="prescriptionEntrySection" class="mt-6 bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-                <h3 id="formTitle" class="text-sm font-bold text-slate-900 border-b border-gray-100 pb-2 flex items-center gap-1.5"><i class="fas fa-file-medical text-slate-700"></i> নতুন ৰোগীৰ প্ৰেচক্ৰিপচন এণ্ট্ৰী চেকচন</h3>
+                <h3 id="formTitle" class="text-sm font-bold text-slate-900 border-b border-gray-100 pb-2 flex items-center gap-1.5"><i class="fas fa-file-medical text-slate-700"></i> নতুন ৰোগীৰ প্ৰেচক্ৰিপচন সংযোগ চেকচন</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <input type="text" id="pName" placeholder="ৰোগীৰ নাম" class="p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
                     <input type="text" id="pAgeSex" placeholder="বয়স / লিংগ" class="p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
@@ -185,7 +185,7 @@
                 <textarea id="pHistory" placeholder="ৰোগৰ ইতিবৃত্ত (Case History)" class="w-full p-3 border border-gray-200 rounded-xl h-20 text-sm focus:outline-none shadow-inner resize-none"></textarea>
                 <textarea id="pMedicine" placeholder="ঔষধৰ নাম আৰু ব্যৱহাৰৰ নিয়ম (Rx)" class="w-full p-3 border border-gray-200 rounded-xl h-28 text-sm focus:outline-none shadow-inner"></textarea>
                 <input type="number" id="pFees" placeholder="ভিজিট ফীজ (Fees ₹)" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
-                <button id="btnSavePatient" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition text-sm">ৰেকৰ্ড সংৰক্ষণ কৰক</button>
+                <button id="btnSavePatient" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition text-sm">ৰেকৰ্ড চেভ কৰক</button>
             </div>
         </div>
 
@@ -216,7 +216,7 @@
         let currentFee = 100;
         let isDoctor = false;
         const healthTips = [
-            { title: "হৃদযন্ত্ৰ সুস্থ ৰাখক", content: "হৃদযন্ত্ৰ সজীৱ কৰিবলৈ দৈনিক পুৱা অতি কমেও ৩০ মিনিট খোজ কাঢ়ক।" },
+            { title: "হৃদযন্ত্ৰ সুস্থ ৰাখক", content: "হৃদযন্ত্ৰ সজীৱ কৰিবলৈ দৈনিক পুৱা অতি কমেও ৩০-৪০ মিনিট খোজ কাঢ়ক।" },
             { title: "ৰাতিপুৱা সোনকালে উঠক", content: "ৰাতিপুৱা সোনকালে উঠিলে মগজু সতেজ হয় আৰু দিনটোৰ কাৰ্যক্ষমতা বৃদ্ধি পায়।" },
             { title: "পৰ্যাপ্ত পানী সেৱন", content: "দিনটোত অন্ততঃ ৩ ৰ পৰা ৪ লিটাৰ পানী খোৱাটো জৰুৰী।" },
             { title: "পৰ্যাপ্ত টোপনিৰ প্ৰয়োজন", content: "শৰীৰৰ কোষসমূহ সজীৱ কৰিবলৈ দৈনিক ৭-৮ ঘণ্টা শান্তিপূৰ্ণ টোপনি লওক।" }
