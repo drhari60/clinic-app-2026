@@ -1,476 +1,573 @@
 <!DOCTYPE html>
 <html lang="as">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dr. Haris Clinic</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
-body { font-family: 'Poppins', sans-serif; overflow-x: hidden; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Haris Clinic</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Poppins', sans-serif; overflow-x: hidden; }
+        .premium-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+    </style>
 </head>
-<body class="bg-slate-50 text-gray-800 antialiased">
-<div id="mainPatientSection" class="w-full max-w-md mx-auto bg-white shadow-2xl rounded-2xl p-4 sm:p-6 my-2 min-h-full overflow-y-auto">
-<div class="text-center w-full mt-2 flex flex-col items-center">
-<div class="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 border-slate-900 shadow-xl overflow-hidden mb-3 bg-slate-100 flex items-center justify-center">
-<img src="doctor.jpg.jpeg" alt="Dr. Harikanta Das" class="w-full h-full object-cover" onerror="this.src='https://img.icons8.com/illustrations/lexicon/96/null/doctor-male.png'">
-</div>
-<h1 class="text-xl font-bold text-slate-900">Dr. Harikanta Das</h1>
-<p class="text-xs text-gray-500 font-semibold mt-0.5">Homeopathic Physician & Physiotherapist</p>
-<h2 class="text-2xl font-black text-slate-900 mt-3 tracking-tight">Dr. Haris Clinic</h2>
-</div>
-<div id="bookingStep1" class="w-full bg-slate-50 p-4 sm:p-5 rounded-2xl border border-gray-100 space-y-3 mt-4">
-<h3 class="text-sm font-bold text-center text-gray-900">  🏥  পোনপটীয়া অনলাইন বুকিং ফৰ্ম</h3>
-<div class="flex flex-wrap gap-2 justify-center my-1">
-<button id="btnSelectRegular" class="text-[11px] sm:text-xs font-bold px-3 py-2 bg-slate-900 text-white rounded-xl transition">Regular Appointment</button>
-<button id="btnSelectOnline" class="text-[11px] sm:text-xs font-bold px-3 py-2 bg-gray-200 text-gray-700 rounded-xl transition">Online Consultation</button>
-</div>
-<input type="text" id="bName" placeholder="ৰোগীৰ সম্পূৰ্ণ নাম" class="w-full p-3 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-slate-900">
-<input type="text" id="bPhone" placeholder="ম'বাইল নম্বৰ" class="w-full p-3 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-slate-900">
-<textarea id="bProblem" placeholder="স্বাস্থ্য সমস্যাসমূহ (চমুকৈ)" class="w-full p-3 border border-gray-200 rounded-xl h-16 text-sm bg-white focus:outline-none focus:border-slate-900"></textarea>
-<button id="btnProceedToPay" class="w-full bg-slate-900 text-white font-bold py-3.5 rounded-xl shadow-md hover:bg-slate-800 text-xs uppercase tracking-wider transition">
-বুকিং প্ৰক্ৰিয়া আগবঢ়াওক <i class="fas fa-arrow-right ml-1"></i>
-</button>
-</div>
-<div id="bookingStep2" class="w-full bg-slate-50 p-4 sm:p-5 rounded-2xl border border-gray-100 space-y-3 hidden mt-4">
-<button id="btnBackToStep1" class="text-xs font-bold text-gray-500 hover:text-slate-900 flex items-center gap-1 mb-1">
-<i class="fas fa-arrow-left"></i> তথ্য সলনি কৰক
-</button>
-<h3 class="text-sm font-bold text-center text-emerald-700">  💰  বুকিং নিশ্চিত কৰিবলৈ পেমেন্ট কৰক</h3>
-<div class="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center bg-white flex flex-col items-center shadow-inner">
-<span id="qrBadge" class="text-[11px] bg-slate-900 text-white font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2">ফীজ: ₹100</span>
-<div class="bg-white p-2 rounded-lg border border-gray-200 mb-2">
-<img id="paymentQRCode" src="" alt="UPI QR Code Scanner" class="w-40 h-40 sm:w-44 sm:h-44 object-contain">
-</div>
-<a id="upiPayBtn" href="#" class="inline-flex items-center gap-2 bg-[#E05300] hover:bg-orange-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow transition w-full justify-center">
-<i class="fas fa-wallet"></i> মোবাইলৰ পৰা পেমেন্ট কৰক
-</a>
-<p class="text-[10px] text-gray-400 mt-1.5">UPI ID: <span class="font-mono font-bold text-gray-700">9954340102@okbizaxis</span></p>
-</div>
-<div class="space-y-1">
-<label class="text-[11px] font-bold text-red-600 block">ট্ৰেনজেকচন আইডি দিয়াটো বাধ্যতামূলক:*</label>
-<input type="text" id="bTxnId" placeholder="12-Digit UPI Transaction ID দিয়ক" class="w-full p-3 border-2 border-slate-950 rounded-xl font-mono text-sm font-bold text-center tracking-widest bg-white focus:outline-none">
-</div>
-<button id="btnSubmitBooking" class="w-full bg-emerald-600 text-white font-bold py-3.5 rounded-xl shadow-md hover:bg-emerald-700 text-xs uppercase transition tracking-wider">বুকিং নিশ্চিত কৰক (Confirm)</button>
-</div>
-<div class="w-full space-y-3 my-4 border-t border-b border-gray-100 py-4">
-<p class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">ক্লিনিক মেনেজমেণ্ট কণ্ট্ৰ’ল</p>
-<div class="grid grid-cols-1 gap-2">
-<input type="email" id="loginEmail" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-slate-800 bg-slate-50/50 text-xs" placeholder="ইমেইল ঠিকনা">
-<div class="flex gap-2">
-<input type="password" id="loginPassword" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-slate-800 bg-slate-50/50 text-xs" placeholder="পাছৱৰ্ড">
-<button id="btnStaffLogin" class="bg-[#111827] hover:bg-slate-800 text-white font-bold px-4 rounded-xl transition text-[10px] tracking-wider uppercase">LOGIN</button>
-</div>
-</div>
-</div>
-<div class="w-full text-center border-t border-gray-100 pt-3">
-<div class="flex justify-center gap-5 text-xl sm:text-2xl">
-<a href="https://www.facebook.com/drhari365" target="_blank" class="w-10 h-10 rounded-full bg-slate-100 text-[#1877F2] flex items-center justify-center border border-gray-200 transition hover:scale-110"><i class="fab fa-facebook-f"></i></a>
-<a href="https://www.youtube.com/@drhari" target="_blank" class="w-10 h-10 rounded-full bg-slate-100 text-[#FF0000] flex items-center justify-center border border-gray-200 transition hover:scale-110"><i class="fab fa-youtube"></i></a>
-<a href="https://www.instagram.com/drharikanta" target="_blank" class="w-10 h-10 rounded-full bg-slate-100 text-[#E1306C] flex items-center justify-center border border-gray-200 transition hover:scale-110"><i class="fab fa-instagram"></i></a>
-<a href="https://drhariswellfuture.com/" target="_blank" class="w-10 h-10 rounded-full bg-slate-100 text-[#008080] flex items-center justify-center border border-gray-200 transition hover:scale-110"><i class="fas fa-globe"></i></a>
-</div>
-</div>
-<div class="w-full bg-[#1e5a22] text-white p-3 sm:p-4 rounded-xl border border-green-800 mt-4 text-center flex flex-col items-center justify-center min-h-[80px] shadow-md">
-<h4 class="text-xs font-bold tracking-wide mb-1 text-yellow-300 uppercase" id="tipTitle">হৃদযন্ত্ৰ সুস্থ ৰাখক</h4>
-<p class="text-[11px] text-green-50 font-medium leading-relaxed" id="tipContent">দৈনিক পুৱা ৩০ মিনিট খোজ কাঢ়ক।</p>
-</div>
-</div>
-<div id="appDashboard" class="hidden min-h-screen pb-24 bg-slate-50">
-<div class="bg-white border-b border-gray-100 px-4 sm:px-6 py-4 sticky top-0 z-50 shadow-sm flex justify-between items-center max-w-4xl mx-auto">
-<div>
-<h2 class="text-sm sm:text-base font-bold text-slate-900">DR. HARIS CLINIC</h2>
-<span id="accessBadge" class="text-[9px] sm:text-[10px] bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Access</span>
-</div>
-<button id="btnLogout" class="text-red-500 hover:text-red-700 text-xs font-bold uppercase tracking-wider"><i class="fas fa-sign-out-alt"></i> লগ-আউট</button>
-</div>
-<div class="p-3 sm:p-4 max-w-4xl mx-auto overflow-x-hidden">
-<div id="tab-home" class="tab-content space-y-4">
-<div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-<input type="text" id="searchBox" placeholder="  🔍  নাম বা মোবাইল নম্বৰেৰে ৰোগী সন্ধান কৰক..." class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50/50 text-sm">
-<button id="btnScrollToEntry" class="w-full mt-3 bg-[#111827] text-white font-bold py-3 px-4 rounded-xl shadow-sm text-center block text-sm">
-<i class="fas fa-user-plus mr-2"></i> নতুন ৰোগী সংযোগ কৰক
-</button>
-</div>
-<div id="listPatients" class="space-y-3"></div>
-</div>
-<div id="tab-booking" class="tab-content hidden space-y-4">
-<h3 class="text-md font-bold text-gray-900">তাৰিখ ভিত্তিক অনলাইন বুকিং তালিকা</h3>
-<div id="listBookings" class="space-y-3"></div>
-</div>
-<div id="tab-profile" class="tab-content hidden space-y-4">
-<div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
-<div class="w-20 h-20 bg-slate-100 text-slate-800 rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-3">H</div>
-<h3 class="text-lg font-bold text-gray-900">Dr. Harikanta Das</h3>
-<p class="text-xs text-gray-500">Homeopathic Physician & Physiotherapist</p>
-<p class="text-[11px] text-gray-400 mt-1">Gogamukh, Dhemaji, Assam</p>
-</div>
-</div>
-<div id="tab-expenses" class="tab-content hidden space-y-4">
-<div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100">
-<h3 class="text-sm font-bold text-gray-900 mb-3">নতুন দৈনিক খৰচৰ এণ্ট্ৰী</h3>
-<div class="space-y-3">
-<select id="expCategory" class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm">
-<option value="Salary">দৰমহা (Salary)</option>
-<option value="Rent">ঘৰ ভাড়া (Rent)</option>
-<option value="Electricity Bill">বিজুলীৰ বিল (Electricity Bill)</option>
-<option value="Miscellaneous Expenses">অন্যান্য খৰচ (Miscellaneous Expenses)</option>
-</select>
-<input type="number" id="expAmount" placeholder="টকাৰ পৰিমাণ (₹)" class="w-full p-3 border border-gray-200 rounded-xl text-sm">
-<input type="text" id="expDesc" placeholder="বিৱৰণ (Description)" class="w-full p-3 border border-gray-200 rounded-xl text-sm">
-<button id="btnSaveExpense" class="w-full bg-red-600 text-white font-bold py-3 rounded-xl shadow text-sm">খৰচ সংৰক্ষণ কৰক</button>
-</div>
-</div>
-<div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm space-y-2">
-<h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider border-b pb-1.5 flex items-center gap-1"><i class="fas fa-chart-pie text-slate-700"></i> ক্লিিনকৰ আয়-ব্যয় প্ৰতিবেদন</h4>
-<div id="expenseSummaryText" class="text-xs space-y-1.5 text-gray-700">হিচাপ লোড হৈ আছে...</div>
-</div>
-<div id="listExpenses" class="space-y-2"></div>
-</div>
-<div id="prescriptionEntrySection" class="mt-6 bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-<h3 id="formTitle" class="text-sm font-bold text-slate-900 border-b border-gray-100 pb-2">নতুন ৰোগীৰ প্ৰেচক্ৰিপচন এণ্ট্ৰী চেকচন</h3>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-<input type="text" id="pName" placeholder="ৰোগীৰ নাম" class="p-3 border border-gray-200 rounded-xl text-sm">
-<input type="text" id="pAgeSex" placeholder="বয়স / লিংগ" class="p-3 border border-gray-200 rounded-xl text-sm">
-<input type="text" id="pBP" placeholder="ৰক্তচাপ (BP)" class="p-3 border border-gray-200 rounded-xl text-sm">
-<input type="text" id="pPhone" placeholder="ম'বাইল নম্বৰ" class="p-3 border border-gray-200 rounded-xl text-sm">
-</div>
-<textarea id="pHistory" placeholder="ৰোগৰ ইতিবৃত্ত (Case History)" class="w-full p-3 border border-gray-200 rounded-xl h-20 text-sm"></textarea>
-<textarea id="pMedicine" placeholder="ঔষধৰ নাম আৰু ব্যৱহাৰৰ নিয়ম (Rx)" class="w-full p-3 border border-gray-200 rounded-xl h-28 text-sm"></textarea>
-<input type="number" id="pFees" placeholder="ভিজিট ফীজ (Fees ₹)" class="w-full p-3 border border-gray-200 rounded-xl text-sm">
-<button id="btnSavePatient" class="w-full bg-[#111827] text-white font-bold py-3 rounded-xl shadow-md text-sm">ৰেকৰ্ড সংৰক্ষণ কৰক</button>
-</div>
-</div>
-<div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg px-4 py-2 flex justify-between items-center z-50 max-w-4xl mx-auto rounded-t-xl">
-<button data-tab="home" class="tab-btn flex flex-col items-center gap-1 text-slate-900 border-b-2 border-slate-900 px-2 py-1 text-xs font-bold transition">
-<i class="fas fa-home text-base"></i>হোম
-</button>
-<button data-tab="booking" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-2 py-1 text-xs font-bold transition">
-<i class="fas fa-calendar-alt text-base"></i>বুকিং
-</button>
-<button data-tab="expenses" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-2 py-1 text-xs font-bold transition">
-<i class="fas fa-wallet text-base"></i>খৰচ
-</button>
-<button data-tab="profile" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-2 py-1 text-xs font-bold transition">
-<i class="fas fa-user text-base"></i>প্ৰফাইল
-</button>
-</div>
-</div>
-<div id="printArea" class="hidden p-8 bg-white text-black"></div>
-<script>
-const SUPABASE_URL = 'https://oblvgjnyecvvnnnesegl.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9';
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-let currentEditId = null;
-let selectedBookingType = 'Regular Appointment';
-let currentFee = 100;
-let isDoctor = false;
-const healthTips = [
-{ title: "হৃদযন্ত্ৰ সুস্থ ৰাখক", content: "হৃদযন্ত্ৰ সজীৱ কৰিবলৈ দৈনিক পুৱা অতি কমেও ৩০ মিনিট খোজ কাঢ়ক।" },
-{ title: "ৰাতিপুৱা সোনকালে উঠক", content: "ৰাতিপুৱা সোনকালে উঠিলে মগজু সতেজ হয় আৰু দিনটোৰ কাৰ্যক্ষমতা বৃদ্ধি পায়।" },
-{ title: "পৰ্যাপ্ত পানী সেৱন", content: "দিনটোত অন্ততঃ ৩ ৰ পৰা ৪ লিটাৰ পানী খোৱাটো জৰুৰী।" },
-{ title: "পৰ্যাপ্ত টোপনিৰ প্ৰয়োজন", content: "শৰীৰৰ কোষসমূহ সজীৱ কৰিবলৈ দৈনিক ৭-৮ ঘণ্টা শান্তিপূৰ্ণ টোপনি লওক।" }
-];
-const safeGet = (id) => document.getElementById(id) || { addEventListener: () => {}, style: {}, classList: { add:()=>{}, remove:()=>{} }, value: '' };
-window.addEventListener('DOMContentLoaded', async () => {
-try {
-const { data: { session } } = await supabaseClient.auth.getSession();
-if (session && session.user) {
-await checkRole(session.user.email);
-showDashboard();
-}
-} catch (err) {
-console.log('Auth error bypassed');
-}
-const btnRegular = document.getElementById('btnSelectRegular');
-const btnOnline = document.getElementById('btnSelectOnline');
-if(btnRegular && btnOnline) {
-btnRegular.addEventListener('click', () => {
-selectedBookingType = 'Regular Appointment'; currentFee = 100;
-btnRegular.className = "text-xs font-bold px-4 py-2 bg-slate-900 text-white rounded-xl transition";
-btnOnline.className = "text-xs font-bold px-4 py-2 bg-gray-200 text-gray-700 rounded-xl transition";
-});
-btnOnline.addEventListener('click', () => {
-selectedBookingType = 'Online Consultation'; currentFee = 250;
-btnOnline.className = "text-xs font-bold px-4 py-2 bg-slate-900 text-white rounded-xl transition";
-btnRegular.className = "text-xs font-bold px-4 py-2 bg-gray-200 text-gray-700 rounded-xl transition";
-});
-}
-const btnProceedToPay = document.getElementById('btnProceedToPay');
-if(btnProceedToPay) {
-btnProceedToPay.addEventListener('click', () => {
-const name = safeGet('bName').value?.trim();
-const phone = safeGet('bPhone').value?.trim();
-if(!name || !phone) return alert('অনুগ্ৰহ কৰি আগবাঢ়িবলৈ ৰোগীৰ নাম আৰু ম’বাইল নম্বৰ প্ৰদান কৰক।');
-generateLiveQR();
-document.getElementById('bookingStep1').classList.add('hidden');
-document.getElementById('bookingStep2').classList.remove('hidden');
-});
-}
-const btnBackToStep1 = document.getElementById('btnBackToStep1');
-if(btnBackToStep1) {
-btnBackToStep1.addEventListener('click', () => {
-document.getElementById('bookingStep2').classList.add('hidden');
-document.getElementById('bookingStep1').classList.remove('hidden');
-});
-}
-document.getElementById('btnStaffLogin')?.addEventListener('click', handleLogin);
-document.getElementById('btnSubmitBooking')?.addEventListener('click', submitBooking);
-document.getElementById('btnSavePatient')?.addEventListener('click', savePatientRecord);
-document.getElementById('btnSaveExpense')?.addEventListener('click', saveExpenseRecord);
-document.getElementById('btnLogout')?.addEventListener('click', handleLogout);
-document.getElementById('searchBox')?.addEventListener('keyup', filterPatients);
-document.getElementById('btnScrollToEntry')?.addEventListener('click', () => {
-document.getElementById('prescriptionEntrySection')?.scrollIntoView({ behavior: 'smooth' });
-});
-startHealthTipsRotation();
-setupTabs();
-});
-async function checkRole(userEmail) {
-if (!userEmail) return;
-isDoctor = (userEmail.toLowerCase() === 'das.harikanta60@gmail.com');
-const badge = document.getElementById('accessBadge');
-if (badge) {
-badge.innerText = isDoctor ? 'Doctor (Full Access)' : 'Staff Mode (Restricted)';
-badge.className = isDoctor
-? 'text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider'
-: 'text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider';
-}
-}
-function generateLiveQR() {
-const qrBadge = document.getElementById('qrBadge');
-if(qrBadge) qrBadge.innerText = `ফীজ: ₹${currentFee} (${selectedBookingType})`;
-const upiPayload = `upi://pay?pa=9954340102@okbizaxis&pn=Dr%20Harikanta%20Das&am=${currentFee}&cu=INR&tn=${encodeURIComponent(selectedBookingType)}`;
-const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=${encodeURIComponent(upiPayload)}&ecc=M`;
-const qrImageContainer = document.getElementById('paymentQRCode');
-if(qrImageContainer) qrImageContainer.src = qrApiUrl;
-const upiPayBtn = document.getElementById('upiPayBtn');
-if(upiPayBtn) upiPayBtn.href = upiPayload;
-}
-function startHealthTipsRotation() {
-let index = 0;
-setInterval(() => {
-index = (index + 1) % healthTips.length;
-const tEl = document.getElementById('tipTitle');
-const cEl = document.getElementById('tipContent');
-if(tEl && cEl) {
-tEl.innerText = healthTips[index].title;
-cEl.innerText = healthTips[index].content;
-}
-}, 5000);
-}
-async function handleLogin() {
-const email = safeGet('loginEmail').value.trim();
-const password = safeGet('loginPassword').value.trim();
-if (!email || !password) return alert('অনুগ্ৰহ কৰি ইমেইল আৰু পাছৱৰ্ড লিখক।');
-const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-if (error) return alert('ভুল ইমেইল বা পাছৱৰ্ড।');
-await checkRole(email);
-showDashboard();
-}
-function showDashboard() {
-safeGet('mainPatientSection').style.display = 'none';
-safeGet('appDashboard').classList.remove('hidden');
-loadPatients();
-loadBookings();
-loadExpenses();
-}
-async function handleLogout() {
-await supabaseClient.auth.signOut();
-location.reload();
-}
-async function submitBooking() {
-const name = safeGet('bName').value?.trim();
-const phone = safeGet('bPhone').value?.trim();
-const txn_id = safeGet('bTxnId').value?.trim();
-const problem = safeGet('bProblem').value?.trim();
-const namePattern = /^[A-Za-zÀ-ÿ\u0980-\u09FF\s.]{3,50}$/;
-if (!namePattern.test(name)) return alert('সঠিক ৰোগীৰ নাম দিয়ক।');
-const phonePattern = /^[6-9]\d{9}$/;
-if (!phonePattern.test(phone)) return alert('সঠিক 10 ডিজিট ম’বাইল নম্বৰ দিয়ক।');
-if (!problem || problem.length < 5) return alert('স্বাস্থ্য সমস্যাটো সঠিককৈ লিখক।');
-const txnPattern = /^[A-Za-z0-9]{10,30}$/;
-if (!txnPattern.test(txn_id)) return alert('সঠিক Transaction ID দিয়ক।');
-const problemDesc = `[${selectedBookingType}] ${problem}`;
-const { error } = await supabaseClient.from('clinic_bookings').insert([{ name, phone, txn_id, problem: problemDesc }]);
-if (error) alert('বুকিং ব্যৰ্থ হৈছে।');
-else {
-alert(`সফল হৈছে! বুকিং গ্ৰহণ কৰা হৈছে।`);
-const flashMsg = ` 🏥  *DR. HARIS CLINIC*\n\nনমস্কাৰ ${name},\nআপোনাৰ *${selectedBookingType}* ৰ বুকিং পঞ্জীয়ন কৰা হৈছে।\nTxn ID: ${txn_id}`;
-window.open(`https://api.whatsapp.com/send?phone=91${phone.replace(/\D/g, '')}&text=${encodeURIComponent(flashMsg)}`, '_blank');
-location.reload();
-}
-}
-async function loadBookings() {
-const { data, error } = await supabaseClient.from('clinic_bookings').select('*').order('created_at', { ascending: false });
-if(error || !data) return;
-const container = document.getElementById('listBookings');
-if(!container) return;
-container.innerHTML = data.map(b => `
-<div class="p-4 border rounded-xl bg-gray-50 flex justify-between items-center shadow-sm text-xs">
-<div>
-<h5 class="font-bold text-gray-900">${escapeHTML(b.name)} (${escapeHTML(b.phone)})</h5>
-<p class="text-emerald-600 font-mono mt-0.5 font-bold">Txn ID: ${escapeHTML(b.txn_id)}</p>
-<p class="text-gray-600 mt-1">${escapeHTML(b.problem || 'No description')}</p>
-</div>
-<span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded font-bold">Verified</span>
-</div>
-`).join('');
-}
-async function loadPatients() {
-const { data, error } = await supabaseClient.from('clinic_data').select('*').order('created_at', { ascending: false });
-if (error || !data) return;
-const container = document.getElementById('listPatients');
-if(!container) return;
-container.innerHTML = '';
-data.forEach(p => container.appendChild(createPatientCard(p)));
-}
-function createPatientCard(p) {
-const card = document.createElement('div');
-card.className = 'bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-3';
-card.innerHTML = `<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-<div>
-<h4 class="text-base font-bold text-slate-900">${escapeHTML(p.name)} <span class="text-xs font-normal text-gray-500">(${escapeHTML(p.age || 'N/A')})</span></h4>
-<p class="text-xs text-gray-600 mt-0.5">  📞  ${escapeHTML(p.phone)} |  🩺  BP: ${escapeHTML(p.bp || 'N/A')} |
-💰  Fees: ₹${p.fees || 0}</p>
-<p class="text-xs text-gray-500 mt-1"><b>History:</b> ${escapeHTML(p.history || 'None')}</p>
-</div>
-</div>`;
-const actions = document.createElement('div');
-actions.className = 'flex flex-wrap gap-1.5 border-t pt-2 mt-1 justify-end';
+<body class="bg-slate-100 text-gray-800 antialiased min-h-screen py-4 sm:py-8 px-2">
 
-const btnPrint = document.createElement('button');
-btnPrint.className = 'bg-gray-800 text-white px-2.5 py-2 rounded-lg text-xs font-bold';
-btnPrint.innerHTML = '<i class="fas fa-print"></i>';
-btnPrint.onclick = () => printPrescription(p);
+    <div id="mainPatientSection" class="w-full max-w-md mx-auto glass-card shadow-2xl rounded-3xl p-5 sm:p-6 border border-white/40 overflow-y-auto">
+        <div class="text-center w-full mt-2 flex flex-col items-center">
+            <div class="relative mb-4">
+                <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 border-slate-900 shadow-xl overflow-hidden bg-slate-100 flex items-center justify-center">
+                    <img src="doctor.jpg.jpeg" alt="Dr. Harikanta Das" class="w-full h-full object-cover" onerror="this.src='https://img.icons8.com/illustrations/lexicon/96/null/doctor-male.png'">
+                </div>
+                <div class="absolute -bottom-1 right-2 bg-emerald-500 w-5 h-5 rounded-full border-4 border-white animate-pulse"></div>
+            </div>
+            
+            <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Dr. Haris Clinic</h2>
+            <div class="w-12 h-1 bg-slate-900 rounded-full mt-2 mb-4"></div>
+        </div>
 
-const btnPDF = document.createElement('button');
-btnPDF.className = 'bg-red-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold flex items-center gap-1';
-btnPDF.innerHTML = '<i class="fas fa-file-pdf"></i> PDF';
-btnPDF.onclick = () => generatePrescriptionPDF(p);
+        <div class="w-full text-center bg-slate-50 p-3 rounded-2xl border border-slate-200/60 shadow-sm mb-4">
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5">আমাৰ সৈতে সংযোগ হওক</p>
+            <div class="flex justify-center gap-4 text-xl">
+                <a href="https://www.facebook.com/drhari365" target="_blank" class="w-10 h-10 rounded-xl bg-white text-[#1877F2] flex items-center justify-center border border-gray-200 shadow-sm transition hover:scale-110 hover:shadow-md"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.youtube.com/@drhari" target="_blank" class="w-10 h-10 rounded-xl bg-white text-[#FF0000] flex items-center justify-center border border-gray-200 shadow-sm transition hover:scale-110 hover:shadow-md"><i class="fab fa-youtube"></i></a>
+                <a href="https://www.instagram.com/drharikanta" target="_blank" class="w-10 h-10 rounded-xl bg-white text-[#E1306C] flex items-center justify-center border border-gray-200 shadow-sm transition hover:scale-110 hover:shadow-md"><i class="fab fa-instagram"></i></a>
+                <a href="https://drhariswellfuture.com/" target="_blank" class="w-10 h-10 rounded-xl bg-white text-[#008080] flex items-center justify-center border border-gray-200 shadow-sm transition hover:scale-110 hover:shadow-md"><i class="fas fa-globe"></i></a>
+            </div>
+        </div>
 
-const btnWA = document.createElement('button');
-btnWA.className = 'bg-green-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1';
-btnWA.innerHTML = '<i class="fab fa-whatsapp"></i> Rx';
-btnWA.onclick = () => sendWhatsAppRx(p);
+        <div id="bookingStep1" class="w-full bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200/60 space-y-4 shadow-sm">
+            <h3 class="text-xs font-bold text-center text-slate-500 uppercase tracking-wider flex items-center justify-center gap-1.5">
+                <i class="fas fa-clinic-medical text-slate-900"></i> পোনপটীয়া অনলাইন বুকিং ফৰ্ম
+            </h3>
+            
+            <div class="flex gap-2 justify-center my-1 bg-slate-200/60 p-1 rounded-xl">
+                <button id="btnSelectRegular" class="w-1/2 text-[11px] sm:text-xs font-bold px-3 py-2.5 bg-slate-900 text-white rounded-lg transition-all shadow-sm">Regular Appointment</button>
+                <button id="btnSelectOnline" class="w-1/2 text-[11px] sm:text-xs font-bold px-3 py-2.5 text-slate-600 rounded-lg transition-all">Online Consultation</button>
+            </div>
+            
+            <div class="space-y-3">
+                <div class="relative">
+                    <input type="text" id="bName" placeholder="ৰোগীৰ সম্পূৰ্ণ নাম" class="w-full p-3.5 pl-10 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all shadow-inner">
+                    <i class="fas fa-user absolute left-3.5 top-4 text-gray-400 text-xs"></i>
+                </div>
+                <div class="relative">
+                    <input type="text" id="bPhone" placeholder="ম'বাইল নম্বৰ" class="w-full p-3.5 pl-10 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all shadow-inner">
+                    <i class="fas fa-phone absolute left-3.5 top-4 text-gray-400 text-xs"></i>
+                </div>
+                <div class="relative">
+                    <textarea id="bProblem" placeholder="স্বাস্থ্য সমস্যাসমূহ (চমুকৈ)" class="w-full p-3.5 pl-10 border border-gray-200 rounded-xl h-20 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all shadow-inner resize-none"></textarea>
+                    <i class="fas fa-notes-medical absolute left-3.5 top-4 text-gray-400 text-xs"></i>
+                </div>
+            </div>
 
-const btnReminder = document.createElement('button');
-btnReminder.className = 'bg-orange-500 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1';
-btnReminder.innerHTML = '<i class="fas fa-clock"></i> Send Reminder';
-btnReminder.onclick = () => sendMedicineReminder(p);
+            <button id="btnProceedToPay" class="w-full premium-gradient text-white font-bold py-4 rounded-xl shadow-lg hover:opacity-95 text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 mt-2">
+                বুকিং প্ৰক্ৰিয়া আগবঢ়াওক <i class="fas fa-chevron-right text-[10px]"></i>
+            </button>
+        </div>
 
-actions.append(btnPrint, btnPDF, btnWA, btnReminder);
-if (isDoctor) {
-const btnEdit = document.createElement('button');
-btnEdit.className = 'bg-blue-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold';
-btnEdit.innerHTML = '<i class="fas fa-edit"></i>';
-btnEdit.onclick = () => loadPatientToForm(p);
-actions.append(btnEdit);
-const btnDelete = document.createElement('button');
-btnDelete.className = 'bg-red-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold';
-btnDelete.innerHTML = '<i class="fas fa-trash"></i>';
-btnDelete.onclick = () => deletePatientRecord(p.id);
-actions.append(btnDelete);
-}
-card.append(actions);
-return card;
-}
-async function savePatientRecord() {
-const name = safeGet('pName').value?.trim();
-if(!name) return alert('ৰোগীৰ নাম লিখাটো বাধ্যতামূলক।');
-const patientData = {
-name,
-age: safeGet('pAgeSex').value,
-bp: safeGet('pBP').value,
-phone: safeGet('pPhone').value,
-history: safeGet('pHistory').value,
-medicine: safeGet('pMedicine').value,
-fees: parseInt(safeGet('pFees').value) || 0
-};
-if (currentEditId) {
-await supabaseClient.from('clinic_data').update(patientData).eq('id', currentEditId);
-alert('প্ৰেচক্ৰিপচন সফলতাৰে আপডেট হ’ল।');
-} else {
-await supabaseClient.from('clinic_data').insert([patientData]);
-alert('নতুন ৰোগীৰ তথ্য সংৰক্ষণ কৰা হ’ল।');
-}
-currentEditId = null;
-safeGet('formTitle').innerText = 'নতুন ৰোগীৰ প্ৰেচক্ৰিপচন এণ্ট্ৰী চেকচন';
-clearForm();
-loadPatients();
-loadExpenses();
-}
-function loadPatientToForm(p) {
-currentEditId = p.id;
-safeGet('formTitle').innerText = `এডিট মোড: ${p.name}`;
-safeGet('pName').value = p.name;
-safeGet('pAgeSex').value = p.age || '';
-safeGet('pBP').value = p.bp || '';
-safeGet('pPhone').value = p.phone || '';
-safeGet('pHistory').value = p.history || '';
-safeGet('pMedicine').value = p.medicine || '';
-safeGet('pFees').value = p.fees || 0;
-document.getElementById('prescriptionEntrySection')?.scrollIntoView({ behavior: 'smooth' });
-}
-async function deletePatientRecord(id) {
-if (!isDoctor) return alert('Doctor access required');
-if (!confirm('আপুনি সঁচাকৈয়ে এই তথ্য delete কৰিব বিচাৰে?')) return;
-await supabaseClient.from('clinic_data').delete().eq('id', id);
-loadPatients();
-loadExpenses();
-}
-async function saveExpenseRecord() {
-const category = safeGet('expCategory').value;
-const amount = parseFloat(safeGet('expAmount').value);
-const description = safeGet('expDesc').value;
-if (!amount || amount <= 0) return alert('সঠিক খৰচৰ পৰিমাণ লিখক।');
-const { error } = await supabaseClient.from('clinic_expenses').insert([{ category, amount, description }]);
-if (error) alert('খৰচ সংৰক্ষণ ব্যৰ্থ হৈছে।');
-else {
-alert('খৰচৰ হিচাপ সংৰক্ষণ কৰা হ’ল।');
-safeGet('expAmount').value = '';
-safeGet('expDesc').value = '';
-loadExpenses();
-}
-}
-async function loadExpenses() {
-try {
-const { data: patientData } = await supabaseClient.from('clinic_data').select('fees');
-let totalIncome = 0;
-if (patientData) {
-patientData.forEach(p => { totalIncome += parseFloat(p.fees || 0); });
-}
-const { data: expenseData } = await supabaseClient.from('clinic_expenses').select('*').order('created_at', { ascending: false });
-const container = document.getElementById('listExpenses');
-if(!container) return;
-container.innerHTML = '';
-let summary = { Salary: 0, Rent: 0, 'Electricity Bill': 0, 'Miscellaneous Expenses': 0 };
-let totalExpense = 0;
-if (expenseData) {
-expenseData.forEach(e => {
-if (summary[e.category] !== undefined) summary[e.category] += parseFloat(e.amount);
-totalExpense += parseFloat(e.amount);
-const card = document.createElement('div');
-card.className = 'p-3 bg-white border border-gray-100 rounded-xl flex justify-between items-center text-xs shadow-sm';
-let actionBtn = isDoctor ? `<button class="text-red-400 hover:text-red-600" onclick="deleteExpenseRecord('${e.id}')"><i class="fas fa-trash"></i></button>` : '';
-card.innerHTML = `<div>
-<span class="font-bold text-red-700">[${escapeHTML(e.category)}]</span>
-<p class="text-gray-500 mt-0.5">${escapeHTML(e.description || 'No details')}</p>
-</div>
-<div class="flex items-center gap-3">
-<span class="font-bold text-gray-900">₹${e.amount}</span>
-${actionBtn}
-</div>`;
-container.appendChild(card);
-});
-}
-const netBalance = totalIncome - totalExpense;
-const balanceClass = netBalance >= 0 ? 'text-emerald-700 font-bold' : 'text-red-700 font-bold';
-const sEl = document.getElementById('expenseSummaryText');
-if(sEl) {
-sEl.innerHTML = `
-<div class="grid grid-cols-2 gap-2 border-b pb
+        <div id="bookingStep2" class="w-full bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200/60 space-y-4 hidden shadow-sm">
+            <button id="btnBackToStep1" class="text-xs font-bold text-gray-500 hover:text-slate-900 flex items-center gap-1 transition">
+                <i class="fas fa-arrow-left text-[10px]"></i> তথ্য সলনি কৰক
+            </button>
+            <h3 class="text-sm font-bold text-center text-emerald-800 flex items-center justify-center gap-1.5">
+                <i class="fas fa-shield-alt text-emerald-600"></i> বুকিং নিশ্চিত কৰিবলৈ পেমেন্ট কৰক
+            </h3>
+            
+            <div class="border border-slate-200 rounded-xl p-5 text-center bg-white flex flex-col items-center shadow-sm relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1 premium-gradient"></div>
+                <span id="qrBadge" class="text-[11px] premium-gradient text-white font-bold px-4 py-1.5 rounded-full uppercase tracking-wider mb-3 shadow-sm">ফীজ: ₹100</span>
+                <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-md mb-3 transition hover:scale-102">
+                    <img id="paymentQRCode" src="" alt="UPI QR Code Scanner" class="w-40 h-40 sm:w-44 sm:h-44 object-contain">
+                </div>
+                <a id="upiPayBtn" href="#" class="inline-flex items-center gap-2 bg-[#E05300] hover:bg-orange-700 text-white px-5 py-3 rounded-xl text-xs font-bold shadow-md transition w-full justify-center">
+                    <i class="fas fa-wallet"></i> মোবাইলৰ পৰা পেমেন্ট কৰক
+                </a>
+                <p class="text-[10px] text-gray-400 mt-2.5">UPI ID: <span class="font-mono font-bold text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded">9954340102@okbizaxis</span></p>
+            </div>
+            
+            <div class="space-y-1.5">
+                <label class="text-[11px] font-bold text-red-600 block flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> ট্ৰেনজেকচন আইডি দিয়াটো বাধ্যতামূলক:*</label>
+                <input type="text" id="bTxnId" placeholder="12-Digit UPI Transaction ID দিয়ক" class="w-full p-3.5 border-2 border-slate-950 rounded-xl font-mono text-sm font-bold text-center tracking-widest bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 shadow-inner">
+            </div>
+            <button id="btnSubmitBooking" class="w-full bg-emerald-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-emerald-700 text-xs uppercase transition tracking-wider">বুকিং নিশ্চিত কৰক (Confirm)</button>
+        </div>
+
+        <div class="w-full space-y-3 my-5 border-t border-b border-gray-200/60 py-4">
+            <p class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">ক্লিনিক মেনেজমেণ্ট কন্ট্ৰ’ল</p>
+            <div class="grid grid-cols-1 gap-2">
+                <input type="email" id="loginEmail" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-slate-800 bg-slate-50 text-xs shadow-inner" placeholder="ইমেইল ঠিকনা">
+                <div class="flex gap-2">
+                    <input type="password" id="loginPassword" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-slate-800 bg-slate-50 text-xs shadow-inner" placeholder="পাছৱৰ্ড">
+                    <button id="btnStaffLogin" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-5 rounded-xl transition text-[10px] tracking-wider uppercase shadow-md">LOGIN</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-full bg-[#1e5a22] text-white p-4 rounded-2xl border border-green-800 mt-1 text-center flex flex-col items-center justify-center min-h-[90px] shadow-lg relative overflow-hidden">
+            <div class="absolute -right-4 -bottom-4 opacity-10 text-5xl text-white"><i class="fas fa-heartbeat"></i></div>
+            <h4 class="text-xs font-bold tracking-wide mb-1 text-yellow-300 uppercase flex items-center gap-1" id="tipTitle">হৃদযন্ত্ৰ সুস্থ ৰাখক</h4>
+            <p class="text-[11px] text-green-50 font-medium leading-relaxed max-w-[90%]" id="tipContent">দৈনিক পুৱা-গধূলি ৩০-৪০ মিনিট খোজ কাঢ়ক।</p>
+        </div>
+    </div>
+
+    <div id="appDashboard" class="hidden min-h-screen pb-24 bg-slate-50">
+        <div class="bg-white border-b border-gray-200 px-4 sm:px-6 py-4 sticky top-0 z-50 shadow-sm flex justify-between items-center max-w-4xl mx-auto rounded-b-xl">
+            <div>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight">DR. HARIS CLINIC</h2>
+                <span id="accessBadge" class="text-[9px] sm:text-[10px] bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Access</span>
+            </div>
+            <button id="btnLogout" class="text-red-500 hover:text-red-700 text-xs font-bold uppercase tracking-wider transition flex items-center gap-1"><i class="fas fa-sign-out-alt"></i> লগ-আউট</button>
+        </div>
+
+        <div class="p-3 sm:p-4 max-w-4xl mx-auto overflow-x-hidden">
+            <div id="tab-home" class="tab-content space-y-4">
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="relative">
+                        <input type="text" id="searchBox" placeholder="  🔍  নাম বা মোবাইল নম্বৰেৰে ৰোগী সন্ধান কৰক..." class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm focus:outline-none focus:border-slate-500 shadow-inner">
+                    </div>
+                    <button id="btnScrollToEntry" class="w-full mt-3 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl shadow transition text-center block text-sm">
+                        <i class="fas fa-user-plus mr-2"></i> নতুন ৰোগী সংযোগ কৰক
+                    </button>
+                </div>
+                <div id="listPatients" class="space-y-3"></div>
+            </div>
+
+            <div id="tab-booking" class="tab-content hidden space-y-4">
+                <h3 class="text-md font-bold text-slate-900 px-1">তাৰিখ ভিত্তিক অনলাইন বুকিং তালিকা</h3>
+                <div id="listBookings" class="space-y-3"></div>
+            </div>
+
+            <div id="tab-profile" class="tab-content hidden space-y-4">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center relative overflow-hidden">
+                    <div class="absolute top-0 left-0 right-0 h-1.5 premium-gradient"></div>
+                    <div class="w-20 h-20 premium-gradient text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-3 shadow-md">H</div>
+                    <h3 class="text-lg font-bold text-gray-900">Dr. Harikanta Das</h3>
+                    <p class="text-xs text-gray-500 font-medium">Homeopathic Physician & Physiotherapist</p>
+                    <p class="text-[11px] text-gray-400 mt-1 flex items-center justify-center gap-1"><i class="fas fa-map-marker-alt"></i> Gogamukh, Dhemaji, Assam</p>
+                </div>
+            </div>
+
+            <div id="tab-expenses" class="tab-content hidden space-y-4">
+                <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="text-sm font-bold text-gray-900 mb-3 border-b pb-2 flex items-center gap-1.5"><i class="fas fa-plus-circle text-red-500"></i> নতুন দৈনিক খৰচৰ লিখক</h3>
+                    <div class="space-y-3">
+                        <select id="expCategory" class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm focus:outline-none">
+                            <option value="Salary">দৰমহা (Salary)</option>
+                            <option value="Rent">ঘৰ ভাড়া (Rent)</option>
+                            <option value="Electricity Bill">বিজুলীৰ বিল (Electricity Bill)</option>
+                            <option value="Miscellaneous Expenses">অন্যান্য খৰচ (Miscellaneous Expenses)</option>
+                        </select>
+                        <input type="number" id="expAmount" placeholder="টকাৰ পৰিমাণ (₹)" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                        <input type="text" id="expDesc" placeholder="বিৱৰণ (Description)" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                        <button id="btnSaveExpense" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow transition text-sm">খৰচ সংৰক্ষণ কৰক</button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm space-y-2">
+                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider border-b pb-1.5 flex items-center gap-1"><i class="fas fa-chart-pie text-slate-700"></i> ক্লিনিকৰ আয়-ব্যয় প্ৰতিবেদন</h4>
+                    <div id="expenseSummaryText" class="text-xs space-y-1.5 text-gray-700">হিচাপ লোড হৈ আছে...</div>
+                </div>
+                <div id="listExpenses" class="space-y-2"></div>
+            </div>
+
+            <div id="prescriptionEntrySection" class="mt-6 bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
+                <h3 id="formTitle" class="text-sm font-bold text-slate-900 border-b border-gray-100 pb-2 flex items-center gap-1.5"><i class="fas fa-file-medical text-slate-700"></i> নতুন ৰোগীৰ প্ৰেচক্ৰিপচন সংযোগ চেকচন</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input type="text" id="pName" placeholder="ৰোগীৰ নাম" class="p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                    <input type="text" id="pAgeSex" placeholder="বয়স / লিংগ" class="p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                    <input type="text" id="pBP" placeholder="ৰক্তচাপ (BP)" class="p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                    <input type="text" id="pPhone" placeholder="ম'বাইল নম্বৰ" class="p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                </div>
+                <textarea id="pHistory" placeholder="ৰোগৰ ইতিবৃত্ত (Case History)" class="w-full p-3 border border-gray-200 rounded-xl h-20 text-sm focus:outline-none shadow-inner resize-none"></textarea>
+                <textarea id="pMedicine" placeholder="ঔষধৰ নাম আৰু ব্যৱহাৰৰ নিয়ম (Rx)" class="w-full p-3 border border-gray-200 rounded-xl h-28 text-sm focus:outline-none shadow-inner"></textarea>
+                <input type="number" id="pFees" placeholder="ভিজিট ফীজ (Fees ₹)" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                <button id="btnSavePatient" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition text-sm">ৰেকৰ্ড চেভ কৰক</button>
+            </div>
+        </div>
+
+        <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-gray-200 shadow-xl px-4 py-2 flex justify-between items-center z-50 max-w-4xl mx-auto rounded-t-2xl">
+            <button data-tab="home" class="tab-btn flex flex-col items-center gap-1 text-slate-900 border-b-2 border-slate-900 px-3 py-1 text-xs font-bold transition">
+                <i class="fas fa-home text-base"></i>হোম
+            </button>
+            <button data-tab="booking" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition">
+                <i class="fas fa-calendar-alt text-base"></i>বুকিং
+            </button>
+            <button data-tab="expenses" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition">
+                <i class="fas fa-wallet text-base"></i>খৰচ
+            </button>
+            <button data-tab="profile" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition">
+                <i class="fas fa-user text-base"></i>প্ৰফাইল
+            </button>
+        </div>
+    </div>
+
+    <div id="printArea" class="hidden p-8 bg-white text-black"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://oblvgjnyecvvnnnesegl.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_ekuwTZtgiCXsGRBWJXqYzQ_T8xUYjF9';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let currentEditId = null;
+        let selectedBookingType = 'Regular Appointment';
+        let currentFee = 100;
+        let isDoctor = false;
+        const healthTips = [
+            { title: "হৃদযন্ত্ৰ সুস্থ ৰাখক", content: "হৃদযন্ত্ৰ সজীৱ কৰিবলৈ দৈনিক পুৱা অতি কমেও ৩০-৪০ মিনিট খোজ কাঢ়ক।" },
+            { title: "ৰাতিপুৱা সোনকালে উঠক", content: "ৰাতিপুৱা সোনকালে উঠিলে মগজু সতেজ হয় আৰু দিনটোৰ কাৰ্যক্ষমতা বৃদ্ধি পায়।" },
+            { title: "পৰ্যাপ্ত পানী সেৱন", content: "দিনটোত অন্ততঃ ৩ ৰ পৰা ৪ লিটাৰ পানী খোৱাটো জৰুৰী।" },
+            { title: "পৰ্যাপ্ত টোপনিৰ প্ৰয়োজন", content: "শৰীৰৰ কোষসমূহ সজীৱ কৰিবলৈ দৈনিক ৭-৮ ঘণ্টা শান্তিপূৰ্ণ টোপনি লওক।" }
+        ];
+        const safeGet = (id) => document.getElementById(id) || { addEventListener: () => {}, style: {}, classList: { add:()=>{}, remove:()=>{} }, value: '' };
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session && session.user) {
+                    await checkRole(session.user.email);
+                    showDashboard();
+                }
+            } catch (err) {
+                console.log('Auth error bypassed');
+            }
+            const btnRegular = document.getElementById('btnSelectRegular');
+            const btnOnline = document.getElementById('btnSelectOnline');
+            if(btnRegular && btnOnline) {
+                btnRegular.addEventListener('click', () => {
+                    selectedBookingType = 'Regular Appointment'; currentFee = 100;
+                    btnRegular.className = "w-1/2 text-xs font-bold px-4 py-2.5 bg-slate-900 text-white rounded-lg transition-all shadow-sm";
+                    btnOnline.className = "w-1/2 text-xs font-bold px-4 py-2.5 bg-transparent text-gray-500 rounded-lg transition-all";
+                });
+                btnOnline.addEventListener('click', () => {
+                    selectedBookingType = 'Online Consultation'; currentFee = 250;
+                    btnOnline.className = "w-1/2 text-xs font-bold px-4 py-2.5 bg-slate-900 text-white rounded-lg transition-all shadow-sm";
+                    btnRegular.className = "w-1/2 text-xs font-bold px-4 py-2.5 bg-transparent text-gray-500 rounded-lg transition-all";
+                });
+            }
+            const btnProceedToPay = document.getElementById('btnProceedToPay');
+            if(btnProceedToPay) {
+                btnProceedToPay.addEventListener('click', () => {
+                    const name = safeGet('bName').value?.trim();
+                    const phone = safeGet('bPhone').value?.trim();
+                    if(!name || !phone) return alert('অনুগ্ৰহ কৰি আগবাঢ়িবলৈ ৰোগীৰ নাম আৰু ম’বাইল নম্বৰ প্ৰদান কৰক।');
+                    generateLiveQR();
+                    document.getElementById('bookingStep1').classList.add('hidden');
+                    document.getElementById('bookingStep2').classList.remove('hidden');
+                });
+            }
+            const btnBackToStep1 = document.getElementById('btnBackToStep1');
+            if(btnBackToStep1) {
+                btnBackToStep1.addEventListener('click', () => {
+                    document.getElementById('bookingStep2').classList.add('hidden');
+                    document.getElementById('bookingStep1').classList.remove('hidden');
+                });
+            }
+            document.getElementById('btnStaffLogin')?.addEventListener('click', handleLogin);
+            document.getElementById('btnSubmitBooking')?.addEventListener('click', submitBooking);
+            document.getElementById('btnSavePatient')?.addEventListener('click', savePatientRecord);
+            document.getElementById('btnSaveExpense')?.addEventListener('click', saveExpenseRecord);
+            document.getElementById('btnLogout')?.addEventListener('click', handleLogout);
+            document.getElementById('searchBox')?.addEventListener('keyup', filterPatients);
+            document.getElementById('btnScrollToEntry')?.addEventListener('click', () => {
+                document.getElementById('prescriptionEntrySection')?.scrollIntoView({ behavior: 'smooth' });
+            });
+            startHealthTipsRotation();
+            setupTabs();
+        });
+        async function checkRole(userEmail) {
+            if (!userEmail) return;
+            isDoctor = (userEmail.toLowerCase() === 'das.harikanta60@gmail.com');
+            const badge = document.getElementById('accessBadge');
+            if (badge) {
+                badge.innerText = isDoctor ? 'Doctor (Full Access)' : 'Staff Mode (Restricted)';
+                badge.className = isDoctor
+                    ? 'text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider'
+                    : 'text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider';
+            }
+        }
+        function generateLiveQR() {
+            const qrBadge = document.getElementById('qrBadge');
+            if(qrBadge) qrBadge.innerText = `ফীজ: ₹${currentFee} (${selectedBookingType})`;
+            const upiPayload = `upi://pay?pa=9954340102@okbizaxis&pn=Dr%20Harikanta%20Das&am=${currentFee}&cu=INR&tn=${encodeURIComponent(selectedBookingType)}`;
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=${encodeURIComponent(upiPayload)}&ecc=M`;
+            const qrImageContainer = document.getElementById('paymentQRCode');
+            if(qrImageContainer) qrImageContainer.src = qrApiUrl;
+            const upiPayBtn = document.getElementById('upiPayBtn');
+            if(upiPayBtn) upiPayBtn.href = upiPayload;
+        }
+        function startHealthTipsRotation() {
+            let index = 0;
+            setInterval(() => {
+                index = (index + 1) % healthTips.length;
+                const tEl = document.getElementById('tipTitle');
+                const cEl = document.getElementById('tipContent');
+                if(tEl && cEl) {
+                    tEl.innerText = healthTips[index].title;
+                    cEl.innerText = healthTips[index].content;
+                }
+            }, 5000);
+        }
+        async function handleLogin() {
+            const email = safeGet('loginEmail').value.trim();
+            const password = safeGet('loginPassword').value.trim();
+            if (!email || !password) return alert('অনুগ্ৰহ কৰি ইমেইল আৰু পাছৱৰ্ড লিখক।');
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) return alert('ভুল ইমেইল বা পাছৱৰ্ড।');
+            await checkRole(email);
+            showDashboard();
+        }
+        function showDashboard() {
+            safeGet('mainPatientSection').style.display = 'none';
+            safeGet('appDashboard').classList.remove('hidden');
+            loadPatients();
+            loadBookings();
+            loadExpenses();
+        }
+        async function handleLogout() {
+            await supabaseClient.auth.signOut();
+            location.reload();
+        }
+        async function submitBooking() {
+            const name = safeGet('bName').value?.trim();
+            const phone = safeGet('bPhone').value?.trim();
+            const txn_id = safeGet('bTxnId').value?.trim();
+            const problem = safeGet('bProblem').value?.trim();
+            const namePattern = /^[A-Za-zÀ-ÿ\u0980-\u09FF\s.]{3,50}$/;
+            if (!namePattern.test(name)) return alert('সঠিক ৰোগীৰ নাম দিয়ক।');
+            const phonePattern = /^[6-9]\d{9}$/;
+            if (!phonePattern.test(phone)) return alert('সঠিক 10 ডিজিট ম’বাইল নম্বৰ দিয়ক।');
+            if (!problem || problem.length < 5) return alert('স্বাস্থ্য সমস্যাটো সঠিককৈ লিখক।');
+            const txnPattern = /^[A-Za-z0-9]{10,30}$/;
+            if (!txnPattern.test(txn_id)) return alert('সঠিক Transaction ID দিয়ক।');
+            const problemDesc = `[${selectedBookingType}] ${problem}`;
+            const { error } = await supabaseClient.from('clinic_bookings').insert([{ name, phone, txn_id, problem: problemDesc }]);
+            if (error) alert('বুকিং ব্যৰ্থ হৈছে।');
+            else {
+                alert(`সফল হৈছে! বুকিং গ্ৰহণ কৰা হৈছে।`);
+                const flashMsg = ` 🏥  *DR. HARIS CLINIC*\n\nনমস্কাৰ ${name},\nআপোনাৰ *${selectedBookingType}* ৰ বুকিং পঞ্জীয়ন কৰা হৈছে।\nTxn ID: ${txn_id}`;
+                window.open(`https://api.whatsapp.com/send?phone=91${phone.replace(/\D/g, '')}&text=${encodeURIComponent(flashMsg)}`, '_blank');
+                location.reload();
+            }
+        }
+        async function loadBookings() {
+            const { data, error } = await supabaseClient.from('clinic_bookings').select('*').order('created_at', { ascending: false });
+            if(error || !data) return;
+            const container = document.getElementById('listBookings');
+            if(!container) return;
+            container.innerHTML = data.map(b => `
+                <div class="p-4 border rounded-xl bg-white flex justify-between items-center shadow-sm text-xs">
+                    <div>
+                        <h5 class="font-bold text-gray-900">${escapeHTML(b.name)} (${escapeHTML(b.phone)})</h5>
+                        <p class="text-emerald-600 font-mono mt-0.5 font-bold">Txn ID: ${escapeHTML(b.txn_id)}</p>
+                        <p class="text-gray-600 mt-1">${escapeHTML(b.problem || 'No description')}</p>
+                    </div>
+                    <span class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded font-bold">Verified</span>
+                </div>
+            `).join('');
+        }
+        async function loadPatients() {
+            const { data, error } = await supabaseClient.from('clinic_data').select('*').order('created_at', { ascending: false });
+            if (error || !data) return;
+            const container = document.getElementById('listPatients');
+            if(!container) return;
+            container.innerHTML = '';
+            data.forEach(p => container.appendChild(createPatientCard(p)));
+        }
+        function createPatientCard(p) {
+            const card = document.createElement('div');
+            card.className = 'bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-3';
+            card.innerHTML = `<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                <div>
+                    <h4 class="text-base font-bold text-slate-900">${escapeHTML(p.name)} <span class="text-xs font-normal text-gray-500">(${escapeHTML(p.age || 'N/A')})</span></h4>
+                    <p class="text-xs text-gray-600 mt-0.5">  📞  ${escapeHTML(p.phone)} |  🩺  BP: ${escapeHTML(p.bp || 'N/A')} | 💰  Fees: ₹${p.fees || 0}</p>
+                    <p class="text-xs text-gray-500 mt-1"><b>History:</b> ${escapeHTML(p.history || 'None')}</p>
+                </div>
+            </div>`;
+            const actions = document.createElement('div');
+            actions.className = 'flex flex-wrap gap-1.5 border-t pt-2 mt-1 justify-end';
+            const btnPrint = document.createElement('button');
+            btnPrint.className = 'bg-gray-800 text-white px-2.5 py-2 rounded-lg text-xs font-bold';
+            btnPrint.innerHTML = '<i class="fas fa-print"></i>';
+            btnPrint.onclick = () => printPrescription(p);
+            const btnWA = document.createElement('button');
+            btnWA.className = 'bg-green-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1';
+            btnWA.innerHTML = '<i class="fab fa-whatsapp"></i> Rx';
+            btnWA.onclick = () => sendWhatsAppRx(p);
+            const btnReminder = document.createElement('button');
+            btnReminder.className = 'bg-orange-500 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1';
+            btnReminder.innerHTML = '<i class="fas fa-clock"></i> Send Reminder';
+            btnReminder.onclick = () => sendMedicineReminder(p);
+            actions.append(btnPrint, btnWA, btnReminder);
+            if (isDoctor) {
+                const btnEdit = document.createElement('button');
+                btnEdit.className = 'bg-blue-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold';
+                btnEdit.innerHTML = '<i class="fas fa-edit"></i>';
+                btnEdit.onclick = () => loadPatientToForm(p);
+                actions.append(btnEdit);
+                const btnDelete = document.createElement('button');
+                btnDelete.className = 'bg-red-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold';
+                btnDelete.innerHTML = '<i class="fas fa-trash"></i>';
+                btnDelete.onclick = () => deletePatientRecord(p.id);
+                actions.append(btnDelete);
+            }
+            card.append(actions);
+            return card;
+        }
+        async function savePatientRecord() {
+            const name = safeGet('pName').value?.trim();
+            if(!name) return alert('ৰোগীৰ নাম লিখাটো বাধ্যতা মূলক।');
+            const patientData = {
+                name,
+                age: safeGet('pAgeSex').value,
+                bp: safeGet('pBP').value,
+                phone: safeGet('pPhone').value,
+                history: safeGet('pHistory').value,
+                medicine: safeGet('pMedicine').value,
+                fees: parseInt(safeGet('pFees').value) || 0
+            };
+            if (currentEditId) {
+                await supabaseClient.from('clinic_data').update(patientData).eq('id', currentEditId);
+                alert('প্ৰেচক্ৰিপচন সফলতাৰে আপডেট হ’ল।');
+            } else {
+                await supabaseClient.from('clinic_data').insert([patientData]);
+                alert('নতুন ৰোগীৰ তথ্য সংৰক্ষণ কৰা হ’ল।');
+            }
+            currentEditId = null;
+            safeGet('formTitle').innerText = 'নতুন ৰোগীৰ প্ৰেচক্ৰিপচন এণ্ট্ৰী চেকচন';
+            clearForm();
+            loadPatients();
+            loadExpenses();
+        }
+        function loadPatientToForm(p) {
+            currentEditId = p.id;
+            safeGet('formTitle').innerText = `এডিট মোড: ${p.name}`;
+            safeGet('pName').value = p.name;
+            safeGet('pAgeSex').value = p.age || '';
+            safeGet('pBP').value = p.bp || '';
+            safeGet('pPhone').value = p.phone || '';
+            safeGet('pHistory').value = p.history || '';
+            safeGet('pMedicine').value = p.medicine || '';
+            safeGet('pFees').value = p.fees || 0;
+            document.getElementById('prescriptionEntrySection')?.scrollIntoView({ behavior: 'smooth' });
+        }
+        async function deletePatientRecord(id) {
+            if (!isDoctor) return alert('Doctor access required');
+            if (!confirm('আপুনি সঁচাকৈয়ে এই তথ্য delete কৰিব বিচাৰে?')) return;
+            await supabaseClient.from('clinic_data').delete().eq('id', id);
+            loadPatients();
+            loadExpenses();
+        }
+        async function saveExpenseRecord() {
+            const category = safeGet('expCategory').value;
+            const amount = parseFloat(safeGet('expAmount').value);
+            const description = safeGet('expDesc').value;
+            if (!amount || amount <= 0) return alert('সঠিক খৰচৰ পৰিমাণ লিখক।');
+            const { error } = await supabaseClient.from('clinic_expenses').insert([{ category, amount, description }]);
+            if (error) alert('খৰচ সংৰক্ষণ ব্যৰ্থ হৈছে।');
+            else {
+                alert('খৰচৰ হিচাপ সংৰক্ষণ কৰা হ’ল।');
+                safeGet('expAmount').value = '';
+                safeGet('expDesc').value = '';
+                loadExpenses();
+            }
+        }
+        async function loadExpenses() {
+            try {
+                const { data: patientData } = await supabaseClient.from('clinic_data').select('fees');
+                let totalIncome = 0;
+                if (patientData) {
+                    patientData.forEach(p => { totalIncome += parseFloat(p.fees || 0); });
+                }
+                const { data: expenseData } = await supabaseClient.from('clinic_expenses').select('*').order('created_at', { ascending: false });
+                const container = document.getElementById('listExpenses');
+                if(!container) return;
+                container.innerHTML = '';
+                let summary = { Salary: 0, Rent: 0, 'Electricity Bill': 0, 'Miscellaneous Expenses': 0 };
+                let totalExpense = 0;
+                if (expenseData) {
+                    expenseData.forEach(e => {
+                        if (summary[e.category] !== undefined) summary[e.category] += parseFloat(e.amount);
+                        totalExpense += parseFloat(e.amount);
+                        const card = document.createElement('div');
+                        card.className = 'p-3 bg-white border border-gray-100 rounded-xl flex justify-between items-center text-xs shadow-sm';
+                        let actionBtn = isDoctor ? `<button class="text-red-400 hover:text-red-600" onclick="deleteExpenseRecord('${e.id}')"><i class="fas fa-trash"></i></button>` : '';
+                        card.innerHTML = `<div>
+                            <span class="font-bold text-red-700">[${escapeHTML(e.category)}]</span>
+                            <p class="text-gray-500 mt-0.5">${escapeHTML(e.description || 'No details')}</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-gray-900">₹${e.amount}</span>
+                            ${actionBtn}
+                        </div>`;
+                        container.appendChild(card);
+                    });
+                }
+                const netBalance = totalIncome - totalExpense;
+                const balanceClass = netBalance >= 0 ? 'text-emerald-700 font-bold' : 'text-red-700 font-bold';
+                const sEl = document.getElementById('expenseSummaryText');
+                if(sEl) {
+                    sEl.innerHTML = `
+                        <div class="grid grid-cols-2 gap-2 border-b pb-2 mb-2 text-xs font-semibold">
+                            <div class="text-emerald-600"> 💵  সৰ্বমুঠ আয়: ₹${totalIncome}</div>
+                            <div class="text-red-600"> 📉  সৰ্বমুঠ খৰচ: ₹${totalExpense}</div>
+                        </div>
+                        <div class="p-2 rounded-lg bg-slate-50 border text-center text-xs font-bold mb-2">
+                            হিচাপৰ নাটনি/লাভ: <span class="${balanceClass}">₹${netBalance}</span>
+                        </div>
+                        <div class="space-y-1 text-[11px] text-gray-600">
+                            • দৰমহা (Salary): ₹${summary['Salary']}<br>
+                            • ঘৰ ভাড়া (Rent): ₹${summary['Rent']}<br>
+                            • বিজুলী বিল (Electricity): ₹${summary['Electricity Bill']}<br>
+                            • অন্যান্য খৰচ (Misc): ₹${summary['Miscellaneous Expenses']}
+                        </div>`;
+                }
+            } catch(err) {
+                console.error(err);
+            }
+        }
+        async function deleteExpenseRecord(id) {
+            if (!isDoctor) return alert('Doctor access required');
+            if (!confirm('খৰচৰ ৰেকৰ্ড delete কৰিব বিচাৰে?')) return;
+            await supabaseClient.from('clinic_expenses').delete().eq('id', id);
+            loadExpenses();
+        }
+        function sendWhatsAppRx(p) {
+            if(!p.phone) return alert('মোবাইল নম্বৰ পোৱা নগ’ল।');
+            const msg = ` 🏥  *DR. HARIS HOMEOPATHIC CLINIC*\n\n*Patient Name:* ${p.name}\n\n*Rx (Prescription):*\n${p.medicine}\n\n---\n 🌐  *Connect with Us:*\n• Facebook: https://www.facebook.com/drhari365\n• YouTube: https://www.youtube.com/@drhari\n• Instagram: https://www.instagram.com/drharikanta\n• Website: https://drhariswellfuture.com/`;
+            window.open(`https://api.whatsapp.com/send?phone=91${p.phone.replace(/\D/g, '')}&text=${encodeURIComponent(msg)}`, '_blank');
+        }
+        function sendMedicineReminder(p) {
+            if(!p.phone) return alert('মোবাইল নম্বৰ পোৱা নগ’ল।');
+            const reminderMsg = ` ⏰  *MEDICINE REMINDER | DR. HARIS CLINIC*\n\nনমস্কাৰ ${p.name},\nআপোনাক জনোৱা হৈছে যে আপোনাৰ ঔষধ খোৱাৰ সময় হৈছে। অনুগ্ৰহ কৰি প্ৰেচক্ৰিপচন অনুসৰি সঠিক সময়ত ঔষধ গ্ৰহণ কৰক। সুস্থ থাকক, কুশলে থাকক।\n\n 🏥  *ডাঃ হৰিচ হোমিয়োপেথিক এণ্ড ফিজিওথেৰাপী ক্লিনিক*, গোগামুখ।`;
+            window.open(`https://api.whatsapp.com/send?phone=91${p.phone.replace(/\D/g, '')}&text=${encodeURIComponent(reminderMsg)}`, '_blank');
+        }
+        function printPrescription(p) {
+            const printArea = document.getElementById('printArea');
+            if(!printArea) return;
+            printArea.innerHTML = `<h1>DR. HARIS CLINIC</h1><hr><p><b>Name:</b> ${escapeHTML(p.name)}</p><p><b>Rx:</b><br>${escapeHTML(p.medicine).replace(/\n/g, '<br>')}</p>`;
+            window.print();
+        }
+        function escapeHTML(str) { return str ? str.replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t)) : ''; }
+        function filterPatients() {
+            const term = safeGet('searchBox').value.toLowerCase();
+            document.querySelectorAll('#listPatients > div').forEach(c => c.style.display = c.innerText.toLowerCase().includes(term) ? 'flex' : 'none');
+        }
+        function clearForm() { ['pName', 'pAgeSex', 'pBP', 'pPhone', 'pHistory', 'pMedicine', 'pFees'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; }); }
+        function setupTabs() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('text-slate-900', 'border-b-2', 'border-slate-900'));
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.add('text-gray-400'));
+                    btn.classList.remove('text-gray-400');
+                    btn.classList.add('text-slate-900', 'border-b-2', 'border-slate-900');
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                    const tEl = document.getElementById(`tab-${btn.dataset.tab}`);
+                    if(tEl) tEl.classList.remove('hidden');
+                });
+            });
+        }
+    </script>
+</body>
+</html>
