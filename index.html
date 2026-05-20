@@ -331,6 +331,21 @@
                 }
             });
 
+
+                    window.addEventListener('DOMContentLoaded', async () => {
+            // ... আপোনাৰ বৰ্তমানৰ কোড যি আছে ...
+            
+            // 👇 ইয়াত এই লাইনবোৰ যোগ কৰক
+            // Setup Accounting Tabs
+            setupAccountingTabs();
+
+            // Add Expense Button Listener
+            const btnAddExpense = document.getElementById('btnAddExpense');
+            if (btnAddExpense) {
+                btnAddExpense.addEventListener('click', addExpenseItem);
+            }
+        });
+
             const btnRegular = document.getElementById('btnSelectRegular');
             const btnOnline = document.getElementById('btnSelectOnline');
             if(btnRegular && btnOnline) {
@@ -474,7 +489,230 @@
             if(!container) return;
             container.innerHTML = '';
             data.forEach(p => container.appendChild(createPatientCard(p)));
+
         }
+
+
+        // ========== ACCOUNTING DASHBOARD FUNCTIONS ==========
+
+// Load both Income and Expense
+async function loadAccountingData() {
+    await loadIncomeData();
+    await loadExpenseData();
+    updateSummary();
+}
+
+// Load Income (Patient Fees)
+async function loadIncomeData() {
+    const { data: patients, error } = await supabaseClient
+        .from('clinic_data')
+        .select('id, name, phone, fees, created_at')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Income load error:', error);
+        return;
+    }
+
+    const tbody = document.getElementById('incomeTableBody');
+    if (!patients || patients.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-gray-400">কোনো ৰোগীৰ তথ্য নাই</td></tr>';
+        document.getElementById('incomeTotalCount').innerText = '0';
+        document.getElementById('totalIncomeAmount').innerHTML = '₹0';
+        return;
+    }
+
+    tbody.innerHTML = patients.map(p => `
+        <tr class="border-b border-gray-100 hover:bg-gray-50">
+            <td class="px-4 py-3 text-xs text-gray-500">${formatDate(p.created_at)}</td>
+            <td class="px-4 py-3 text-sm font-medium text-gray-800">${escapeHTML(p.name)}</td>
+            <td class="px-4 py-3 text-xs text-gray-500">${escapeHTML(p.phone)}</td>
+            <td class="px-4 py-3 text-right font-semibold text-green-600">₹${parseFloat(p.fees || 0).toLocaleString()}</td>
+            <td class="px-4 py-3 text-center">
+                ${isDoctor ? `<button onclick="deleteIncome('${p.id}')" class="text-red-500 hover:text-red-700" title="মচক"><i class="fas fa-trash-alt"></i></button>` : '<span class="text-gray-300">-</span>'}
+            </td>
+        </tr>
+    `).join('');
+
+    const totalIncome = patients.reduce((sum, p) => sum + (parseFloat(p.fees) || 0), 0);
+    document.getElementById('incomeTotalCount').innerText = patients.length;
+    document.getElementById('totalIncomeAmount').innerHTML = `₹${totalIncome.toLocaleString()}`;
+}
+
+// Load Expense Data
+async function loadExpenseData() {
+    const { data: expenses, error } = await supabaseClient
+        .from('clinic_expenses')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Expense load error:', error);
+        return;
+    }
+
+    const tbody = document.getElementById('expenseTableBody');
+    if (!expenses || expenses.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-gray-400">কোনো খৰচৰ তথ্য নাই</td></tr>';
+        document.getElementById('totalExpenseAmount').innerHTML = '₹0';
+        return;
+    }
+
+    tbody.innerHTML = expenses.map(e => `
+        <tr class="border-b border-gray-100 hover:bg-gray-50">
+            <td class="px-4 py-3 text-xs text-gray-500">${formatDate(e.created_at)}</td>
+            <td class="px-4 py-3">
+                <span class="inline-flex px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(e.category)}">
+                    ${escapeHTML(e.category)}
+                </span>
+            </td>
+            <td class="px-4 py-3 text-right font-semibold text-red-600">₹${parseFloat(e.amount).toLocaleString()}</td>
+            <td class="px-4 py-3 text-xs text-gray-500">${escapeHTML(e.note || e.description || '-')}</td>
+            <td class="px-4 py-3 text-center">
+                ${isDoctor ? `<button onclick="deleteExpenseItem('${e.id}')" class="text-red-500 hover:text-red-700" title="মচক"><i class="fas fa-trash-alt"></i></button>` : '<span class="text-gray-300">-</span>'}
+            </td>
+        </tr>
+    `).join('');
+
+    const totalExpense = expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+    document.getElementById('totalExpenseAmount').innerHTML = `₹${totalExpense.toLocaleString()}`;
+}
+
+// Update Summary (Net Profit)
+function updateSummary() {
+    const totalIncomeText = document.getElementById('totalIncomeAmount')?.innerText || '₹0';
+    const totalExpenseText = document.getElementById('totalExpenseAmount')?.innerText || '₹0';
+    
+    const totalIncome = parseFloat(totalIncomeText.replace('₹', '').replace(/,/g, '')) || 0;
+    const totalExpense = parseFloat(totalExpenseText.replace('₹', '').replace(/,/g, '')) || 0;
+    const netProfit = totalIncome - totalExpense;
+    
+    const profitEl = document.getElementById('netProfitAmount');
+    if (profitEl) {
+        profitEl.innerHTML = `₹${netProfit.toLocaleString()}`;
+        if (netProfit >= 0) {
+            profitEl.className = 'text-xl font-bold text-blue-600';
+        } else {
+            profitEl.className = 'text-xl font-bold text-red-600';
+        }
+    }
+}
+
+// Add Expense
+async function addExpenseItem() {
+    const type = document.getElementById('expenseType')?.value;
+    const amount = parseFloat(document.getElementById('expenseAmount')?.value);
+    const note = document.getElementById('expenseNote')?.value.trim();
+
+    if (!amount || amount <= 0) {
+        alert('অনুগ্ৰহ কৰি পৰিমাণ লিখক');
+        return;
+    }
+
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) {
+        alert('প্ৰথমে লগইন কৰক');
+        return;
+    }
+
+    const { error } = await supabaseClient
+        .from('clinic_expenses')
+        .insert([{
+            category: type,
+            amount: amount,
+            description: note || '-',
+            note: note || '-',
+            user_id: user.id
+        }]);
+
+    if (error) {
+        alert('খৰচ যোগ কৰা নগ’ল: ' + error.message);
+    } else {
+        document.getElementById('expenseAmount').value = '';
+        document.getElementById('expenseNote').value = '';
+        await loadExpenseData();
+        updateSummary();
+        alert('✅ খৰচ যোগ হৈছে');
+    }
+}
+
+// Delete Income (Patient Fee)
+async function deleteIncome(patientId) {
+    if (!confirm('সঁচাকৈয়ে ৰোগীৰ ফীজৰ ৰেকৰ্ড মচিব নে?')) return;
+    
+    const { error } = await supabaseClient
+        .from('clinic_data')
+        .delete()
+        .eq('id', patientId);
+    
+    if (error) {
+        alert('মচিব পৰা নগ’ল: ' + error.message);
+    } else {
+        await loadIncomeData();
+        updateSummary();
+        alert('✅ ৰেকৰ্ড মচা হৈছে');
+    }
+}
+
+// Delete Expense
+async function deleteExpenseItem(expenseId) {
+    if (!confirm('সঁচাকৈয়ে খৰচটো মচিব নে?')) return;
+    
+    const { error } = await supabaseClient
+        .from('clinic_expenses')
+        .delete()
+        .eq('id', expenseId);
+    
+    if (error) {
+        alert('মচিব পৰা নগ’ল: ' + error.message);
+    } else {
+        await loadExpenseData();
+        updateSummary();
+        alert('✅ খৰচ মচা হৈছে');
+    }
+}
+
+// Tab Switching
+function setupAccountingTabs() {
+    const incomeTabBtn = document.getElementById('incomeTabBtn');
+    const expenseTabBtn = document.getElementById('expenseTabBtn');
+    const incomePanel = document.getElementById('incomePanel');
+    const expensePanel = document.getElementById('expensePanel');
+
+    if (incomeTabBtn && expenseTabBtn) {
+        incomeTabBtn.addEventListener('click', () => {
+            incomeTabBtn.className = 'px-4 py-2 text-sm font-semibold text-emerald-600 border-b-2 border-emerald-600';
+            expenseTabBtn.className = 'px-4 py-2 text-sm font-semibold text-gray-500 hover:text-gray-700';
+            incomePanel.classList.remove('hidden');
+            expensePanel.classList.add('hidden');
+        });
+
+        expenseTabBtn.addEventListener('click', () => {
+            expenseTabBtn.className = 'px-4 py-2 text-sm font-semibold text-emerald-600 border-b-2 border-emerald-600';
+            incomeTabBtn.className = 'px-4 py-2 text-sm font-semibold text-gray-500 hover:text-gray-700';
+            expensePanel.classList.remove('hidden');
+            incomePanel.classList.add('hidden');
+        });
+    }
+}
+
+// Helper Functions
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    const d = new Date(dateString);
+    return `${d.getDate().toString().padStart(2, '0')}-${(d.getMonth()+1).toString().padStart(2, '0')}`;
+}
+
+function getTypeColor(type) {
+    const colors = {
+        'Rent': 'bg-blue-100 text-blue-700',
+        'Salary': 'bg-purple-100 text-purple-700',
+        'Medicine': 'bg-green-100 text-green-700',
+        'Electricity': 'bg-yellow-100 text-yellow-700',
+        'Other': 'bg-gray-100 text-gray-700'
+    };
+    return colors[type] || 'bg-gray-100 text-gray-700';
+}
         function createPatientCard(p) {
             const card = document.createElement('div');
             card.className = 'bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-3';
@@ -515,6 +753,8 @@
                 btnDelete.onclick = () => deletePatientRecord(p.id);
 
                 actions.append(btnEdit, btnDelete);
+
+                
             }
 
             card.appendChild(actions);
@@ -837,7 +1077,7 @@ async function deleteExpense(expenseId) {
                     document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
                     // নিৰ্দিষ্ট টেবটো দেখুওৱা
                     document.getElementById(`tab-${targetTab}`)?.classList.remove('hidden');
-
+        if (targetTab === 'expenses') { loadAccountingData(); }
                     // বুটামৰ এক্টিভ ক্লাচ সলনি কৰা
                     buttons.forEach(b => {
                         b.classList.remove('text-slate-900', 'border-b-2', 'border-slate-900');
