@@ -599,6 +599,25 @@
                     user_id: user.id   // ✅ এইটো নতুনকৈ যোগ কৰা হৈছে
                 }]);
 
+
+            // খৰচ মচি পেলোৱা ফাংচন
+async function deleteExpense(expenseId) {
+    if (!confirm('আপুনি সঁচাকৈয়ে এই খৰচটো মচি পেলাব বিচাৰে নে?')) {
+        return;
+    }
+
+    const { error } = await supabaseClient
+        .from('clinic_expenses')
+        .delete()
+        .eq('id', expenseId);
+
+    if (error) {
+        alert('খৰচ মচিব পৰা নগ’ল: ' + error.message);
+    } else {
+        alert('খৰচ সফলতাৰে মচি পেলোৱা হৈছে।');
+        loadExpenses(); // তালিকা পুনৰ লোড কৰক
+    }
+}
             if (error) {
                 alert('খৰচ সংৰক্ষণ কৰিব পৰা নগ’ল: ' + error.message);
             } else {
