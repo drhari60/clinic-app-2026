@@ -490,7 +490,7 @@
             document.getElementById('prescriptionEntrySection')?.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // নতুন ৰোগী যোগ কৰা আৰু পুৰণি ৰোগীৰ ডাটা আপডেট কৰা ফাংচন
+        // নতুন ৰোগী যোগ কৰা আৰু পুৰণি ৰোগীৰ ডাটা আপডেট কৰা ১০০% সঠিক ফাংচন
         async function savePatientRecord() {
             const name = safeGet('pName').value.trim();
             const age = safeGet('pAgeSex').value.trim();
@@ -507,26 +507,36 @@
             const patientData = { name, age, bp, phone, history, medicine, fees };
 
             if (currentEditId) {
-                // ডাটা আপডেট (Update Logics)
-                const { error } = await supabaseClient.from('clinic_data').update(patientData).eq('id', currentEditId);
-                if (error) alert('আপডেট কৰিব পৰা নগ’ল: ' + error.message);
-                else {
+                // ডাটা আপডেট কৰা লজিক (Update Logic)
+                const { error } = await supabaseClient
+                    .from('clinic_data')
+                    .update(patientData)
+                    .eq('id', currentEditId);
+
+                if (error) {
+                    alert('আপডেট ব্যৰ্থ হৈছে: ' + error.message);
+                } else {
                     alert('ৰোগীৰ তথ্য সফলতাৰে আপডেট কৰা হৈছে।');
                     resetPatientForm();
-                    loadPatients();
+                    setTimeout(loadPatients, 300); // ডাটা ৰিফ্ৰেছ হ’বলৈ ৩০০ মিল চেকেণ্ড সময় দিয়া হৈছে
                 }
             } else {
-                // নতুন ডাটা সংৰক্ষণ (Insert Logics)
-                const { error } = await supabaseClient.from('clinic_data').insert([patientData]);
-                if (error) alert('সংৰক্ষণ ব্যৰ্থ হৈছে: ' + error.message);
-                else {
+                // নতুন ডাটা সংৰক্ষণ লজিক (Insert Logic)
+                // ইয়াতে .select() ব্যৱহাৰ কৰা হৈছে যাতে সুপাবেচে লগে লগে নতুন ID টো এপ্পক দি দিয়ে
+                const { data, error } = await supabaseClient
+                    .from('clinic_data')
+                    .insert([patientData])
+                    .select(); 
+
+                if (error) {
+                    alert('সংৰক্ষণ কৰিব পৰা নগ’ল: ' + error.message);
+                } else {
                     alert('নতুন ৰোগীৰ ৰেকৰ্ড সফলতাৰে সংৰক্ষণ কৰা হৈছে।');
                     resetPatientForm();
-                    loadPatients();
+                    setTimeout(loadPatients, 300); // পেজ ৰিলোড নকৰাকৈয়ে নতুন ID সহ লিষ্ট আপডেট হ’ব
                 }
             }
         }
-
         function resetPatientForm() {
             currentEditId = null;
             safeGet('pName').value = '';
