@@ -565,7 +565,7 @@
             if(btnSave) btnSave.innerText = 'ৰেকৰ্ড সংৰক্ষণ কৰক';
         }
 
-        // ৩. খৰচ (Expense) সংৰক্ষণ কৰাৰ ১০০% কাম কৰা সঠিক ফাংচন
+                // ৩. খৰচ (Expense) সংৰক্ষণ কৰাৰ ১০০% কাম কৰা সঠিক ফাংচন
         async function saveExpenseRecord() {
             const categoryEl = document.getElementById('expCategory');
             const amountEl = document.getElementById('expAmount');
@@ -576,16 +576,28 @@
             }
 
             const category = categoryEl ? categoryEl.value : 'Miscellaneous Expenses';
-            const amount = parseFloat(amountEl.value); // String-ক Number কৰা হৈছে সুপাবেচৰ বাবে
+            const amount = parseFloat(amountEl.value);
             const description = descEl ? descEl.value.trim() : '';
 
             if (isNaN(amount) || amount <= 0) {
                 return alert('অনুগ্ৰহ কৰি সঠিক টকাৰ পৰিমাণ লিখক।');
             }
 
+            // ✅ লগইন কৰা ব্যৱহাৰকাৰীৰ ID লওক
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            
+            if (!user) {
+                return alert('অনুগ্ৰহ কৰি প্ৰথমে লগইন কৰক।');
+            }
+
             const { error } = await supabaseClient
                 .from('clinic_expenses')
-                .insert([{ category, amount, description }]);
+                .insert([{ 
+                    category, 
+                    amount, 
+                    description,
+                    user_id: user.id   // ✅ এইটো নতুনকৈ যোগ কৰা হৈছে
+                }]);
 
             if (error) {
                 alert('খৰচ সংৰক্ষণ কৰিব পৰা নগ’ল: ' + error.message);
@@ -593,7 +605,7 @@
                 alert('দৈনিক খৰচ সফলতাৰে সংৰক্ষণ কৰা হৈছে।');
                 if (amountEl) amountEl.value = '';
                 if (descEl) descEl.value = '';
-                loadExpenses(); // খৰচৰ তালিকা আৰু ৰিপৰ্ট ৰিফ্ৰেছ কৰিবলৈ
+                loadExpenses();
             }
         }
 
