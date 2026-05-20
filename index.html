@@ -252,7 +252,6 @@
                         console.log('Share canceled or failed');
                     }
                 } else {
-                    // Fallback logic for desktops
                     try {
                         await navigator.clipboard.writeText(window.location.href);
                         alert('লিংক সফলতাৰে কপি কৰা হৈছে! আপুনি এতিয়া যিকোনো ঠাইত share কৰিব পাৰিব।');
@@ -432,8 +431,6 @@
             btnReminder.onclick = () => sendMedicineReminder(p);
             actions.append(btnPrint, btnWA, btnReminder);
 
-            
-            // ডক্টৰ প্ৰফাইল হ’লে ডিলিট আৰু এডিট বুটাম যোগ কৰা হ’ব
             if (isDoctor) {
                 const btnEdit = document.createElement('button');
                 btnEdit.className = 'bg-blue-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold';
@@ -453,35 +450,25 @@
         }
 
        async function deletePatientRecord(id) {
-            // 🔍 পৰীক্ষা কৰিবলৈ এই লাইনটো যোগ কৰক
-            alert("ডিলিট বুটাম কাম কৰিছে! ৰোগীৰ ID হ'ল: " + id); 
-
             if (!id) {
                 return alert('ভুল হৈছে: ৰোগীৰ ID পোৱা নগ’ল!');
             }
-            // ...বাকী থকা ক’ডখিনি একেই থাকিব...
-
             if (!confirm('আপুনি সঁচাকৈয়ে এই ৰেকৰ্ডটো চিৰদিনৰ বাবে মচি পেলাব বিচাৰে নে?')) {
                 return;
             }
-
-            // সুপাবেচলৈ ডিলিট কমাণ্ড পঠিওৱা হৈছে
             const { error } = await supabaseClient
                 .from('clinic_data')
                 .delete()
                 .eq('id', id);
 
             if (error) {
-                // যদি ডাটাবেচে ডিলিট কৰিবলৈ দিয়া নাই, এতিয়া ইয়াতে আচল ইৰৰটো ওলাই পৰিব
                 alert('ডাটাবেচে ডিলিট কৰিবলৈ দিয়া নাই: ' + error.message);
             } else {
                 alert('ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হ’ল।');
-                // লিষ্টখন লগে লগে ৰিফ্ৰেছ কৰিবলৈ
                 setTimeout(loadPatients, 300);
             }
         }
         
-        // ৰোগীৰ ৰেকৰ্ড এডিট কৰাৰ বাবে ফৰ্মলৈ ডাটা অনা
         function editPatientRecord(p) {
             currentEditId = p.id;
             safeGet('pName').value = p.name || '';
@@ -501,7 +488,6 @@
             document.getElementById('prescriptionEntrySection')?.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // নতুন ৰোগী যোগ কৰা আৰু পুৰণি ৰোগীৰ ডাটা আপডেট কৰা ১০০% সঠিক ফাংচন
         async function savePatientRecord() {
             const name = safeGet('pName').value.trim();
             const age = safeGet('pAgeSex').value.trim();
@@ -518,7 +504,6 @@
             const patientData = { name, age, bp, phone, history, medicine, fees };
 
             if (currentEditId) {
-                // ডাটা আপডেট কৰা লজিক (Update Logic)
                 const { error } = await supabaseClient
                     .from('clinic_data')
                     .update(patientData)
@@ -529,22 +514,19 @@
                 } else {
                     alert('ৰোগীৰ তথ্য সফলতাৰে আপডেট কৰা হৈছে।');
                     resetPatientForm();
-                    setTimeout(loadPatients, 300); // ডাটা ৰিফ্ৰেছ হ’বলৈ ৩০০ মিল চেকেণ্ড সময় দিয়া হৈছে
+                    setTimeout(loadPatients, 300);
                 }
             } else {
-                // নতুন ডাটা সংৰক্ষণ লজিক (Insert Logic)
-                // ইয়াতে .select() ব্যৱহাৰ কৰা হৈছে যাতে সুপাবেচে লগে লগে নতুন ID টো এপ্পক দি দিয়ে
-                const { data, error } = await supabaseClient
+                const { error } = await supabaseClient
                     .from('clinic_data')
-                    .insert([patientData])
-                    .select(); 
+                    .insert([patientData]);
 
                 if (error) {
                     alert('সংৰক্ষণ কৰিব পৰা নগ’ল: ' + error.message);
                 } else {
                     alert('নতুন ৰোগীৰ ৰেকৰ্ড সফলতাৰে সংৰক্ষণ কৰা হৈছে।');
                     resetPatientForm();
-                    setTimeout(loadPatients, 300); // পেজ ৰিলোড নকৰাকৈয়ে নতুন ID সহ লিষ্ট আপডেট হ’ব
+                    setTimeout(loadPatients, 300);
                 }
             }
         }
@@ -565,7 +547,6 @@
             if(btnSave) btnSave.innerText = 'ৰেকৰ্ড সংৰক্ষণ কৰক';
         }
 
-        // ৩. খৰচ (Expense) সংৰক্ষণ কৰাৰ ১০০% কাম কৰা সঠিক ফাংচন
         async function saveExpenseRecord() {
             const categoryEl = document.getElementById('expCategory');
             const amountEl = document.getElementById('expAmount');
@@ -576,7 +557,7 @@
             }
 
             const category = categoryEl ? categoryEl.value : 'Miscellaneous Expenses';
-            const amount = parseFloat(amountEl.value); // String-ক Number কৰা হৈছে সুপাবেচৰ বাবে
+            const amount = parseFloat(amountEl.value);
             const description = descEl ? descEl.value.trim() : '';
 
             if (isNaN(amount) || amount <= 0) {
@@ -593,20 +574,17 @@
                 alert('দৈনিক খৰচ সফলতাৰে সংৰক্ষণ কৰা হৈছে।');
                 if (amountEl) amountEl.value = '';
                 if (descEl) descEl.value = '';
-                loadExpenses(); // খৰচৰ তালিকা আৰু ৰিপৰ্ট ৰিফ্ৰেছ কৰিবলৈ
+                loadExpenses();
             }
         }
 
-        // ৪. খৰচৰ তালিকা আৰু আয়-ব্যয় প্ৰতিবেদন লোড কৰা ফাংচন
+        // ✅ এয়া হৈছে সলনি কৰা loadExpenses ফাংচন - য'ত ডক্তৰে ডিলিট কৰিব পাৰে
         async function loadExpenses() {
-            // প্ৰথমে খৰচৰ তালিকা অনা
             const { data: expenses, error: expErr } = await supabaseClient.from('clinic_expenses').select('*').order('created_at', { ascending: false });
-            // ভিজিত ফীজৰ পৰা হোৱা সৰ্বমুঠ আয় গণনা কৰিবলৈ ৰোগীৰ তালিকা লোড কৰা
             const { data: patients, error: patErr } = await supabaseClient.from('clinic_data').select('fees');
 
             if (expErr) return console.log('Expenses load failed');
 
-            // আয় আৰু ব্যয়ৰ হিচাপ উলিওৱা
             let totalIncome = 0;
             if (patients) {
                 totalIncome = patients.reduce((sum, p) => sum + (parseFloat(p.fees) || 0), 0);
@@ -619,7 +597,6 @@
 
             let netProfit = totalIncome - totalExpense;
 
-            // ৰিপৰ্ট দেখুওৱা
             const summaryText = document.getElementById('expenseSummaryText');
             if (summaryText) {
                 summaryText.innerHTML = `
@@ -631,7 +608,6 @@
                 `;
             }
 
-            // খৰচৰ তালিকাখন HTML ত দেখুওৱা
             const container = document.getElementById('listExpenses');
             if (!container) return;
             if (!expenses || expenses.length === 0) {
@@ -639,20 +615,40 @@
                 return;
             }
 
+            // ✅ ইয়াত ডক্তৰ হলে ডিলিট বুটাম যোগ কৰা হৈছে
             container.innerHTML = expenses.map(e => `
                 <div class="p-3 border rounded-xl bg-white flex justify-between items-center shadow-sm text-xs">
-                    <div>
+                    <div class="flex-1">
                         <span class="font-bold text-gray-800 bg-gray-100 px-2 py-0.5 rounded">${escapeHTML(e.category)}</span>
                         <p class="text-gray-500 mt-1">${escapeHTML(e.description || 'বিৱৰণ নাই')}</p>
                     </div>
-                    <div class="text-right">
+                    <div class="text-right flex items-center gap-2">
                         <span class="font-bold text-red-600 text-sm">₹${e.amount}</span>
+                        ${isDoctor ? `<button onclick="deleteExpense('${e.id}')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-lg text-xs"><i class="fas fa-trash"></i> মচক</button>` : ''}
                     </div>
                 </div>
             `).join('');
         }
 
-        // ৫. চাৰ্ছ বক্সৰ ফিল্টাৰ লজিক
+        // ✅ ডিলিট ফাংচন যোগ কৰা হৈছে
+        async function deleteExpense(expenseId) {
+            if (!confirm('আপুনি সঁচাকৈয়ে এই খৰচটো মচি পেলাব বিচাৰে নে?')) {
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('clinic_expenses')
+                .delete()
+                .eq('id', expenseId);
+
+            if (error) {
+                alert('খৰচ মচিব পৰা নগ’ল: ' + error.message);
+            } else {
+                alert('খৰচ সফলতাৰে মচি পেলোৱা হৈছে।');
+                loadExpenses();
+            }
+        }
+
         function filterPatients() {
             const query = safeGet('searchBox').value.toLowerCase().trim();
             const container = document.getElementById('listPatients');
@@ -669,7 +665,6 @@
             }
         }
 
-        // প্ৰেচক্ৰিপচন প্ৰিণ্ট কৰা সৰল ব্যৱস্থা
         function printPrescription(p) {
             const printArea = document.getElementById('printArea');
             if (!printArea) return;
@@ -690,7 +685,6 @@
             window.print();
         }
 
-    // ১. ৱাটছএপলৈ প্ৰেচক্ৰিপচন পঠোৱাৰ ফাংচন (লিংকসহ)
         function sendWhatsAppRx(p) {
             if(!p.phone) return alert('মোবাইল নম্বৰ নাই।');
             
@@ -708,7 +702,6 @@
             window.open(`https://api.whatsapp.com/send?phone=91${p.phone.replace(/\D/g, '')}&text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        // ২. ঔষধ খোৱাৰ ৰিমাইণ্ডাৰ পঠোৱাৰ ফাংচন (লিংকসহ)
         function sendMedicineReminder(p) {
             if(!p.phone) return alert('মোবাইল নম্বৰ নাই।');
             
@@ -725,19 +718,15 @@
             window.open(`https://api.whatsapp.com/send?phone=91${p.phone.replace(/\D/g, '')}&text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        // টেব নেভিগেচন লজিক (Tabs Navigation)
         function setupTabs() {
             const buttons = document.querySelectorAll('.tab-btn');
             buttons.forEach(btn => {
                 btn.addEventListener('click', () => {
                     const targetTab = btn.getAttribute('data-tab');
                     
-                    // সকলো টেব কণ্টেণ্ট লুকুওৱা
                     document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
-                    // নিৰ্দিষ্ট টেবটো দেখুওৱা
                     document.getElementById(`tab-${targetTab}`)?.classList.remove('hidden');
 
-                    // বুটামৰ এক্টিভ ক্লাচ সলনি কৰা
                     buttons.forEach(b => {
                         b.classList.remove('text-slate-900', 'border-b-2', 'border-slate-900');
                         b.classList.add('text-gray-400');
@@ -748,7 +737,6 @@
             });
         }
 
-        // HTML সুৰক্ষিত কৰিবলৈ (XSS Security)
         function escapeHTML(str) {
             if (!str) return '';
             return str.replace(/[&<>'"]/g, 
