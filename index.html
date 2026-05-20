@@ -132,7 +132,7 @@
             <div id="tab-home" class="tab-content space-y-4">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
                     <div class="relative">
-                        <input type="text" id="searchBox" placeholder="  🔍  নাম বা মোবাইল নম্বৰেৰে ৰোগী সন্ধান কৰক..." class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm focus:outline-none focus:border-slate-500 shadow-inner">
+                        <input type="text" id="searchBox" placeholder="    নাম বা মোবাইল নম্বৰেৰে ৰোগী সন্ধান কৰক..." class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm focus:outline-none focus:border-slate-500 shadow-inner">
                     </div>
                     <button id="btnScrollToEntry" class="w-full mt-3 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl shadow transition text-center block text-sm">
                         <i class="fas fa-user-plus mr-2"></i> নতুন ৰোগী সংযোগ কৰক
@@ -412,7 +412,7 @@
             card.innerHTML = `<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <div>
                     <h4 class="text-base font-bold text-slate-900">${escapeHTML(p.name)} <span class="text-xs font-normal text-gray-500">(${escapeHTML(p.age || 'N/A')})</span></h4>
-                    <p class="text-xs text-gray-600 mt-0.5">  📞  ${escapeHTML(p.phone)} |  🩺  BP: ${escapeHTML(p.bp || 'N/A')} | 💰  Fees: ₹${p.fees || 0}</p>
+                    <p class="text-xs text-gray-600 mt-0.5">    ${escapeHTML(p.phone)} |  🩺  BP: ${escapeHTML(p.bp || 'N/A')} | 💰  Fees: ₹${p.fees || 0}</p>
                     <p class="text-xs text-gray-500 mt-1"><b>History:</b> ${escapeHTML(p.history || 'None')}</p>
                 </div>
             </div>`;
@@ -541,8 +541,8 @@
                 if(sEl) {
                     sEl.innerHTML = `
                         <div class="grid grid-cols-2 gap-2 border-b pb-2 mb-2 text-xs font-semibold">
-                            <div class="text-emerald-600"> 💵  সৰ্বমুঠ আয়: ₹${totalIncome}</div>
-                            <div class="text-red-600"> 📉  সৰ্বমুঠ খৰচ: ₹${totalExpense}</div>
+                            <div class="text-emerald-600">   সৰ্বমুঠ আয়: ₹${totalIncome}</div>
+                            <div class="text-red-600">   সৰ্বমুঠ খৰচ: ₹${totalExpense}</div>
                         </div>
                         <div class="p-2 rounded-lg bg-slate-50 border text-center text-xs font-bold mb-2">
                             হিচাপৰ নাটনি/লাভ: <span class="${balanceClass}">₹${netBalance}</span>
