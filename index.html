@@ -450,26 +450,31 @@
             return card;
         }
 
-        // ৰোগীৰ ৰেকৰ্ড ডিলিট কৰা ফাংচন (ডক্টৰ মোডত কাম কৰিব)
+        // ৰোগীৰ ৰেকৰ্ড ডিলিট কৰা সঠিক ফাংচন
         async function deletePatientRecord(id) {
             if (!id) {
-                return alert('এই ৰোগীৰ আইডি (ID) বিচাৰি পোৱা নাই।');
+                return alert('ভুল হৈছে: ৰোগীৰ ID পোৱা নগ’ল!');
             }
-            if (!confirm('আপুনি সঁচাকৈয়ে এই ৰোগীৰ ৰেকৰ্ডটো ডাটাবেচৰ পৰা মচি পেলাব বিচাৰিছেনে?')) return;
 
+            if (!confirm('আপুনি সঁচাকৈয়ে এই ৰেকৰ্ডটো চিৰদিনৰ বাবে মচি পেলাব বিচাৰে নে?')) {
+                return;
+            }
+
+            // সুপাবেচ ডিলিট কমাণ্ড
             const { error } = await supabaseClient
                 .from('clinic_data')
                 .delete()
                 .eq('id', id);
 
             if (error) {
-                alert('মচি পেলোৱা সম্ভৱ নহ’ল: ' + error.message);
+                // যদি ডাটাবেচে ডিলিট কৰিবলৈ দিয়া নাই, তেন্তে আচল ইৰৰটো ইয়াত ওলাই পৰিব
+                alert('ডাটাবেচৰ পৰা মচিব পৰা নগ’ল: ' + error.message);
             } else {
-                alert('ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হৈছে।');
-                loadPatients(); // তালিকাখন ৰিফ্ৰেছ কৰিবলৈ
+                alert('ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হ’ল।');
+                // তালিকাখন লগে লগে আপডেট কৰিবলৈ
+                setTimeout(loadPatients, 300);
             }
         }
-
         // ৰোগীৰ ৰেকৰ্ড এডিট কৰাৰ বাবে ফৰ্মলৈ ডাটা অনা
         function editPatientRecord(p) {
             currentEditId = p.id;
