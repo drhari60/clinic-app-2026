@@ -629,7 +629,7 @@ async function deleteExpense(expenseId) {
         }
 
         // ৪. খৰচৰ তালিকা আৰু আয়-ব্যয় প্ৰতিবেদন লোড কৰা ফাংচন
-        async function loadExpenses() {
+                async function loadExpenses() {
             // প্ৰথমে খৰচৰ তালিকা অনা
             const { data: expenses, error: expErr } = await supabaseClient.from('clinic_expenses').select('*').order('created_at', { ascending: false });
             // ভিজিত ফীজৰ পৰা হোৱা সৰ্বমুঠ আয় গণনা কৰিবলৈ ৰোগীৰ তালিকা লোড কৰা
@@ -670,20 +670,20 @@ async function deleteExpense(expenseId) {
                 return;
             }
 
+            // ✅ এই অংশত delete বুটাম যোগ কৰা হৈছে
             container.innerHTML = expenses.map(e => `
-    <div class="p-3 border rounded-xl bg-white flex justify-between items-center shadow-sm text-xs" id="expense-${e.id}">
-        <div class="flex-1">
-            <span class="font-bold text-gray-800 bg-gray-100 px-2 py-0.5 rounded">${escapeHTML(e.category)}</span>
-            <p class="text-gray-500 mt-1">${escapeHTML(e.description || 'বিৱৰণ নাই')}</p>
-        </div>
-        <div class="text-right flex items-center gap-2">
-            <span class="font-bold text-red-600 text-sm">₹${e.amount}</span>
-            ${isDoctor ? `<button onclick="deleteExpense('${e.id}')" class="bg-red-500...">মচক</button>` : ''}</i> মচক</button>` : ''}
-        </div>
-    </div>
-`).join('');
+                <div class="p-3 border rounded-xl bg-white flex justify-between items-center shadow-sm text-xs">
+                    <div class="flex-1">
+                        <span class="font-bold text-gray-800 bg-gray-100 px-2 py-0.5 rounded">${escapeHTML(e.category)}</span>
+                        <p class="text-gray-500 mt-1">${escapeHTML(e.description || 'বিৱৰণ নাই')}</p>
+                    </div>
+                    <div class="text-right flex items-center gap-2">
+                        <span class="font-bold text-red-600 text-sm">₹${e.amount}</span>
+                        ${isDoctor ? `<button onclick="deleteExpense('${e.id}')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-lg text-xs"><i class="fas fa-trash"></i> মচক</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
         }
-
         // ৫. চাৰ্ছ বক্সৰ ফিল্টাৰ লজিক
         function filterPatients() {
             const query = safeGet('searchBox').value.toLowerCase().trim();
