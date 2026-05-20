@@ -532,14 +532,23 @@
                         const card = document.createElement('div');
                         card.className = 'grid grid-cols-4 items-center text-xs hover:bg-slate-50 transition';
                         let actionBtn = isDoctor ? `<button class="text-red-400 hover:text-red-600" onclick="deleteExpenseRecord('${e.id}')"><i class="fas fa-trash"></i></button>` : '';
-                        card.innerHTML = `<div>
-                            <span class="font-bold text-red-700">[${escapeHTML(e.category)}]</span>
-                            <p class="text-gray-500 mt-0.5">${escapeHTML(e.description || 'No details')}</p>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="font-bold text-gray-900">₹${e.amount}</span>
-                            ${actionBtn}
-                        </div>`;
+                       card.innerHTML = `
+    <div class="p-3 font-semibold text-red-700 border-r">
+        ${escapeHTML(e.category)}
+    </div>
+
+    <div class="p-3 text-gray-600 border-r break-words">
+        ${escapeHTML(e.description || 'No details')}
+    </div>
+
+    <div class="p-3 text-center font-bold text-slate-900 border-r">
+        ₹${e.amount}
+    </div>
+
+    <div class="p-3 flex justify-center">
+        ${actionBtn}
+    </div>
+`;
                         container.appendChild(card);
                     });
                 }
