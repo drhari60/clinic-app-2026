@@ -132,10 +132,10 @@
             <div id="tab-home" class="tab-content space-y-4">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
                     <div class="relative">
-                        <input type="text" id="searchBox" placeholder="    নাম বা মোবাইল নম্বৰেৰে ৰোগী সন্ধান কৰক..." class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm focus:outline-none focus:border-slate-500 shadow-inner">
+                        <input type="text" id="searchBox" placeholder="নাম বা মোবাইল নম্বৰেৰে ৰোগী সন্ধান কৰক..." class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm focus:outline-none focus:border-slate-500 shadow-inner">
                     </div>
                     <button id="btnScrollToEntry" class="w-full mt-3 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl shadow transition text-center block text-sm">
-                        <i class="fas fa-user-plus mr-2"></i> নতুন ৰোগী সংযোগ কৰক
+                        <i class="fas fa-user-plus mr-2"></i> নতুন ৰোগী যোগ কৰক
                     </button>
                 </div>
                 <div id="listPatients" class="space-y-3"></div>
@@ -173,25 +173,30 @@
                 </div>
 
                 <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm space-y-2">
-                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider border-b pb-1.5 flex items-center gap-1"><i class="fas fa-chart-pie text-slate-700"></i> ক্লিিনকৰ আয়-ব্যয় প্ৰতিবেদন</h4>
+                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider border-b pb-1.5 flex items-center gap-1"><i class="fas fa-chart-pie text-slate-700"></i> ক্লিনিকৰ আয়-ব্যয় প্ৰতিবেদন</h4>
                     <div id="expenseSummaryText" class="text-xs space-y-1.5 text-gray-700">হিচাপ লোড হৈ আছে...</div>
                 </div>
                 <div id="listExpenses" class="space-y-2"></div>
             </div>
 
-            <div id="prescriptionEntrySection" class="mt-6 bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-                <h3 id="formTitle" class="text-sm font-bold text-slate-900 border-b border-gray-100 pb-2 flex items-center gap-1.5"><i class="fas fa-file-medical text-slate-700"></i> নতুন ৰোগীৰ প্ৰেচক্ৰিপচন এণ্ট্ৰী চেকচন</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <input type="text" id="pName" placeholder="ৰোগীৰ নাম" class="p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
-                    <input type="text" id="pAgeSex" placeholder="বয়স / লিংগ" class="p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
-                    <input type="text" id="pBP" placeholder="ৰক্তচাপ (BP)" class="p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
-                    <input type="text" id="pPhone" placeholder="ম'বাইল নম্বৰ" class="p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+            <!-- ✅ নতুন ৰোগী যোগ কৰাৰ Modal ফৰ্ম (hidden initially) -->
+            <div id="patientModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+                <div class="bg-white rounded-xl p-5 w-full max-w-md">
+                    <h3 id="modalTitle" class="font-bold text-lg mb-3">➕ নতুন ৰোগী</h3>
+                    <input type="text" id="pName" placeholder="ৰোগীৰ নাম *" class="w-full p-2 border rounded-lg mb-2">
+                    <input type="text" id="pAgeSex" placeholder="বয়স / লিংগ" class="w-full p-2 border rounded-lg mb-2">
+                    <input type="text" id="pBP" placeholder="ৰক্তচাপ (BP)" class="w-full p-2 border rounded-lg mb-2">
+                    <input type="text" id="pPhone" placeholder="ম'বাইল নম্বৰ *" class="w-full p-2 border rounded-lg mb-2">
+                    <textarea id="pHistory" placeholder="ৰোগৰ ইতিবৃত্ত (Case History)" class="w-full p-2 border rounded-lg mb-2 h-20 resize-none"></textarea>
+                    <textarea id="pMedicine" placeholder="ঔষধৰ নাম আৰু ব্যৱহাৰৰ নিয়ম (Rx)" class="w-full p-2 border rounded-lg mb-2 h-24 resize-none"></textarea>
+                    <input type="number" id="pFees" placeholder="ভিজিট ফীজ (₹)" class="w-full p-2 border rounded-lg mb-3">
+                    <div class="flex gap-2">
+                        <button id="savePatientBtn" class="flex-1 bg-emerald-600 text-white py-2 rounded-lg font-medium">সংৰক্ষণ</button>
+                        <button id="closeModalBtn" class="flex-1 bg-gray-300 py-2 rounded-lg">বন্ধ</button>
+                    </div>
                 </div>
-                <textarea id="pHistory" placeholder="ৰোগৰ ইতিবৃত্ত (Case History)" class="w-full p-3 border border-gray-200 rounded-xl h-20 text-sm focus:outline-none shadow-inner resize-none"></textarea>
-                <textarea id="pMedicine" placeholder="ঔষধৰ নাম আৰু ব্যৱহাৰৰ নিয়ম (Rx)" class="w-full p-3 border border-gray-200 rounded-xl h-28 text-sm focus:outline-none shadow-inner"></textarea>
-                <input type="number" id="pFees" placeholder="ভিジット ফীজ (Fees ₹)" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
-                <button id="btnSavePatient" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition text-sm">ৰেকৰ্ড সংৰক্ষণ কৰক</button>
             </div>
+            
         </div>
 
         <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-gray-200 shadow-xl px-4 py-2 flex justify-between items-center z-50 max-w-4xl mx-auto rounded-t-2xl">
@@ -239,7 +244,6 @@
                 console.log('Auth error bypassed');
             }
 
-            // SHARE BUTTON LOGIC
             document.getElementById('btnShareApp')?.addEventListener('click', async () => {
                 if (navigator.share) {
                     try {
@@ -295,13 +299,15 @@
             }
             document.getElementById('btnStaffLogin')?.addEventListener('click', handleLogin);
             document.getElementById('btnSubmitBooking')?.addEventListener('click', submitBooking);
-            document.getElementById('btnSavePatient')?.addEventListener('click', savePatientRecord);
             document.getElementById('btnSaveExpense')?.addEventListener('click', saveExpenseRecord);
             document.getElementById('btnLogout')?.addEventListener('click', handleLogout);
             document.getElementById('searchBox')?.addEventListener('keyup', filterPatients);
-            document.getElementById('btnScrollToEntry')?.addEventListener('click', () => {
-                document.getElementById('prescriptionEntrySection')?.scrollIntoView({ behavior: 'smooth' });
-            });
+            
+            // নতুন ৰোগী যোগ কৰাৰ বুটাম ইভেণ্ট
+            document.getElementById('btnScrollToEntry')?.addEventListener('click', openAddPatientModal);
+            document.getElementById('savePatientBtn')?.addEventListener('click', savePatientRecord);
+            document.getElementById('closeModalBtn')?.addEventListener('click', closePatientModal);
+            
             startHealthTipsRotation();
             setupTabs();
         });
@@ -317,6 +323,24 @@
                     : 'text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider';
             }
         }
+        
+        function openAddPatientModal() {
+            currentEditId = null;
+            document.getElementById('modalTitle').innerHTML = '➕ নতুন ৰোগী';
+            document.getElementById('pName').value = '';
+            document.getElementById('pAgeSex').value = '';
+            document.getElementById('pBP').value = '';
+            document.getElementById('pPhone').value = '';
+            document.getElementById('pHistory').value = '';
+            document.getElementById('pMedicine').value = '';
+            document.getElementById('pFees').value = '';
+            document.getElementById('patientModal').classList.remove('hidden');
+        }
+        
+        function closePatientModal() {
+            document.getElementById('patientModal').classList.add('hidden');
+        }
+        
         function generateLiveQR() {
             const qrBadge = document.getElementById('qrBadge');
             if(qrBadge) qrBadge.innerText = `ফীজ: ₹${currentFee} (${selectedBookingType})`;
@@ -327,6 +351,7 @@
             const upiPayBtn = document.getElementById('upiPayBtn');
             if(upiPayBtn) upiPayBtn.href = upiPayload;
         }
+        
         function startHealthTipsRotation() {
             let index = 0;
             setInterval(() => {
@@ -339,6 +364,7 @@
                 }
             }, 5000);
         }
+        
         async function handleLogin() {
             const email = safeGet('loginEmail').value.trim();
             const password = safeGet('loginPassword').value.trim();
@@ -348,6 +374,7 @@
             await checkRole(email);
             showDashboard();
         }
+        
         function showDashboard() {
             safeGet('mainPatientSection').style.display = 'none';
             safeGet('appDashboard').classList.remove('hidden');
@@ -355,10 +382,12 @@
             loadBookings();
             loadExpenses();
         }
+        
         async function handleLogout() {
             await supabaseClient.auth.signOut();
             location.reload();
         }
+        
         async function submitBooking() {
             const name = safeGet('bName').value?.trim();
             const phone = safeGet('bPhone').value?.trim();
@@ -381,6 +410,7 @@
                 location.reload();
             }
         }
+        
         async function loadBookings() {
             const { data, error } = await supabaseClient.from('clinic_bookings').select('*').order('created_at', { ascending: false });
             if(error || !data) return;
@@ -397,6 +427,7 @@
                 </div>
             `).join('');
         }
+        
         async function loadPatients() {
             const { data, error } = await supabaseClient.from('clinic_data').select('*').order('created_at', { ascending: false });
             if (error || !data) return;
@@ -405,14 +436,16 @@
             container.innerHTML = '';
             data.forEach(p => container.appendChild(createPatientCard(p)));
         }
+        
         function createPatientCard(p) {
             const card = document.createElement('div');
             card.className = 'bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-3';
             card.innerHTML = `<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <div>
                     <h4 class="text-base font-bold text-slate-900">${escapeHTML(p.name)} <span class="text-xs font-normal text-gray-500">(${escapeHTML(p.age || 'N/A')})</span></h4>
-                    <p class="text-xs text-gray-600 mt-0.5">    ${escapeHTML(p.phone)} |  🩺  BP: ${escapeHTML(p.bp || 'N/A')} | 💰  Fees: ₹${p.fees || 0}</p>
+                    <p class="text-xs text-gray-600 mt-0.5">${escapeHTML(p.phone)} | 🩺 BP: ${escapeHTML(p.bp || 'N/A')} | 💰 Fees: ₹${p.fees || 0}</p>
                     <p class="text-xs text-gray-500 mt-1"><b>History:</b> ${escapeHTML(p.history || 'None')}</p>
+                    <p class="text-xs text-gray-600 mt-1"><b>Rx:</b> ${escapeHTML((p.medicine || '').slice(0, 80))}</p>
                 </div>
             </div>`;
             const actions = document.createElement('div');
@@ -427,7 +460,7 @@
             btnWA.onclick = () => sendWhatsAppRx(p);
             const btnReminder = document.createElement('button');
             btnReminder.className = 'bg-orange-500 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1';
-            btnReminder.innerHTML = '<i class="fas fa-clock"></i> Send Reminder';
+            btnReminder.innerHTML = '<i class="fas fa-clock"></i> Reminder';
             btnReminder.onclick = () => sendMedicineReminder(p);
             actions.append(btnPrint, btnWA, btnReminder);
 
@@ -449,7 +482,7 @@
             return card;
         }
 
-       async function deletePatientRecord(id) {
+        async function deletePatientRecord(id) {
             if (!id) {
                 return alert('ভুল হৈছে: ৰোগীৰ ID পোৱা নগ’ল!');
             }
@@ -465,43 +498,41 @@
                 alert('ডাটাবেচে ডিলিট কৰিবলৈ দিয়া নাই: ' + error.message);
             } else {
                 alert('ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হ’ল।');
-                setTimeout(loadPatients, 300);
+                loadPatients();
+                loadExpenses();
             }
         }
         
         function editPatientRecord(p) {
             currentEditId = p.id;
-            safeGet('pName').value = p.name || '';
-            safeGet('pAgeSex').value = p.age || '';
-            safeGet('pBP').value = p.bp || '';
-            safeGet('pPhone').value = p.phone || '';
-            safeGet('pHistory').value = p.history || '';
-            safeGet('pMedicine').value = p.medicine || '';
-            safeGet('pFees').value = p.fees || '';
-            
-            const formTitle = document.getElementById('formTitle');
-            if(formTitle) formTitle.innerHTML = '<i class="fas fa-edit text-blue-500"></i> ৰোগীৰ ৰেকৰ্ড আপডেট (Update) কৰক';
-            
-            const btnSave = document.getElementById('btnSavePatient');
-            if(btnSave) btnSave.innerText = 'তথ্য আপডেট কৰক';
-            
-            document.getElementById('prescriptionEntrySection')?.scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('modalTitle').innerHTML = '✏️ ৰোগীৰ তথ্য আপডেট কৰক';
+            document.getElementById('pName').value = p.name || '';
+            document.getElementById('pAgeSex').value = p.age || '';
+            document.getElementById('pBP').value = p.bp || '';
+            document.getElementById('pPhone').value = p.phone || '';
+            document.getElementById('pHistory').value = p.history || '';
+            document.getElementById('pMedicine').value = p.medicine || '';
+            document.getElementById('pFees').value = p.fees || 0;
+            document.getElementById('patientModal').classList.remove('hidden');
         }
 
         async function savePatientRecord() {
-            const name = safeGet('pName').value.trim();
-            const age = safeGet('pAgeSex').value.trim();
-            const bp = safeGet('pBP').value.trim();
-            const phone = safeGet('pPhone').value.trim();
-            const history = safeGet('pHistory').value.trim();
-            const medicine = safeGet('pMedicine').value.trim();
-            const fees = parseFloat(safeGet('pFees').value) || 0;
+            const name = document.getElementById('pName').value.trim();
+            const phone = document.getElementById('pPhone').value.trim();
 
             if (!name || !phone) {
                 return alert('অনুগ্ৰহ কৰি ৰোগীৰ নাম আৰু মোবাইল নম্বৰ নিশ্চিতভাৱে দিয়ক।');
             }
 
-            const patientData = { name, age, bp, phone, history, medicine, fees };
+            const patientData = { 
+                name, 
+                age: document.getElementById('pAgeSex').value,
+                bp: document.getElementById('pBP').value,
+                phone,
+                history: document.getElementById('pHistory').value,
+                medicine: document.getElementById('pMedicine').value,
+                fees: parseFloat(document.getElementById('pFees').value) || 0
+            };
 
             if (currentEditId) {
                 const { error } = await supabaseClient
@@ -513,8 +544,9 @@
                     alert('আপডেট ব্যৰ্থ হৈছে: ' + error.message);
                 } else {
                     alert('ৰোগীৰ তথ্য সফলতাৰে আপডেট কৰা হৈছে।');
-                    resetPatientForm();
-                    setTimeout(loadPatients, 300);
+                    closePatientModal();
+                    loadPatients();
+                    loadExpenses();
                 }
             } else {
                 const { error } = await supabaseClient
@@ -525,26 +557,11 @@
                     alert('সংৰক্ষণ কৰিব পৰা নগ’ল: ' + error.message);
                 } else {
                     alert('নতুন ৰোগীৰ ৰেকৰ্ড সফলতাৰে সংৰক্ষণ কৰা হৈছে।');
-                    resetPatientForm();
-                    setTimeout(loadPatients, 300);
+                    closePatientModal();
+                    loadPatients();
+                    loadExpenses();
                 }
             }
-        }
-        function resetPatientForm() {
-            currentEditId = null;
-            safeGet('pName').value = '';
-            safeGet('pAgeSex').value = '';
-            safeGet('pBP').value = '';
-            safeGet('pPhone').value = '';
-            safeGet('pHistory').value = '';
-            safeGet('pMedicine').value = '';
-            safeGet('pFees').value = '';
-            
-            const formTitle = document.getElementById('formTitle');
-            if(formTitle) formTitle.innerHTML = '<i class="fas fa-file-medical text-slate-700"></i> নতুন ৰোগীৰ প্ৰেচক্ৰিপচন এণ্ট্ৰী চেকচন';
-            
-            const btnSave = document.getElementById('btnSavePatient');
-            if(btnSave) btnSave.innerText = 'ৰেকৰ্ড সংৰক্ষণ কৰক';
         }
 
         async function saveExpenseRecord() {
@@ -578,7 +595,6 @@
             }
         }
 
-        // ✅ এয়া হৈছে সলনি কৰা loadExpenses ফাংচন - য'ত ডক্তৰে ডিলিট কৰিব পাৰে
         async function loadExpenses() {
             const { data: expenses, error: expErr } = await supabaseClient.from('clinic_expenses').select('*').order('created_at', { ascending: false });
             const { data: patients, error: patErr } = await supabaseClient.from('clinic_data').select('fees');
@@ -615,7 +631,6 @@
                 return;
             }
 
-            // ✅ ইয়াত ডক্তৰ হলে ডিলিট বুটাম যোগ কৰা হৈছে
             container.innerHTML = expenses.map(e => `
                 <div class="p-3 border rounded-xl bg-white flex justify-between items-center shadow-sm text-xs">
                     <div class="flex-1">
@@ -630,7 +645,6 @@
             `).join('');
         }
 
-        // ✅ ডিলিট ফাংচন যোগ কৰা হৈছে
         async function deleteExpense(expenseId) {
             if (!confirm('আপুনি সঁচাকৈয়ে এই খৰচটো মচি পেলাব বিচাৰে নে?')) {
                 return;
