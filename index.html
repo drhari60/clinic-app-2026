@@ -431,6 +431,8 @@
             btnReminder.innerHTML = '<i class="fas fa-clock"></i> Send Reminder';
             btnReminder.onclick = () => sendMedicineReminder(p);
             actions.append(btnPrint, btnWA, btnReminder);
+
+            
             // ডক্টৰ প্ৰফাইল হ’লে ডিলিট আৰু এডিট বুটাম যোগ কৰা হ’ব
             if (isDoctor) {
                 const btnEdit = document.createElement('button');
@@ -450,11 +452,14 @@
             return card;
         }
 
-       // ৰোগীৰ ৰেকৰ্ড ডিলিট কৰাৰ ১০০% সঠিক আৰু সুৰক্ষিত ফাংচন
-        async function deletePatientRecord(id) {
+       async function deletePatientRecord(id) {
+            // 🔍 পৰীক্ষা কৰিবলৈ এই লাইনটো যোগ কৰক
+            alert("ডিলিট বুটাম কাম কৰিছে! ৰোগীৰ ID হ'ল: " + id); 
+
             if (!id) {
                 return alert('ভুল হৈছে: ৰোগীৰ ID পোৱা নগ’ল!');
             }
+            // ...বাকী থকা ক’ডখিনি একেই থাকিব...
 
             if (!confirm('আপুনি সঁচাকৈয়ে এই ৰেকৰ্ডটো চিৰদিনৰ বাবে মচি পেলাব বিচাৰে নে?')) {
                 return;
