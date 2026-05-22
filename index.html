@@ -866,30 +866,37 @@ async function loadExpenses() {
 
             </div>
 
-            <div class="col-span-2 flex justify-end gap-1">
+           <div class="col-span-2 flex justify-end gap-1">
 
-                <button
-                    onclick="editExpense('${e.id}','${e.category}','${e.amount}','${(e.description || '').replace(/'/g, "\\'")}')"
+    ${isDoctor ? `
 
-                    class="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition">
+    <button
+        onclick="editExpense('${e.id}','${e.category}','${e.amount}','${(e.description || '').replace(/'/g, "\\'")}')"
 
-                    <i class="fas fa-pen text-[10px]"></i>
+        class="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition">
 
-                </button>
+        <i class="fas fa-pen text-[10px]"></i>
 
-                <button
-                    onclick="deleteExpense('${e.id}')"
+    </button>
 
-                    class="w-8 h-8 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 transition">
+    <button
+        onclick="deleteExpense('${e.id}')"
 
-                    <i class="fas fa-trash text-[10px]"></i>
+        class="w-8 h-8 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 transition">
 
-                </button>
+        <i class="fas fa-trash text-[10px]"></i>
 
-            </div>
+    </button>
 
-        </div>
+    ` : `
 
+    <span class="text-[10px] text-gray-300 font-bold">
+        ---
+    </span>
+
+    `}
+
+</div>
     `).join('');
 }
 
