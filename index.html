@@ -563,7 +563,7 @@ async function savePatientRecord() {
             .insert([patientData]);
 
         if (error) {
-            alert('সংৰক্ষণ কৰিব পৰা নগ'ল: ' + error.message);
+           alert("সংৰক্ষণ কৰিব পৰা নগ'ল: " + error.message);
         } else {
             // Automatically fees track কৰক
             if (fees > 0) {
