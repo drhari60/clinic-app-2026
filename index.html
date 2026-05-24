@@ -582,26 +582,42 @@ if (reportMonthEl) reportMonthEl.value = new Date().getMonth();
             return card;
         }
 
-        async function deletePatientRecord(id) {
-            if (!id) {
-                return alert('ভুল হৈছে: ৰোগীৰ ID পোৱা নগ’ল!');
-            }
-            if (!confirm('আপুনি সঁচাকৈয়ে এই ৰেকৰ্ডটো চিৰদিনৰ বাবে মচি পেলাব বিচাৰে নে?')) {
-                return;
-            }
-            const { error } = await supabaseClient
-                .from('clinic_data')
-                .delete()
-                .eq('id', id);
+async function deletePatientRecord(id) {
+    if (!id) {
+        return alert('ভুল হৈছে: ৰোগীৰ ID পোৱা নগ'ল!');
+    }
+    if (!confirm('আপুনি সঁচাকৈয়ে এই ৰেকৰ্ডটো চিৰদিনৰ বাবে মচি পেলাব বিচাৰে নে?')) {
+        return;
+    }
 
-            if (error) {
-                alert('ডাটাবেচে ডিলিট কৰিবলৈ দিয়া নাই: ' + error.message);
-            } else {
-                alert('ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হ’ল।');
-                loadPatients();
-                loadExpenses();
-            }
+    // আগতে patient-ৰ নাম লওক
+    const { data: patientData } = await supabaseClient
+        .from('clinic_data')
+        .select('name')
+        .eq('id', id)
+        .single();
+
+    // clinic_data ৰ পৰা মচক
+    const { error } = await supabaseClient
+        .from('clinic_data')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        alert('ডাটাবেচে ডিলিট কৰিবলৈ দিয়া নাই: ' + error.message);
+    } else {
+        // clinic_payments ৰ পৰাও মচক
+        if (patientData?.name) {
+            await supabaseClient
+                .from('clinic_payments')
+                .delete()
+                .eq('patient_name', patientData.name);
         }
+        alert("ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হ'ল।");
+        loadPatients();
+        loadExpenses();
+    }
+}
         
         function editPatientRecord(p) {
             currentEditId = p.id;
