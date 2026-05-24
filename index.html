@@ -741,21 +741,22 @@ async function loadExpenses() {
             }
         }
 
-        function filterPatients() {
-            const query = safeGet('searchBox').value.toLowerCase().trim();
-            const container = document.getElementById('listPatients');
-            if (!container) return;
-            const cards = container.getElementsByClassName('bg-white');
-            
-            for (let i = 0; i < cards.length; i++) {
-                const text = cards[i].innerText.toLowerCase();
-                if (text.includes(query)) {
-                    cards[i].style.display = "";
-                } else {
-                    cards[i].style.display = "none";
-                }
-            }
+  function filterPatients() {
+    const query = safeGet('searchBox').value.toLowerCase().trim();
+    const container = document.getElementById('listPatients');
+    if (!container) return;
+    
+    const cards = container.querySelectorAll('.bg-white.p-4.rounded-xl');
+    
+    cards.forEach(card => {
+        const text = card.innerText.toLowerCase();
+        if (text.includes(query)) {
+            card.style.display = "";
+        } else {
+            card.style.display = "none";
         }
+    });
+}
 
         function printPrescription(p) {
             const printArea = document.getElementById('printArea');
