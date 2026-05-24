@@ -515,54 +515,69 @@
             document.getElementById('pFees').value = p.fees || 0;
             document.getElementById('patientModal').classList.remove('hidden');
         }
+async function savePatientRecord() {
+    const name = document.getElementById('pName').value.trim();
+    const phone = document.getElementById('pPhone').value.trim();
 
-        async function savePatientRecord() {
-            const name = document.getElementById('pName').value.trim();
-            const phone = document.getElementById('pPhone').value.trim();
+    if (!name || !phone) {
+        return alert('অনুগ্ৰহ কৰি ৰোগীৰ নাম আৰু মোবাইল নম্বৰ দিয়ক।');
+    }
 
-            if (!name || !phone) {
-                return alert('অনুগ্ৰহ কৰি ৰোগীৰ নাম আৰু মোবাইল নম্বৰ নিশ্চিতভাৱে দিয়ক।');
+    const fees = parseFloat(document.getElementById('pFees').value) || 0;
+
+    const patientData = {
+        name,
+        age: document.getElementById('pAgeSex').value,
+        bp: document.getElementById('pBP').value,
+        phone,
+        history: document.getElementById('pHistory').value,
+        medicine: document.getElementById('pMedicine').value,
+        fees
+    };
+
+    if (currentEditId) {
+        // Edit কৰোঁতে
+        const { error } = await supabaseClient
+            .from('clinic_data')
+            .update(patientData)
+            .eq('id', currentEditId);
+
+        if (error) {
+            alert('আপডেট ব্যৰ্থ হৈছে: ' + error.message);
+        } else {
+            // Edit কৰোঁতে fees track কৰক
+            if (fees > 0) {
+                await supabaseClient
+                    .from('clinic_payments')
+                    .insert([{ patient_name: name, fees }]);
             }
-
-            const patientData = { 
-                name, 
-                age: document.getElementById('pAgeSex').value,
-                bp: document.getElementById('pBP').value,
-                phone,
-                history: document.getElementById('pHistory').value,
-                medicine: document.getElementById('pMedicine').value,
-                fees: parseFloat(document.getElementById('pFees').value) || 0
-            };
-
-            if (currentEditId) {
-                const { error } = await supabaseClient
-                    .from('clinic_data')
-                    .update(patientData)
-                    .eq('id', currentEditId);
-
-                if (error) {
-                    alert('আপডেট ব্যৰ্থ হৈছে: ' + error.message);
-                } else {
-                    alert('ৰোগীৰ তথ্য সফলতাৰে আপডেট কৰা হৈছে।');
-                    closePatientModal();
-                    loadPatients();
-                    loadExpenses();
-                }
-            } else {
-                const { error } = await supabaseClient
-                    .from('clinic_data')
-                    .insert([patientData]);
-
-                if (error) {
-                    alert('সংৰক্ষণ কৰিব পৰা নগ’ল: ' + error.message);
-                } else {
-                    alert('নতুন ৰোগীৰ ৰেকৰ্ড সফলতাৰে সংৰক্ষণ কৰা হৈছে।');
-                    closePatientModal();
-                    loadPatients();
-                    loadExpenses();
-                }
-            }
+            alert('ৰোগীৰ তথ্য সফলতাৰে আপডেট কৰা হৈছে।');
+            closePatientModal();
+            loadPatients();
+            loadExpenses();
         }
+    } else {
+        // নতুন Patient যোগ কৰোঁতে
+        const { error } = await supabaseClient
+            .from('clinic_data')
+            .insert([patientData]);
+
+        if (error) {
+            alert('সংৰক্ষণ কৰিব পৰা নগ'ল: ' + error.message);
+        } else {
+            // Automatically fees track কৰক
+            if (fees > 0) {
+                await supabaseClient
+                    .from('clinic_payments')
+                    .insert([{ patient_name: name, fees }]);
+            }
+            alert('নতুন ৰোগীৰ ৰেকৰ্ড সফলতাৰে সংৰক্ষণ কৰা হৈছে।');
+            closePatientModal();
+            loadPatients();
+            loadExpenses();
+        }
+    }
+}
 
         async function saveExpenseRecord() {
             const categoryEl = document.getElementById('expCategory');
