@@ -12,6 +12,54 @@
         body { font-family: 'Poppins', sans-serif; overflow-x: hidden; }
         .premium-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
         .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        @media print {
+    body * { visibility: hidden; }
+    #printArea, #printArea * { visibility: visible; }
+    #printArea {
+        display: block !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 20px;
+        background: white;
+    }
+    .print-header {
+        text-align: center;
+        border-bottom: 2px solid #333;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    .print-header h1 {
+        font-size: 22px;
+        font-weight: bold;
+        margin: 0;
+    }
+    .print-header p {
+        font-size: 12px;
+        color: #555;
+        margin: 3px 0;
+    }
+    .print-body {
+        font-size: 13px;
+        line-height: 1.8;
+    }
+    .print-rx {
+        border-top: 1px solid #ccc;
+        margin-top: 15px;
+        padding-top: 10px;
+        white-space: pre-wrap;
+        font-size: 14px;
+        line-height: 1.8;
+    }
+    .print-footer {
+        margin-top: 60px;
+        text-align: right;
+        font-weight: bold;
+        border-top: 1px solid #ccc;
+        padding-top: 10px;
+    }
+}
     </style>
 </head>
 <body class="bg-slate-100 text-gray-800 antialiased min-h-screen py-4 sm:py-8 px-2">
@@ -758,25 +806,47 @@ async function loadExpenses() {
     });
 }
 
-        function printPrescription(p) {
-            const printArea = document.getElementById('printArea');
-            if (!printArea) return;
-            printArea.innerHTML = `
-                <div style="font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; border: 2px solid #333;">
-                    <h2 style="text-align: center; margin-bottom: 5px;">DR. HARIS CLINIC</h2>
-                    <p style="text-align: center; font-size: 12px; margin-top: 0; color: #555;">Homeopathic & Physiotherapy Center</p>
-                    <hr>
-                    <p><b>ৰোগীৰ নাম:</b> ${p.name} &nbsp;&nbsp;&nbsp;&nbsp; <b>বয়স/লিংগ:</b> ${p.age || 'N/A'}</p>
-                    <p><b>ৰক্তচাপ (BP):</b> ${p.bp || 'N/A'} &nbsp;&nbsp;&nbsp;&nbsp; <b>তাৰিখ:</b> ${new Date(p.created_at).toLocaleDateString()}</p>
-                    <hr>
-                    <h3>Rx (ঔষধৰ বিৱৰণ):</h3>
-                    <p style="white-space: pre-wrap; font-size: 15px; line-height: 1.6;">${p.medicine || 'No prescription written.'}</p>
-                    <br><br><br>
-                    <p style="text-align: right; font-weight: bold;">Signature: .........................</p>
-                </div>
-            `;
-            window.print();
-        }
+        
+function printPrescription(p) {
+    const printArea = document.getElementById('printArea');
+    if (!printArea) return;
+    printArea.innerHTML = `
+        <div class="print-header">
+            <h1>DR. HARIS CLINIC</h1>
+            <p>Homeopathic & Physiotherapy Center</p>
+            <p>Gogamukh, Dhemaji, Assam | +91 70025 45678</p>
+        </div>
+        <div class="print-body">
+            <table style="width:100%; font-size:13px;">
+                <tr>
+                    <td><b>ৰোগীৰ নাম:</b> ${escapeHTML(p.name)}</td>
+                    <td><b>বয়স/লিংগ:</b> ${escapeHTML(p.age || 'N/A')}</td>
+                </tr>
+                <tr>
+                    <td><b>ৰক্তচাপ (BP):</b> ${escapeHTML(p.bp || 'N/A')}</td>
+                    <td><b>তাৰিখ:</b> ${new Date(p.created_at).toLocaleDateString('en-IN')}</td>
+                </tr>
+                <tr>
+                    <td><b>মোবাইল:</b> ${escapeHTML(p.phone || 'N/A')}</td>
+                    <td></td>
+                </tr>
+            </table>
+            <div style="margin-top:10px;">
+                <b>ৰোগৰ ইতিবৃত্ত:</b>
+                <p style="margin:5px 0; color:#444;">${escapeHTML(p.history || 'N/A')}</p>
+            </div>
+            <div class="print-rx">
+                <b style="font-size:16px;">Rx</b>
+                <p>${escapeHTML(p.medicine || 'No prescription written.')}</p>
+            </div>
+        </div>
+        <div class="print-footer">
+            <p>Signature: .........................</p>
+            <p style="font-size:11px; color:#666;">DR. HARIS CLINIC | drhariswellfuture.com</p>
+        </div>
+    `;
+    window.print();
+}
 
         function sendWhatsAppRx(p) {
             if(!p.phone) return alert('মোবাইল নম্বৰ নাই।');
