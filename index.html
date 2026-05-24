@@ -610,55 +610,118 @@ async function savePatientRecord() {
             }
         }
 
-        async function loadExpenses() {
-            const { data: expenses, error: expErr } = await supabaseClient.from('clinic_expenses').select('*').order('created_at', { ascending: false });
-            const { data: patients, error: patErr } = await supabaseClient.from('clinic_data').select('fees');
+async function loadExpenses() {
+    const { data: expenses } = await supabaseClient
+        .from('clinic_expenses')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-            if (expErr) return console.log('Expenses load failed');
+    const { data: payments } = await supabaseClient
+        .from('clinic_payments')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-            let totalIncome = 0;
-            if (patients) {
-                totalIncome = patients.reduce((sum, p) => sum + (parseFloat(p.fees) || 0), 0);
-            }
+    // আজিৰ তাৰিখ
+    const today = new Date().toISOString().split('T')[0];
 
-            let totalExpense = 0;
-            if (expenses) {
-                totalExpense = expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-            }
+    // মুঠ হিচাপ
+    const totalIncome = (payments || []).reduce((sum, p) => sum + (parseFloat(p.fees) || 0), 0);
+    const totalExpense = (expenses || []).reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+    const netProfit = totalIncome - totalExpense;
 
-            let netProfit = totalIncome - totalExpense;
+    // আজিৰ হিচাপ
+    const todayIncome = (payments || [])
+        .filter(p => p.visit_date === today)
+        .reduce((sum, p) => sum + (parseFloat(p.fees) || 0), 0);
+    const todayExpense = (expenses || [])
+        .filter(e => e.created_at.split('T')[0] === today)
+        .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
 
-            const summaryText = document.getElementById('expenseSummaryText');
-            if (summaryText) {
-                summaryText.innerHTML = `
-                    <div class="grid grid-cols-3 gap-2 text-center font-bold mt-1">
-                        <div class="bg-green-50 p-2 rounded-lg text-green-700">মুঠ আয়: <br>₹${totalIncome}</div>
-                        <div class="bg-red-50 p-2 rounded-lg text-red-700">মুঠ খৰচ: <br>₹${totalExpense}</div>
-                        <div class="bg-blue-50 p-2 rounded-lg text-blue-700">বাকী লাভ: <br>₹${netProfit}</div>
-                    </div>
-                `;
-            }
-
-            const container = document.getElementById('listExpenses');
-            if (!container) return;
-            if (!expenses || expenses.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-400 text-xs py-2">কোনো খৰচৰ ৰেকৰ্ড পোৱা নগ’ল।</p>';
-                return;
-            }
-
-            container.innerHTML = expenses.map(e => `
-                <div class="p-3 border rounded-xl bg-white flex justify-between items-center shadow-sm text-xs">
-                    <div class="flex-1">
-                        <span class="font-bold text-gray-800 bg-gray-100 px-2 py-0.5 rounded">${escapeHTML(e.category)}</span>
-                        <p class="text-gray-500 mt-1">${escapeHTML(e.description || 'বিৱৰণ নাই')}</p>
-                    </div>
-                    <div class="text-right flex items-center gap-2">
-                        <span class="font-bold text-red-600 text-sm">₹${e.amount}</span>
-                        ${isDoctor ? `<button onclick="deleteExpense('${e.id}')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-lg text-xs"><i class="fas fa-trash"></i> মচক</button>` : ''}
-                    </div>
+    // Summary Cards
+    const summaryText = document.getElementById('expenseSummaryText');
+    if (summaryText) {
+        summaryText.innerHTML = `
+            <div class="grid grid-cols-2 gap-2 mb-3">
+                <div class="bg-green-50 p-3 rounded-xl text-center">
+                    <p class="text-[10px] text-green-600 font-bold uppercase">আজিৰ আয়</p>
+                    <p class="text-lg font-extrabold text-green-700">₹${todayIncome}</p>
                 </div>
-            `).join('');
-        }
+                <div class="bg-red-50 p-3 rounded-xl text-center">
+                    <p class="text-[10px] text-red-600 font-bold uppercase">আজিৰ খৰচ</p>
+                    <p class="text-lg font-extrabold text-red-700">₹${todayExpense}</p>
+                </div>
+                <div class="bg-blue-50 p-3 rounded-xl text-center">
+                    <p class="text-[10px] text-blue-600 font-bold uppercase">মুঠ আয়</p>
+                    <p class="text-lg font-extrabold text-blue-700">₹${totalIncome}</p>
+                </div>
+                <div class="bg-purple-50 p-3 rounded-xl text-center">
+                    <p class="text-[10px] text-purple-600 font-bold uppercase">মুঠ লাভ</p>
+                    <p class="text-lg font-extrabold text-purple-700">₹${netProfit}</p>
+                </div>
+            </div>
+        `;
+    }
+
+    // Google Sheet-ৰ দৰে Table
+    const container = document.getElementById('listExpenses');
+    if (!container) return;
+
+    // আয় আৰু খৰচ একেলগে দেখুৱাওক
+    const allRows = [
+        ...(payments || []).map(p => ({
+            date: p.visit_date,
+            name: p.patient_name,
+            income: p.fees,
+            expense: 0,
+            desc: 'Visit Fees',
+            type: 'income'
+        })),
+        ...(expenses || []).map(e => ({
+            date: e.created_at.split('T')[0],
+            name: e.category,
+            income: 0,
+            expense: e.amount,
+            desc: e.description || '-',
+            type: 'expense'
+        }))
+    ].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    container.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
+            <table class="w-full text-xs">
+                <thead class="bg-slate-900 text-white">
+                    <tr>
+                        <th class="px-3 py-2.5 text-left">তাৰিখ</th>
+                        <th class="px-3 py-2.5 text-left">নাম / বিভাগ</th>
+                        <th class="px-3 py-2.5 text-left">বিৱৰণ</th>
+                        <th class="px-3 py-2.5 text-right text-green-300">আয় ₹</th>
+                        <th class="px-3 py-2.5 text-right text-red-300">খৰচ ₹</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    ${allRows.map(row => `
+                        <tr class="${row.type === 'income' ? 'bg-green-50/30' : 'bg-red-50/30'}">
+                            <td class="px-3 py-2 text-gray-500">${row.date}</td>
+                            <td class="px-3 py-2 font-medium text-gray-800">${escapeHTML(row.name)}</td>
+                            <td class="px-3 py-2 text-gray-500">${escapeHTML(row.desc)}</td>
+                            <td class="px-3 py-2 text-right font-bold text-green-600">
+                                ${row.income > 0 ? '₹' + row.income : '-'}
+                            </td>
+                            <td class="px-3 py-2 text-right font-bold text-red-500">
+                                ${row.expense > 0 ? '₹' + row.expense : '-'}
+                            </td>
+                        </tr>
+                    `).join('')}
+                    <tr class="bg-slate-900 text-white font-bold">
+                        <td colspan="3" class="px-3 py-2.5 text-center">মুঠ</td>
+                        <td class="px-3 py-2.5 text-right text-green-300">₹${totalIncome}</td>
+                        <td class="px-3 py-2.5 text-right text-red-300">₹${totalExpense}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    `;
+}
 
         async function deleteExpense(expenseId) {
             if (!confirm('আপুনি সঁচাকৈয়ে এই খৰচটো মচি পেলাব বিচাৰে নে?')) {
