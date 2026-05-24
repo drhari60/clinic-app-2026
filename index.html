@@ -848,22 +848,34 @@ function printPrescription(p) {
     window.print();
 }
 
-        function sendWhatsAppRx(p) {
-            if(!p.phone) return alert('মোবাইল নম্বৰ নাই।');
-            
-            const msg = `🏥 *DR. HARIS CLINIC*\n` +
-                        `---------------------------\n` +
-                        `*ৰোগী:* ${p.name}\n` +
-                        `*Rx (ঔষধৰ তালিকা):*\n${p.medicine || 'None'}\n\n` +
-                        `---------------------------\n` +
-                        `🩺 *স্বাস্থ্য সজাগতা আৰু পৰামৰ্শৰ বাবে আমাৰ পেজসমূহ Follow কৰক:* \n\n` +
-                        `📘 *ফেচবুক:* https://www.facebook.com/drhari365\n` +
-                        `🌐 *ৱেবচাইট:* https://drhariswellfuture.com\n` +
-                        `🔴 *ইউটিউব:* https://www.youtube.com/@drhari\n\n` +
-                        `নিৰোগী আৰু সুস্বাস্থ্যৰ কামনাৰে, \n*ডাঃ হৰিকান্ত দাস*`;
+function sendWhatsAppRx(p) {
+    if(!p.phone) return alert('মোবাইল নম্বৰ নাই।');
+    
+    const date = new Date(p.created_at).toLocaleDateString('en-IN');
+    
+    const msg = `🏥 *DR. HARIS CLINIC*\n` +
+                `🌿 Homeopathic & Physiotherapy Center\n` +
+                `📍 Gogamukh, Dhemaji, Assam\n` +
+                `━━━━━━━━━━━━━━━━━━━━\n` +
+                `👤 *ৰোগী:* ${p.name}\n` +
+                `🎂 *বয়স/লিংগ:* ${p.age || 'N/A'}\n` +
+                `🩺 *BP:* ${p.bp || 'N/A'}\n` +
+                `📅 *তাৰিখ:* ${date}\n` +
+                `━━━━━━━━━━━━━━━━━━━━\n` +
+                `💊 *Rx (ঔষধৰ তালিকা):*\n\n` +
+                `${p.medicine || 'None'}\n\n` +
+                `━━━━━━━━━━━━━━━━━━━━\n` +
+                `📘 *Facebook:* https://www.facebook.com/drhari365\n` +
+                `🔴 *YouTube:* https://www.youtube.com/@drhari\n` +
+                `📸 *Instagram:* https://www.instagram.com/drharikanta\n` +
+                `🌐 *Website:* https://drhariswellfuture.com\n` +
+                `━━━━━━━━━━━━━━━━━━━━\n` +
+                `নিৰোগী আৰু সুস্বাস্থ্যৰ কামনাৰে,\n` +
+                `*ডাঃ হৰিকান্ত দাস*\n` +
+                `🏥 DR. HARIS CLINIC`;
 
-            window.open(`https://api.whatsapp.com/send?phone=91${p.phone.replace(/\D/g, '')}&text=${encodeURIComponent(msg)}`, '_blank');
-        }
+    window.open(`https://api.whatsapp.com/send?phone=91${p.phone.replace(/\D/g, '')}&text=${encodeURIComponent(msg)}`, '_blank');
+}
 
         function sendMedicineReminder(p) {
             if(!p.phone) return alert('মোবাইল নম্বৰ নাই।');
