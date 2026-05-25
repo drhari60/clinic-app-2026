@@ -792,14 +792,15 @@ async function loadExpenses() {
             desc: 'Visit Fees',
             type: 'income'
         })),
-        ...(expenses || []).map(e => ({
-            date: e.created_at.split('T')[0],
-            name: e.category,
-            income: 0,
-            expense: e.amount,
-            desc: e.description || '-',
-            type: 'expense'
-        }))
+      ...(expenses || []).map(e => ({
+    date: e.created_at.split('T')[0],
+    name: e.category,
+    income: 0,
+    expense: e.amount,
+    desc: e.description || '-',
+    type: 'expense',
+    id: e.id
+}))
     ].sort((a, b) => new Date(b.date) - new Date(a.date));
 
     container.innerHTML = `
@@ -820,9 +821,10 @@ async function loadExpenses() {
                             <td class="px-3 py-2 text-gray-500">${row.date}</td>
                             <td class="px-3 py-2 font-medium text-gray-800">${escapeHTML(row.name)}</td>
                             <td class="px-3 py-2 text-gray-500">${escapeHTML(row.desc)}</td>
-                            <td class="px-3 py-2 text-right font-bold text-green-600">
-                                ${row.income > 0 ? '₹' + row.income : '-'}
-                            </td>
+                            <td class="px-3 py-2 text-right font-bold text-red-500">
+    ${row.expense > 0 ? 'Rs.' + row.expense : '-'}
+    ${row.type === 'expense' && isDoctor ? `<button onclick="deleteExpense('${row.id}')" class="ml-1 bg-red-500 text-white px-1.5 py-0.5 rounded text-[10px]"><i class="fas fa-trash"></i></button>` : ''}
+</td>
                             <td class="px-3 py-2 text-right font-bold text-red-500">
                                 ${row.expense > 0 ? '₹' + row.expense : '-'}
                             </td>
@@ -839,23 +841,20 @@ async function loadExpenses() {
     `;
 }
 
-        async function deleteExpense(expenseId) {
-            if (!confirm('আপুনি সঁচাকৈয়ে এই খৰচটো মচি পেলাব বিচাৰে নে?')) {
-                return;
-            }
-
-            const { error } = await supabaseClient
-                .from('clinic_expenses')
-                .delete()
-                .eq('id', expenseId);
-
-            if (error) {
-                alert('খৰচ মচিব পৰা নগ’ল: ' + error.message);
-            } else {
-                alert('খৰচ সফলতাৰে মচি পেলোৱা হৈছে।');
-                loadExpenses();
-            }
-        }
+async function deleteExpense(expenseId) {
+    if (!confirm('এই খৰচটো মচিব বিচাৰে নে?')) return;
+    const { error } = await supabaseClient
+        .from('clinic_expenses')
+        .delete()
+        .eq('id', expenseId);
+    if (error) {
+        alert('খৰচ মচিব পৰা নগল: ' + error.message);
+    } else {
+        alert('খৰচ মচি পেলোৱা হৈছে।');
+        loadExpenses();
+        loadReport();
+    }
+}
 
   function filterPatients() {
     const query = safeGet('searchBox').value.toLowerCase().trim();
