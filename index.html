@@ -165,25 +165,6 @@
             <h4 class="text-xs font-bold tracking-wide mb-1 text-yellow-300 uppercase flex items-center gap-1" id="tipTitle">হৃদযন্ত্ৰ সুস্থ ৰাখক</h4>
             <p class="text-[11px] text-green-50 font-medium leading-relaxed max-w-[90%]" id="tipContent">দৈনিক পুৱা ৩০ মিনিট খোজ কাঢ়ক।</p>
         </div>
-
-        <!-- Patient AI Health Assistant -->
-        <div class="w-full mt-3">
-            <button onclick="togglePatientChat()" id="patientChatBtn" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold py-3.5 rounded-2xl shadow-lg hover:opacity-95 transition text-xs uppercase tracking-wider">
-                <i class="fas fa-robot text-base"></i> AI স্বাস্থ্য সহায়ক সুধিব <i id="patientChatArrow" class="fas fa-chevron-down text-xs"></i>
-            </button>
-        </div>
-        <div id="patientChatBox" class="hidden w-full mt-2 rounded-2xl overflow-hidden shadow-xl border border-blue-200">
-            <div class="bg-gradient-to-r from-blue-600 to-cyan-500 px-4 py-2.5 flex justify-between items-center">
-                <span class="text-white font-bold text-xs flex items-center gap-2"><i class="fas fa-robot"></i> Dr. Hari's AI Health Assistant</span>
-                <button onclick="togglePatientChat()" class="text-white/80 hover:text-white text-sm"><i class="fas fa-times"></i></button>
-            </div>
-            <iframe
-                src="https://udify.app/chatbot/8T7qEEh0dmg1Fp0m"
-                style="width: 100%; height: 500px;"
-                frameborder="0"
-                allow="microphone">
-            </iframe>
-        </div>
     </div>
 
     <div id="appDashboard" class="hidden min-h-screen pb-24 bg-slate-50">
@@ -248,6 +229,7 @@
             </div>
 
             <div id="tab-profile" class="tab-content hidden space-y-4">
+                <!-- Doctor Profile Card -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center relative overflow-hidden">
                     <div class="absolute top-0 left-0 right-0 h-1.5 premium-gradient"></div>
                     <div class="w-20 h-20 premium-gradient text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-3 shadow-md">H</div>
@@ -256,20 +238,42 @@
                     <p class="text-[11px] text-gray-400 mt-1 flex items-center justify-center gap-1"><i class="fas fa-map-marker-alt"></i> Gogamukh, Dhemaji, Assam</p>
                 </div>
 
-                <!-- Doctor's Dify AI Assistant -->
+                <!-- Agent 1: Dr. Hari's Assistant (Health) -->
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <button onclick="toggleDoctorChat()" class="w-full flex items-center justify-between px-4 py-4 bg-gradient-to-r from-slate-900 to-slate-700 text-white font-bold text-sm hover:opacity-95 transition">
-                        <span class="flex items-center gap-2"><i class="fas fa-brain text-yellow-400"></i> ক্লিনিকেল AI সহায়ক (Doctor's Assistant)</span>
-                        <i id="doctorChatIcon" class="fas fa-chevron-down text-xs text-white/70"></i>
-                    </button>
-                    <div id="doctorChatBox" class="hidden">
-                        <iframe
-                            src="https://udify.app/chatbot/umBy5IpUIMG6LIiM"
-                            style="width: 100%; height: 600px;"
-                            frameborder="0"
-                            allow="microphone">
-                        </iframe>
+                    <div class="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-500">
+                        <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-stethoscope text-white text-base"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-bold text-sm">Dr. Hari's Assistant</p>
+                            <p class="text-white/70 text-[10px]">স্বাস্থ্য পৰামৰ্শ সহায়ক</p>
+                        </div>
                     </div>
+                    <iframe
+                        src="https://udify.app/chatbot/8T7qEEh0dmg1Fp0m"
+                        style="width: 100%; height: 600px;"
+                        frameborder="0"
+                        allow="microphone">
+                    </iframe>
+                </div>
+
+                <!-- Agent 2: Dr. Hari - Public Leader & Creator -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-slate-800 to-slate-600">
+                        <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-microphone-alt text-white text-base"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-bold text-sm">Dr. Hari - Public Leader & Creator</p>
+                            <p class="text-white/70 text-[10px]">Health · Social · Political Topics</p>
+                        </div>
+                    </div>
+                    <iframe
+                        src="https://udify.app/chatbot/umBy5IpUIMG6LIiM"
+                        style="width: 100%; height: 600px;"
+                        frameborder="0"
+                        allow="microphone">
+                    </iframe>
                 </div>
             </div>
 
@@ -1284,28 +1288,26 @@
             window.open(`https://api.whatsapp.com/send?phone=919954340102&text=${encodeURIComponent(msg)}`, '_blank');
         }
         
-        function toggleDoctorChat() {
-            const box = document.getElementById('doctorChatBox');
-            const icon = document.getElementById('doctorChatIcon');
+        function toggleAgent1() {
+            const box = document.getElementById('agent1Box');
+            const icon = document.getElementById('agent1Icon');
             box.classList.toggle('hidden');
-            if (!box.classList.contains('hidden')) {
-                icon.className = 'fas fa-chevron-up text-xs text-white/70';
+            icon.className = box.classList.contains('hidden')
+                ? 'fas fa-chevron-down text-xs text-white/80'
+                : 'fas fa-chevron-up text-xs text-white/80';
+            if (!box.classList.contains('hidden'))
                 setTimeout(() => box.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
-            } else {
-                icon.className = 'fas fa-chevron-down text-xs text-white/70';
-            }
         }
 
-        function togglePatientChat() {
-            const box = document.getElementById('patientChatBox');
-            const arrow = document.getElementById('patientChatArrow');
+        function toggleAgent2() {
+            const box = document.getElementById('agent2Box');
+            const icon = document.getElementById('agent2Icon');
             box.classList.toggle('hidden');
-            if (!box.classList.contains('hidden')) {
-                arrow.className = 'fas fa-chevron-up text-xs';
+            icon.className = box.classList.contains('hidden')
+                ? 'fas fa-chevron-down text-xs text-white/70'
+                : 'fas fa-chevron-up text-xs text-white/70';
+            if (!box.classList.contains('hidden'))
                 setTimeout(() => box.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
-            } else {
-                arrow.className = 'fas fa-chevron-down text-xs';
-            }
         }
 
         function escapeHTML(str) {
