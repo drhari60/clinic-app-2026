@@ -912,7 +912,7 @@
                                 <td class="px-3 py-2.5 text-right text-green-300">₹${totalIncome}</td>
                                 <td class="px-3 py-2.5 text-right text-red-300">₹${totalExpense}</td>
                                 ${isDoctor ? '<td class="px-3 py-2.5"></td>' : ''}
-                            </table>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -1110,9 +1110,12 @@
             const monthNames = ['জানুৱাৰী','ফেব্ৰুৱাৰী','মাৰ্চ','এপ্ৰিল','মে','জুন',
                                 'জুলাই','আগষ্ট','ছেপ্টেম্বৰ','অক্টোবৰ','নৱেম্বৰ','ডিচেম্বৰ'];
 
+            const monthStartDate = new Date(year, selectedMonth, 1).toISOString().split('T')[0];
+            const monthEndDate = new Date(year, selectedMonth + 1, 0).toISOString().split('T')[0];
+
             const [{ data: payments }, { data: expenses }, { data: patients }] = await Promise.all([
                 supabaseClient.from('clinic_payments').select('*')
-                    .gte('created_at', monthStart).lte('created_at', monthEnd),
+                    .gte('visit_date', monthStartDate).lte('visit_date', monthEndDate),
                 supabaseClient.from('clinic_expenses').select('*')
                     .gte('created_at', monthStart).lte('created_at', monthEnd),
                 supabaseClient.from('clinic_data').select('*')
@@ -1251,8 +1254,11 @@
             const monthStart = new Date(year, parseInt(document.getElementById('reportMonth').value), 1).toISOString();
             const monthEnd = new Date(year, parseInt(document.getElementById('reportMonth').value) + 1, 0, 23, 59, 59).toISOString();
 
+            const monthStartDate2 = new Date(year, parseInt(document.getElementById('reportMonth').value), 1).toISOString().split('T')[0];
+            const monthEndDate2 = new Date(year, parseInt(document.getElementById('reportMonth').value) + 1, 0).toISOString().split('T')[0];
+
             const [{ data: payments }, { data: expenses }, { data: patients }] = await Promise.all([
-                supabaseClient.from('clinic_payments').select('*').gte('created_at', monthStart).lte('created_at', monthEnd),
+                supabaseClient.from('clinic_payments').select('*').gte('visit_date', monthStartDate2).lte('visit_date', monthEndDate2),
                 supabaseClient.from('clinic_expenses').select('*').gte('created_at', monthStart).lte('created_at', monthEnd),
                 supabaseClient.from('clinic_data').select('*').gte('created_at', monthStart).lte('created_at', monthEnd),
             ]);
