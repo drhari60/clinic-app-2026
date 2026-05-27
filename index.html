@@ -518,6 +518,7 @@
             loadPatients();
             loadBookings();
             loadExpenses();
+            loadReport();
         }
         
         async function handleLogout() {
@@ -628,12 +629,6 @@
                 return;
             }
 
-            const { data: patientData } = await supabaseClient
-                .from('clinic_data')
-                .select('name')
-                .eq('id', id)
-                .single();
-
             const { error } = await supabaseClient
                 .from('clinic_data')
                 .delete()
@@ -642,12 +637,11 @@
             if (error) {
                 alert('ডাটাবেচে ডিলিট কৰিবলৈ দিয়া নাই: ' + error.message);
             } else {
-                if (patientData?.name) {
-                    await supabaseClient
-                        .from('clinic_payments')
-                        .delete()
-                        .eq('patient_name', patientData.name);
-                }
+                // patient_name-এ নহয়, patient_id-এৰে delete কৰা হ'ব — একেনামৰ আনজনৰ payment নযাব
+                await supabaseClient
+                    .from('clinic_payments')
+                    .delete()
+                    .eq('patient_id', id);
                 alert("ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হ'ল।");
                 loadPatients();
                 loadExpenses();
@@ -697,11 +691,7 @@
                 if (error) {
                     alert('আপডেট ব্যৰ্থ হৈছে: ' + error.message);
                 } else {
-                    if (fees > 0) {
-                        await supabaseClient
-                            .from('clinic_payments')
-                            .insert([{ patient_name: name, fees, visit_date: new Date().toISOString().split('T')[0] }]);
-                    }
+                    // Edit কৰিলে payment insert নহ'ব — শুধু clinic_data আপডেট হ'ব
                     alert('ৰোগীৰ তথ্য সফলতাৰে আপডেট কৰা হৈছে।');
                     closePatientModal();
                     loadPatients();
@@ -709,17 +699,19 @@
                     loadReport();
                 }
             } else {
-                const { error } = await supabaseClient
+                const { data: insertedData, error } = await supabaseClient
                     .from('clinic_data')
-                    .insert([patientData]);
+                    .insert([patientData])
+                    .select()
+                    .single();
 
                 if (error) {
                    alert("সংৰক্ষণ কৰিব পৰা নগ'ল: " + error.message);
                 } else {
-                    if (fees > 0) {
+                    if (fees > 0 && insertedData?.id) {
                         await supabaseClient
                             .from('clinic_payments')
-                            .insert([{ patient_name: name, fees, visit_date: new Date().toISOString().split('T')[0] }]);
+                            .insert([{ patient_name: name, fees, visit_date: new Date().toISOString().split('T')[0], patient_id: insertedData.id }]);
                     }
                     alert('নতুন ৰোগীৰ ৰেকৰ্ড সফলতাৰে সংৰক্ষণ কৰা হৈছে।');
                     closePatientModal();
