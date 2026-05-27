@@ -200,20 +200,27 @@
                         <i class="fas fa-chart-bar text-slate-900"></i>
                         <h3 class="text-sm font-bold text-slate-900">Monthly Report</h3>
                     </div>
-                    <select id="reportMonth" class="border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold bg-gray-50 focus:outline-none">
-                        <option value="0">জানুৱাৰী</option>
-                        <option value="1">ফেব্ৰুৱাৰী</option>
-                        <option value="2">মাৰ্চ</option>
-                        <option value="3">এপ্ৰিল</option>
-                        <option value="4">মে</option>
-                        <option value="5">জুন</option>
-                        <option value="6">জুলাই</option>
-                        <option value="7">আগষ্ট</option>
-                        <option value="8">ছেপ্টেম্বৰ</option>
-                        <option value="9">অক্টোবৰ</option>
-                        <option value="10">নৱেম্বৰ</option>
-                        <option value="11">ডিচেম্বৰ</option>
-                    </select>
+                    <div class="flex gap-2">
+                        <select id="reportYear" class="border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold bg-gray-50 focus:outline-none">
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                        </select>
+                        <select id="reportMonth" class="border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold bg-gray-50 focus:outline-none">
+                            <option value="0">জানুৱাৰী</option>
+                            <option value="1">ফেব্ৰুৱাৰী</option>
+                            <option value="2">মাৰ্চ</option>
+                            <option value="3">এপ্ৰিল</option>
+                            <option value="4">মে</option>
+                            <option value="5">জুন</option>
+                            <option value="6">জুলাই</option>
+                            <option value="7">আগষ্ট</option>
+                            <option value="8">ছেপ্টেম্বৰ</option>
+                            <option value="9">অক্টোবৰ</option>
+                            <option value="10">নৱেম্বৰ</option>
+                            <option value="11">ডিচেম্বৰ</option>
+                        </select>
+                    </div>
                 </div>
                 <div id="reportSummary" class="grid grid-cols-2 gap-3"></div>
                 <div id="reportFinance" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4"></div>
@@ -504,8 +511,11 @@
         }
         
         document.getElementById('reportMonth')?.addEventListener('change', loadReport);
+        document.getElementById('reportYear')?.addEventListener('change', loadReport);
         const reportMonthEl = document.getElementById('reportMonth');
         if (reportMonthEl) reportMonthEl.value = new Date().getMonth();
+        const reportYearEl = document.getElementById('reportYear');
+        if (reportYearEl) reportYearEl.value = new Date().getFullYear();
         
         async function handleLogin() {
             const email = safeGet('loginEmail').value.trim();
@@ -973,21 +983,25 @@
             }
         }
 
-        function filterPatients() {
+        async function filterPatients() {
             const query = safeGet('searchBox').value.toLowerCase().trim();
             const container = document.getElementById('listPatients');
             if (!container) return;
-            
-            const cards = container.querySelectorAll('.bg-white.p-4.rounded-xl');
-            
-            cards.forEach(card => {
-                const text = card.innerText.toLowerCase();
-                if (text.includes(query)) {
-                    card.style.display = "";
-                } else {
-                    card.style.display = "none";
-                }
-            });
+
+            if (!query) {
+                loadPatients();
+                return;
+            }
+
+            const { data, error } = await supabaseClient
+                .from('clinic_data')
+                .select('*')
+                .or(`name.ilike.%${query}%,phone.ilike.%${query}%`)
+                .order('created_at', { ascending: false });
+
+            if (error || !data) return;
+            container.innerHTML = '';
+            data.forEach(p => container.appendChild(createPatientCard(p)));
         }
         
         function printPrescription(p) {
@@ -1098,8 +1112,9 @@
 
         async function loadReport() {
             const monthSelect = document.getElementById('reportMonth');
+            const yearSelect = document.getElementById('reportYear');
             const selectedMonth = parseInt(monthSelect.value);
-            const year = new Date().getFullYear();
+            const year = yearSelect ? parseInt(yearSelect.value) : new Date().getFullYear();
 
             const monthStart = new Date(year, selectedMonth, 1).toISOString();
             const monthEnd = new Date(year, selectedMonth + 1, 0, 23, 59, 59).toISOString();
@@ -1225,6 +1240,7 @@
             const monthNames = ['জানুৱাৰী','ফেব্ৰুৱাৰী','মাৰ্চ','এপ্ৰিল','মে','জুন',
                                 'জুলাই','আগষ্ট','ছেপ্টেম্বৰ','অক্টোবৰ','নৱেম্বৰ','ডিচেম্বৰ'];
             const month = monthNames[parseInt(document.getElementById('reportMonth').value)];
+            const printYear = parseInt(document.getElementById('reportYear')?.value) || new Date().getFullYear();
             const printArea = document.getElementById('printArea');
             if (!printArea) return;
             printArea.innerHTML = `
@@ -1232,7 +1248,7 @@
                     <div style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 15px;">
                         <h1 style="font-size: 20px; margin: 0;">DR. HARIS CLINIC</h1>
                         <p style="font-size: 12px; color: #555; margin: 3px 0;">Homeopathic & Physiotherapy Center</p>
-                        <p style="font-size: 14px; font-weight: bold; margin-top: 8px;">📊 ${month} ${new Date().getFullYear()} - Monthly Report</p>
+                        <p style="font-size: 14px; font-weight: bold; margin-top: 8px;">📊 ${month} ${printYear} - Monthly Report</p>
                     </div>
                     ${document.getElementById('reportSummary').innerHTML}
                     ${document.getElementById('reportFinance').innerHTML}
@@ -1246,7 +1262,7 @@
             const monthNames = ['জানুৱাৰী','ফেব্ৰুৱাৰী','মাৰ্চ','এপ্ৰিল','মে','জুন',
                                 'জুলাই','আগষ্ট','ছেপ্টেম্বৰ','অক্টোবৰ','নৱেম্বৰ','ডিচেম্বৰ'];
             const month = monthNames[parseInt(document.getElementById('reportMonth').value)];
-            const year = new Date().getFullYear();
+            const year = parseInt(document.getElementById('reportYear')?.value) || new Date().getFullYear();
 
             const monthStart = new Date(year, parseInt(document.getElementById('reportMonth').value), 1).toISOString();
             const monthEnd = new Date(year, parseInt(document.getElementById('reportMonth').value) + 1, 0, 23, 59, 59).toISOString();
