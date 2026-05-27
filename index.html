@@ -239,7 +239,7 @@
                 </div>
 
                 <!-- Agent 1: Dr. Hari's Assistant (Health) -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div id="agentSection1" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div class="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-500">
                         <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
                             <i class="fas fa-stethoscope text-white text-base"></i>
@@ -258,7 +258,7 @@
                 </div>
 
                 <!-- Agent 2: Dr. Hari - Public Leader & Creator -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div id="agentSection2" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div class="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-slate-800 to-slate-600">
                         <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
                             <i class="fas fa-microphone-alt text-white text-base"></i>
@@ -455,6 +455,11 @@
                     ? 'text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider'
                     : 'text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider';
             }
+            // Doctor হ'লে Agent দেখাব, Staff হ'লে লুকুৱাব
+            const a1 = document.getElementById('agentSection1');
+            const a2 = document.getElementById('agentSection2');
+            if (a1) a1.classList.toggle('hidden', !isDoctor);
+            if (a2) a2.classList.toggle('hidden', !isDoctor);
         }
         
         function openAddPatientModal() {
