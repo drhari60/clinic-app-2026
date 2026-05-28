@@ -1018,6 +1018,13 @@
             if (!confirm(`আপুনি সঁচাকৈয়ে "${patientName}" ৰ ভিজিট ফীজটো মচি পেলাব বিচাৰে নে?\n\nসাৱধান: এইটো স্থায়ীভাৱে মচি যাব!`)) {
                 return;
             }
+
+            // আগতে payment record পঢ়ক — patient_id আৰু visit_date লাগিব clinic_visits update কৰিবলৈ
+            const { data: paymentRecord } = await supabaseClient
+                .from('clinic_payments')
+                .select('patient_id, visit_date, income_source')
+                .eq('id', paymentId)
+                .single();
             
             const { error } = await supabaseClient
                 .from('clinic_payments')
@@ -1027,6 +1034,15 @@
             if (error) {
                 alert('আয় ৰেকৰ্ড মচিব পৰা নগ’ল: ' + error.message);
             } else {
+                // clinic_visits ত corresponding visit ৰ payment_status 'unpaid' কৰক
+                // visit record থাকিব — কেৱল payment বাতিল হ’ল বুলি mark হ’ব
+                if (paymentRecord?.patient_id && paymentRecord?.visit_date && paymentRecord?.income_source !== 'manual') {
+                    await supabaseClient
+                        .from('clinic_visits')
+                        .update({ payment_status: 'unpaid', fees_paid: 0 })
+                        .eq('patient_id', paymentRecord.patient_id)
+                        .eq('visit_date', paymentRecord.visit_date);
+                }
                 alert('আয় ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হৈছে।');
                 loadExpenses();
                 loadReport();
@@ -1176,13 +1192,15 @@
             const monthStartDate = new Date(year, selectedMonth, 1).toISOString().split('T')[0];
             const monthEndDate = new Date(year, selectedMonth + 1, 0).toISOString().split('T')[0];
 
-            const [{ data: payments }, { data: expenses }, { data: patients }] = await Promise.all([
+            const [{ data: payments }, { data: expenses }, { data: patients }, { data: visits }] = await Promise.all([
                 supabaseClient.from('clinic_payments').select('*')
                     .gte('visit_date', monthStartDate).lte('visit_date', monthEndDate),
                 supabaseClient.from('clinic_expenses').select('*')
                     .gte('created_at', monthStart).lte('created_at', monthEnd),
                 supabaseClient.from('clinic_data').select('*')
                     .gte('created_at', monthStart).lte('created_at', monthEnd),
+                supabaseClient.from('clinic_visits').select('*')
+                    .gte('visit_date', monthStartDate).lte('visit_date', monthEndDate),
             ]);
 
             const totalIncome = (payments || []).reduce((s, p) => s + (parseFloat(p.fees) || 0), 0);
@@ -1190,13 +1208,13 @@
             const netProfit = totalIncome - totalExpense;
             // মুঠ নতুন ৰোগী = সেই মাহত clinic_data ত registered (নতুন এণ্ট্ৰি)
             const totalNewPatients = (patients || []).length;
-            // Unique ৰোগী (revisit সহ) = payments ত unique patient_id count
+            // Unique ৰোগী (revisit সহ) = clinic_visits ত unique patient_id count
             const uniquePatientIds = new Set(
-                (payments || []).filter(p => p.patient_id && p.income_source !== 'manual').map(p => p.patient_id)
+                (visits || []).filter(v => v.patient_id).map(v => v.patient_id)
             );
             const totalUniqueVisitors = uniquePatientIds.size;
-            // মুঠ Visit = কেৱল patient-linked payments (manual income বাদ) — consistent count
-            const totalVisits = (payments || []).filter(p => p.income_source !== 'manual').length;
+            // মুঠ Visit = clinic_visits table ৰ পৰা — free, unpaid, revisit সকলো সামৰি
+            const totalVisits = (visits || []).length;
 
             const summaryEl = document.getElementById('reportSummary');
             if (summaryEl) {
@@ -1214,7 +1232,7 @@
                     <div class="bg-orange-50 p-3 rounded-xl text-center">
                         <p class="text-[10px] text-orange-600 font-bold uppercase">মুঠ Visit</p>
                         <p class="text-2xl font-extrabold text-orange-700">${totalVisits}</p>
-                        <p class="text-[10px] text-orange-400">টা (Paid Visits)</p>
+                        <p class="text-[10px] text-orange-400">টা (সকলো Visit)</p>
                     </div>
                     <div class="bg-green-50 p-3 rounded-xl text-center">
                         <p class="text-[10px] text-green-600 font-bold uppercase">মুঠ আয়</p>
@@ -1252,13 +1270,33 @@
                 `;
             }
 
-            const dailyMap = {};
+            // Daily income = payments ৰ পৰা (financial data)
+            // Daily visit count = clinic_visits ৰ পৰা (actual footfall)
+            const dailyIncomeMap = {};
             (payments || []).forEach(p => {
                 const date = p.visit_date || p.created_at.split('T')[0];
-                if (!dailyMap[date]) dailyMap[date] = { count: 0, income: 0 };
-                // Manual income visit count-এ নযাব, কেৱল patient visit count হ'ব
-                if (p.income_source !== 'manual') dailyMap[date].count++;
-                dailyMap[date].income += parseFloat(p.fees || 0);
+                if (!dailyIncomeMap[date]) dailyIncomeMap[date] = 0;
+                dailyIncomeMap[date] += parseFloat(p.fees || 0);
+            });
+
+            const dailyVisitMap = {};
+            (visits || []).forEach(v => {
+                const date = v.visit_date;
+                if (!dailyVisitMap[date]) dailyVisitMap[date] = 0;
+                dailyVisitMap[date]++;
+            });
+
+            // সকলো তাৰিখ merge কৰক (visit আছে কিন্তু income নাই, বা income আছে visit নাই)
+            const allDates = new Set([
+                ...Object.keys(dailyIncomeMap),
+                ...Object.keys(dailyVisitMap)
+            ]);
+            const dailyMap = {};
+            allDates.forEach(date => {
+                dailyMap[date] = {
+                    count: dailyVisitMap[date] || 0,
+                    income: dailyIncomeMap[date] || 0
+                };
             });
 
             const dailyRows = Object.entries(dailyMap)
