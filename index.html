@@ -288,8 +288,12 @@
                 <!-- আয় যোগ কৰাৰ ফৰ্ম -->
                 <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100">
                     <h3 class="text-sm font-bold text-gray-900 mb-3 border-b pb-2 flex items-center gap-1.5"><i class="fas fa-plus-circle text-green-500"></i> নতুন আয় যোগ কৰক (Income Entry)</h3>
+                    <p class="text-[10px] text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-3 flex items-start gap-1.5">
+                        <i class="fas fa-exclamation-triangle mt-0.5"></i>
+                        <span>এই section টো কেৱল extra/miscellaneous আয়ৰ বাবে (যেনে: certificate fee, test fee)। নতুন ৰোগীৰ ভিজিট ফীজ পোনপটীয়াকৈ ৰোগী যোগ কৰোঁতে দিয়ক, নহ'লে duplicate আয় হ'ব।</span>
+                    </p>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <input type="text" id="incomePatientName" placeholder="ৰোগীৰ নাম" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                        <input type="text" id="incomePatientName" placeholder="ৰোগীৰ নাম / বিৱৰণ" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
                         <input type="number" id="incomeAmount" placeholder="আয়ৰ পৰিমাণ (₹)" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
                         <button id="btnSaveIncome" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow transition text-sm">আয় সংৰক্ষণ কৰক</button>
                     </div>
@@ -706,7 +710,28 @@
                 if (error) {
                     alert('আপডেট ব্যৰ্থ হৈছে: ' + error.message);
                 } else {
-                    // Edit কৰিলে payment insert নহ'ব — শুধু clinic_data আপডেট হ'ব
+                    // Edit কৰিলে clinic_payments ত fees update কৰা হ'ব (silent financial bug fix)
+                    // আগতে যদি payment আছিল → update, নাথাকিলে → নতুন insert (fees > 0 হ'লে)
+                    const { data: existingPay } = await supabaseClient
+                        .from('clinic_payments')
+                        .select('id')
+                        .eq('patient_id', currentEditId)
+                        .limit(1)
+                        .single();
+
+                    if (existingPay) {
+                        // পুৰণি payment আছে → fees update কৰক
+                        await supabaseClient
+                            .from('clinic_payments')
+                            .update({ fees, patient_name: name })
+                            .eq('patient_id', currentEditId);
+                    } else if (fees > 0) {
+                        // Payment নাই, কিন্তু এতিয়া fees দিছে → নতুন insert
+                        await supabaseClient
+                            .from('clinic_payments')
+                            .insert([{ patient_name: name, fees, visit_date: new Date().toISOString().split('T')[0], patient_id: currentEditId }]);
+                    }
+
                     alert('ৰোগীৰ তথ্য সফলতাৰে আপডেট কৰা হৈছে।');
                     closePatientModal();
                     loadPatients();
@@ -724,9 +749,10 @@
                    alert("সংৰক্ষণ কৰিব পৰা নগ'ল: " + error.message);
                 } else {
                     if (fees > 0 && insertedData?.id) {
+                        // income_source = 'patient' দিয়া হৈছে — manual income ৰ পৰা আলাদা কৰিবলৈ
                         await supabaseClient
                             .from('clinic_payments')
-                            .insert([{ patient_name: name, fees, visit_date: new Date().toISOString().split('T')[0], patient_id: insertedData.id }]);
+                            .insert([{ patient_name: name, fees, visit_date: new Date().toISOString().split('T')[0], patient_id: insertedData.id, income_source: 'patient' }]);
                     }
                     alert('নতুন ৰোগীৰ ৰেকৰ্ড সফলতাৰে সংৰক্ষণ কৰা হৈছে।');
                     closePatientModal();
@@ -749,12 +775,14 @@
                 return alert('অনুগ্ৰহ কৰি সঠিক আয়ৰ পৰিমাণ লিখক।');
             }
 
+            // income_source = 'manual' — Patient-linked income ৰ পৰা আলাদা চিনাক্তকৰণ (Duplicate bug fix)
             const { error } = await supabaseClient
                 .from('clinic_payments')
                 .insert([{ 
                     patient_name: patientName, 
                     fees: amount, 
-                    visit_date: new Date().toISOString().split('T')[0] 
+                    visit_date: new Date().toISOString().split('T')[0],
+                    income_source: 'manual'
                 }]);
 
             if (error) {
@@ -841,7 +869,7 @@
                             <p class="text-lg font-extrabold text-blue-700">₹${totalIncome}</p>
                         </div>
                         <div class="bg-purple-50 p-3 rounded-xl text-center">
-                            <p class="text-[10px] text-purple-600 font-bold uppercase">মুঠ লাভ</p>
+                            <p class="text-[10px] text-purple-600 font-bold uppercase">নিট লাভ (আনুমানিক)</p>
                             <p class="text-lg font-extrabold text-purple-700">₹${netProfit}</p>
                         </div>
                     </div>
@@ -858,8 +886,10 @@
                     name: p.patient_name,
                     income: p.fees,
                     expense: 0,
-                    desc: 'Visit Fees',
-                    type: 'income'
+                    // income_source অনুযায়ী বিৱৰণ দেখুওৱা হ'ব — duplicate চিনাক্ত সহজ হ'ব
+                    desc: p.income_source === 'manual' ? '⚡ Manual Income' : 'Patient Visit',
+                    type: 'income',
+                    source: p.income_source || 'patient'
                 })),
                 ...(expenses || []).map(e => ({
                     id: e.id,
@@ -1137,8 +1167,10 @@
             const totalIncome = (payments || []).reduce((s, p) => s + (parseFloat(p.fees) || 0), 0);
             const totalExpense = (expenses || []).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
             const netProfit = totalIncome - totalExpense;
+            // মুঠ ৰোগী = clinic_data ৰ পৰা (সেই মাহত নতুন registered)
             const totalPatients = (patients || []).length;
-            const totalVisits = (payments || []).length;
+            // মুঠ Visit = কেৱল patient-linked payments (manual income বাদ) — consistent count
+            const totalVisits = (payments || []).filter(p => p.income_source !== 'manual').length;
 
             const summaryEl = document.getElementById('reportSummary');
             if (summaryEl) {
@@ -1158,7 +1190,7 @@
                         <p class="text-2xl font-extrabold text-green-700">₹${totalIncome}</p>
                     </div>
                     <div class="${netProfit >= 0 ? 'bg-purple-50' : 'bg-red-50'} p-3 rounded-xl text-center">
-                        <p class="text-[10px] ${netProfit >= 0 ? 'text-purple-600' : 'text-red-600'} font-bold uppercase">নিট লাভ</p>
+                        <p class="text-[10px] ${netProfit >= 0 ? 'text-purple-600' : 'text-red-600'} font-bold uppercase">নিট লাভ (আনুমানিক)</p>
                         <p class="text-2xl font-extrabold ${netProfit >= 0 ? 'text-purple-700' : 'text-red-700'}">₹${netProfit}</p>
                     </div>
                 `;
@@ -1279,6 +1311,8 @@
             const totalIncome = (payments || []).reduce((s, p) => s + (parseFloat(p.fees) || 0), 0);
             const totalExpense = (expenses || []).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
             const netProfit = totalIncome - totalExpense;
+            // মুঠ Visit = কেৱল patient-linked payments (manual income বাদ)
+            const totalVisitsWA = (payments || []).filter(p => p.income_source !== 'manual').length;
 
             const categories = {};
             (expenses || []).forEach(e => {
@@ -1293,7 +1327,7 @@
                         `📅 *${month} ${year} - Monthly Report*\n` +
                         `━━━━━━━━━━━━━━━━━━━━\n` +
                         `👥 মুঠ ৰোগী: *${(patients || []).length} জন*\n` +
-                        `📅 মুঠ Visit: *${(payments || []).length} টা*\n` +
+                        `📅 মুঠ Visit: *${totalVisitsWA} টা*\n` +
                         `━━━━━━━━━━━━━━━━━━━━\n` +
                         `💰 *আয়-ব্যয় হিচাপ:*\n` +
                         `✅ মুঠ আয়: ₹${totalIncome}\n` +
