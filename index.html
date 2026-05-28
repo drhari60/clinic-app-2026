@@ -1177,8 +1177,10 @@
                         `অনুগ্ৰহ কৰি আপোনাৰ ঔষধখিনি সময়মতে সেৱন কৰিবলৈ মনত পেলাই দিয়া হ’ল।\n\n` +
                         `---------------------------\n` +
                         `💡 *দৈনিক স্বাস্থ্য সম্পৰ্কীয় গুৰুত্বপূৰ্ণ প্ৰবন্ধ পঢ়িবলৈ ক্লিক কৰক:* \n\n` +
-                        `📘 *ফেচবুক পেজ:* https://www.facebook.com/drhari365\n\n` +
-                        `🌐 *ৱেবচাইট:* https://drhariswellfuture.com\n` +
+                        `📘 *Facebook:* https://www.facebook.com/drhari365\n` +
+                        `🔴 *YouTube:* https://www.youtube.com/@drhari\n` +
+                        `📸 *Instagram:* https://www.instagram.com/drharikanta\n` +
+                        `🌐 *Website:* https://drhariswellfuture.com\n` +
                         `কুশলে থাকক, \n*DR. HARIS CLINIC*`;
 
             window.open(`https://api.whatsapp.com/send?phone=91${p.phone.replace(/\D/g, '')}&text=${encodeURIComponent(msg)}`, '_blank');
@@ -1485,7 +1487,7 @@
                 .order('visit_date', { ascending: false });
 
             if (error || !visits || visits.length === 0) {
-                listEl.innerHTML = '<p class="text-gray-400 text-center py-6">কোনো visit পোৱা নগ'ল।</p>';
+                listEl.innerHTML = '<p class="text-gray-400 text-center py-6">কোনো visit পোৱা নগ&#39;ল।</p>';
                 return;
             }
 
