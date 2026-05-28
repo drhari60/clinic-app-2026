@@ -646,7 +646,7 @@
 
                 const btnDelete = document.createElement('button');
                 btnDelete.className = 'bg-red-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold';
-                btnDelete.innerHTML = '<i class="fas fa-trash"></i> মচক';
+                btnDelete.innerHTML = '<i class="fas fa-trash"></i> মচি পেলাওক';
                 btnDelete.onclick = () => deletePatientRecord(p.id);
 
                 actions.append(btnEdit, btnDelete);
@@ -1401,23 +1401,22 @@
             const monthStartDate2 = new Date(year, parseInt(document.getElementById('reportMonth').value), 1).toISOString().split('T')[0];
             const monthEndDate2 = new Date(year, parseInt(document.getElementById('reportMonth').value) + 1, 0).toISOString().split('T')[0];
 
-            const [{ data: payments }, { data: expenses }, { data: patients }] = await Promise.all([
+            const [{ data: payments }, { data: expenses }, { data: patients }, { data: visits }] = await Promise.all([
                 supabaseClient.from('clinic_payments').select('*').gte('visit_date', monthStartDate2).lte('visit_date', monthEndDate2),
                 supabaseClient.from('clinic_expenses').select('*').gte('created_at', monthStart).lte('created_at', monthEnd),
                 supabaseClient.from('clinic_data').select('*').gte('created_at', monthStart).lte('created_at', monthEnd),
+                supabaseClient.from('clinic_visits').select('*').gte('visit_date', monthStartDate2).lte('visit_date', monthEndDate2),
             ]);
 
             const totalIncome = (payments || []).reduce((s, p) => s + (parseFloat(p.fees) || 0), 0);
             const totalExpense = (expenses || []).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
             const netProfit = totalIncome - totalExpense;
-            // মুঠ Visit = কেৱল patient-linked payments (manual income বাদ)
-            const totalVisitsWA = (payments || []).filter(p => p.income_source !== 'manual').length;
+            // মুঠ Visit = clinic_visits টেবুলৰ পৰা সঠিক হিচাপ
+            const totalVisitsWA = (visits || []).length;
             // নতুন ৰোগী = সেই মাহত clinic_data ত registered
             const totalNewPatientsWA = (patients || []).length;
-            // Unique ৰোগী = payments ত unique patient_id
-            const uniqueIdsWA = new Set(
-                (payments || []).filter(p => p.patient_id && p.income_source !== 'manual').map(p => p.patient_id)
-            ).size;
+            // Unique ৰোগী = clinic_visits ত unique patient_id
+            const uniqueIdsWA = new Set((visits || []).filter(v => v.patient_id).map(v => v.patient_id)).size;
 
             const categories = {};
             (expenses || []).forEach(e => {
