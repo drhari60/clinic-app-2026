@@ -323,6 +323,19 @@
                 <div id="listExpenses" class="space-y-2"></div>
             </div>
 
+            <!-- Visit History Modal -->
+            <div id="visitHistoryModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+                <div class="bg-white rounded-2xl w-full max-w-md max-h-[85vh] flex flex-col shadow-2xl">
+                    <div class="flex justify-between items-center px-5 py-4 border-b border-gray-100">
+                        <h3 id="visitHistoryTitle" class="font-bold text-base text-slate-900">📋 Visit History</h3>
+                        <button onclick="document.getElementById('visitHistoryModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-700 text-xl font-bold">&times;</button>
+                    </div>
+                    <div id="visitHistoryList" class="overflow-y-auto px-4 py-3 space-y-3 flex-1 text-sm">
+                        <p class="text-gray-400 text-center py-4">লোড হৈ আছে...</p>
+                    </div>
+                </div>
+            </div>
+
             <div id="patientModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
                 <div class="bg-white rounded-xl p-5 w-full max-w-md">
                     <h3 id="modalTitle" class="font-bold text-lg mb-3">➕ নতুন ৰোগী</h3>
@@ -619,7 +632,11 @@
             btnReminder.className = 'bg-orange-500 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1';
             btnReminder.innerHTML = '<i class="fas fa-clock"></i> Reminder';
             btnReminder.onclick = () => sendMedicineReminder(p);
-            actions.append(btnPrint, btnWA, btnReminder);
+            const btnHistory = document.createElement('button');
+            btnHistory.className = 'bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1';
+            btnHistory.innerHTML = '<i class="fas fa-history"></i> History';
+            btnHistory.onclick = () => showVisitHistory(p);
+            actions.append(btnPrint, btnWA, btnReminder, btnHistory);
 
             if (isDoctor) {
                 const btnEdit = document.createElement('button');
@@ -656,11 +673,11 @@
             if (error) {
                 alert('ডাটাবেচে ডিলিট কৰিবলৈ দিয়া নাই: ' + error.message);
             } else {
-                // patient_name-এ নহয়, patient_id-এৰে delete কৰা হ'ব — একেনামৰ আনজনৰ payment নযাব
-                await supabaseClient
-                    .from('clinic_payments')
-                    .delete()
-                    .eq('patient_id', id);
+                // patient delete হলে সকলো linked data একেলগে delete — orphan record নাথাকিব
+                await Promise.all([
+                    supabaseClient.from('clinic_payments').delete().eq('patient_id', id),
+                    supabaseClient.from('clinic_visits').delete().eq('patient_id', id),
+                ]);
                 alert("ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হ'ল।");
                 loadPatients();
                 loadExpenses();
@@ -733,10 +750,17 @@
                             .insert([{ patient_name: name, fees, visit_date: new Date().toISOString().split('T')[0], patient_id: currentEditId, income_source: 'patient' }]);
                     }
 
-                    // clinic_visits-এ যদি record আছে, payment_status update কৰক
+                    // clinic_visits-এ latest visit ত সকলো update — medical history sync
                     await supabaseClient
                         .from('clinic_visits')
-                        .update({ fees_paid: fees, payment_status: fees > 0 ? 'paid' : 'free', patient_name: name })
+                        .update({
+                            fees_paid: fees,
+                            payment_status: fees > 0 ? 'paid' : 'free',
+                            patient_name: name,
+                            bp: document.getElementById('pBP').value || '',
+                            medicine: document.getElementById('pMedicine').value || '',
+                            notes: document.getElementById('pHistory').value || ''
+                        })
                         .eq('patient_id', currentEditId)
                         .eq('visit_type', 'new');
 
@@ -762,9 +786,12 @@
                         patient_id: insertedData.id,
                         patient_name: name,
                         visit_date: new Date().toISOString().split('T')[0],
-                        visit_type: 'new',       // new | follow_up | revisit
+                        visit_type: 'new',
                         fees_paid: fees > 0 ? fees : 0,
-                        payment_status: fees > 0 ? 'paid' : 'free',  // paid | free | unpaid
+                        payment_status: fees > 0 ? 'paid' : 'free',
+                        // full medical data visit ত save — history timeline ৰ ভিত্তি
+                        bp: document.getElementById('pBP').value || '',
+                        medicine: document.getElementById('pMedicine').value || '',
                         notes: document.getElementById('pHistory').value || ''
                     };
                     await supabaseClient.from('clinic_visits').insert([visitRecord]);
@@ -1438,6 +1465,47 @@
                 : 'fas fa-chevron-up text-xs text-white/70';
             if (!box.classList.contains('hidden'))
                 setTimeout(() => box.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+        }
+
+        // ৰোগীৰ সম্পূৰ্ণ visit timeline দেখুৱাব
+        async function showVisitHistory(p) {
+            const modal = document.getElementById('visitHistoryModal');
+            const titleEl = document.getElementById('visitHistoryTitle');
+            const listEl = document.getElementById('visitHistoryList');
+            if (!modal || !titleEl || !listEl) return;
+
+            titleEl.innerHTML = `📋 ${escapeHTML(p.name)} — Visit History`;
+            listEl.innerHTML = '<p class="text-gray-400 text-center py-4">লোড হৈ আছে...</p>';
+            modal.classList.remove('hidden');
+
+            const { data: visits, error } = await supabaseClient
+                .from('clinic_visits')
+                .select('*')
+                .eq('patient_id', p.id)
+                .order('visit_date', { ascending: false });
+
+            if (error || !visits || visits.length === 0) {
+                listEl.innerHTML = '<p class="text-gray-400 text-center py-6">কোনো visit পোৱা নগ'ল।</p>';
+                return;
+            }
+
+            listEl.innerHTML = visits.map((v, i) => {
+                const statusColor = v.payment_status === 'paid' ? 'bg-green-100 text-green-700' :
+                                    v.payment_status === 'free' ? 'bg-blue-100 text-blue-700' :
+                                    'bg-red-100 text-red-600';
+                const visitLabel = v.visit_type === 'new' ? '🆕 নতুন' :
+                                   v.visit_type === 'follow_up' ? '🔄 Follow-up' : '🔁 Revisit';
+                return `
+                <div class="border border-gray-100 rounded-xl p-3 bg-gray-50 space-y-1.5">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-slate-800 text-xs">${v.visit_date} <span class="text-gray-400 font-normal">${visitLabel}</span></span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${statusColor}">${v.payment_status === 'paid' ? '₹'+v.fees_paid+' Paid' : v.payment_status === 'free' ? 'Free' : 'Unpaid'}</span>
+                    </div>
+                    ${v.bp ? `<p class="text-xs text-gray-600">🩺 BP: <span class="font-medium">${escapeHTML(v.bp)}</span></p>` : ''}
+                    ${v.notes ? `<p class="text-xs text-gray-600">📝 History: <span class="font-medium">${escapeHTML(v.notes)}</span></p>` : ''}
+                    ${v.medicine ? `<div class="text-xs text-indigo-700 bg-indigo-50 rounded-lg px-2 py-1.5 mt-1"><b>Rx:</b> ${escapeHTML(v.medicine)}</div>` : ''}
+                </div>`;
+            }).join('');
         }
 
         function escapeHTML(str) {
