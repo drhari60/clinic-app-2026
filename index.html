@@ -600,7 +600,7 @@
             card.innerHTML = `<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <div>
                     <h4 class="text-base font-bold text-slate-900">${escapeHTML(p.name)} <span class="text-xs font-normal text-gray-500">(${escapeHTML(p.age || 'N/A')})</span></h4>
-                    <p class="text-xs text-gray-600 mt-0.5">${escapeHTML(p.phone)} | 🩺 BP: ${escapeHTML(p.bp || 'N/A')} | 💰 Fees: ₹${p.fees || 0}</p>
+                    <p class="text-xs text-gray-600 mt-0.5">${escapeHTML(p.phone)} | 🩺 BP: ${escapeHTML(p.bp || 'N/A')}</p>
                     <p class="text-xs text-gray-500 mt-1"><b>History:</b> ${escapeHTML(p.history || 'None')}</p>
                     <p class="text-xs text-gray-600 mt-1"><b>Rx:</b> ${escapeHTML((p.medicine || '').slice(0, 80))}</p>
                 </div>
@@ -697,8 +697,8 @@
                 bp: document.getElementById('pBP').value,
                 phone,
                 history: document.getElementById('pHistory').value,
-                medicine: document.getElementById('pMedicine').value,
-                fees
+                medicine: document.getElementById('pMedicine').value
+                // fees এইঠাইত নাই — fees কেৱল clinic_payments ত থাকে (architecture fix)
             };
 
             if (currentEditId) {
@@ -710,12 +710,12 @@
                 if (error) {
                     alert('আপডেট ব্যৰ্থ হৈছে: ' + error.message);
                 } else {
-                    // Edit কৰিলে clinic_payments ত fees update কৰা হ'ব (silent financial bug fix)
-                    // আগতে যদি payment আছিল → update, নাথাকিলে → নতুন insert (fees > 0 হ'লে)
+                    // clinic_payments-এ fees update (fees এতিয়া clinic_data-ত নাই)
                     const { data: existingPay } = await supabaseClient
                         .from('clinic_payments')
                         .select('id')
                         .eq('patient_id', currentEditId)
+                        .eq('income_source', 'patient')
                         .limit(1)
                         .single();
 
@@ -724,13 +724,21 @@
                         await supabaseClient
                             .from('clinic_payments')
                             .update({ fees, patient_name: name })
-                            .eq('patient_id', currentEditId);
+                            .eq('patient_id', currentEditId)
+                            .eq('income_source', 'patient');
                     } else if (fees > 0) {
                         // Payment নাই, কিন্তু এতিয়া fees দিছে → নতুন insert
                         await supabaseClient
                             .from('clinic_payments')
-                            .insert([{ patient_name: name, fees, visit_date: new Date().toISOString().split('T')[0], patient_id: currentEditId }]);
+                            .insert([{ patient_name: name, fees, visit_date: new Date().toISOString().split('T')[0], patient_id: currentEditId, income_source: 'patient' }]);
                     }
+
+                    // clinic_visits-এ যদি record আছে, payment_status update কৰক
+                    await supabaseClient
+                        .from('clinic_visits')
+                        .update({ fees_paid: fees, payment_status: fees > 0 ? 'paid' : 'free', patient_name: name })
+                        .eq('patient_id', currentEditId)
+                        .eq('visit_type', 'new');
 
                     alert('ৰোগীৰ তথ্য সফলতাৰে আপডেট কৰা হৈছে।');
                     closePatientModal();
@@ -748,6 +756,19 @@
                 if (error) {
                    alert("সংৰক্ষণ কৰিব পৰা নগ'ল: " + error.message);
                 } else {
+                    // clinic_visits table-এ visit record কৰা হ'ব (payment থাকক বা নাথাকক)
+                    // এইটোৱেই visit ≠ payment separation ৰ মূল ভিত্তি
+                    const visitRecord = {
+                        patient_id: insertedData.id,
+                        patient_name: name,
+                        visit_date: new Date().toISOString().split('T')[0],
+                        visit_type: 'new',       // new | follow_up | revisit
+                        fees_paid: fees > 0 ? fees : 0,
+                        payment_status: fees > 0 ? 'paid' : 'free',  // paid | free | unpaid
+                        notes: document.getElementById('pHistory').value || ''
+                    };
+                    await supabaseClient.from('clinic_visits').insert([visitRecord]);
+
                     if (fees > 0 && insertedData?.id) {
                         // income_source = 'patient' দিয়া হৈছে — manual income ৰ পৰা আলাদা কৰিবলৈ
                         await supabaseClient
@@ -1167,8 +1188,13 @@
             const totalIncome = (payments || []).reduce((s, p) => s + (parseFloat(p.fees) || 0), 0);
             const totalExpense = (expenses || []).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
             const netProfit = totalIncome - totalExpense;
-            // মুঠ ৰোগী = clinic_data ৰ পৰা (সেই মাহত নতুন registered)
-            const totalPatients = (patients || []).length;
+            // মুঠ নতুন ৰোগী = সেই মাহত clinic_data ত registered (নতুন এণ্ট্ৰি)
+            const totalNewPatients = (patients || []).length;
+            // Unique ৰোগী (revisit সহ) = payments ত unique patient_id count
+            const uniquePatientIds = new Set(
+                (payments || []).filter(p => p.patient_id && p.income_source !== 'manual').map(p => p.patient_id)
+            );
+            const totalUniqueVisitors = uniquePatientIds.size;
             // মুঠ Visit = কেৱল patient-linked payments (manual income বাদ) — consistent count
             const totalVisits = (payments || []).filter(p => p.income_source !== 'manual').length;
 
@@ -1176,20 +1202,25 @@
             if (summaryEl) {
                 summaryEl.innerHTML = `
                     <div class="bg-blue-50 p-3 rounded-xl text-center">
-                        <p class="text-[10px] text-blue-600 font-bold uppercase">মুঠ ৰোগী</p>
-                        <p class="text-2xl font-extrabold text-blue-700">${totalPatients}</p>
-                        <p class="text-[10px] text-blue-400">জন</p>
+                        <p class="text-[10px] text-blue-600 font-bold uppercase">নতুন ৰোগী</p>
+                        <p class="text-2xl font-extrabold text-blue-700">${totalNewPatients}</p>
+                        <p class="text-[10px] text-blue-400">জন (নতুন Registration)</p>
+                    </div>
+                    <div class="bg-indigo-50 p-3 rounded-xl text-center">
+                        <p class="text-[10px] text-indigo-600 font-bold uppercase">Unique ৰোগী</p>
+                        <p class="text-2xl font-extrabold text-indigo-700">${totalUniqueVisitors}</p>
+                        <p class="text-[10px] text-indigo-400">জন (revisit সহ)</p>
                     </div>
                     <div class="bg-orange-50 p-3 rounded-xl text-center">
                         <p class="text-[10px] text-orange-600 font-bold uppercase">মুঠ Visit</p>
                         <p class="text-2xl font-extrabold text-orange-700">${totalVisits}</p>
-                        <p class="text-[10px] text-orange-400">টা</p>
+                        <p class="text-[10px] text-orange-400">টা (Paid Visits)</p>
                     </div>
                     <div class="bg-green-50 p-3 rounded-xl text-center">
                         <p class="text-[10px] text-green-600 font-bold uppercase">মুঠ আয়</p>
                         <p class="text-2xl font-extrabold text-green-700">₹${totalIncome}</p>
                     </div>
-                    <div class="${netProfit >= 0 ? 'bg-purple-50' : 'bg-red-50'} p-3 rounded-xl text-center">
+                    <div class="${netProfit >= 0 ? 'bg-purple-50' : 'bg-red-50'} p-3 rounded-xl text-center col-span-2">
                         <p class="text-[10px] ${netProfit >= 0 ? 'text-purple-600' : 'text-red-600'} font-bold uppercase">নিট লাভ (আনুমানিক)</p>
                         <p class="text-2xl font-extrabold ${netProfit >= 0 ? 'text-purple-700' : 'text-red-700'}">₹${netProfit}</p>
                     </div>
@@ -1225,7 +1256,8 @@
             (payments || []).forEach(p => {
                 const date = p.visit_date || p.created_at.split('T')[0];
                 if (!dailyMap[date]) dailyMap[date] = { count: 0, income: 0 };
-                dailyMap[date].count++;
+                // Manual income visit count-এ নযাব, কেৱল patient visit count হ'ব
+                if (p.income_source !== 'manual') dailyMap[date].count++;
                 dailyMap[date].income += parseFloat(p.fees || 0);
             });
 
@@ -1313,6 +1345,12 @@
             const netProfit = totalIncome - totalExpense;
             // মুঠ Visit = কেৱল patient-linked payments (manual income বাদ)
             const totalVisitsWA = (payments || []).filter(p => p.income_source !== 'manual').length;
+            // নতুন ৰোগী = সেই মাহত clinic_data ত registered
+            const totalNewPatientsWA = (patients || []).length;
+            // Unique ৰোগী = payments ত unique patient_id
+            const uniqueIdsWA = new Set(
+                (payments || []).filter(p => p.patient_id && p.income_source !== 'manual').map(p => p.patient_id)
+            ).size;
 
             const categories = {};
             (expenses || []).forEach(e => {
@@ -1326,7 +1364,8 @@
             const msg = `📊 *DR. HARIS CLINIC*\n` +
                         `📅 *${month} ${year} - Monthly Report*\n` +
                         `━━━━━━━━━━━━━━━━━━━━\n` +
-                        `👥 মুঠ ৰোগী: *${(patients || []).length} জন*\n` +
+                        `🆕 নতুন ৰোগী: *${totalNewPatientsWA} জন*\n` +
+                        `👥 Unique ৰোগী: *${uniqueIdsWA} জন* (revisit সহ)\n` +
                         `📅 মুঠ Visit: *${totalVisitsWA} টা*\n` +
                         `━━━━━━━━━━━━━━━━━━━━\n` +
                         `💰 *আয়-ব্যয় হিচাপ:*\n` +
