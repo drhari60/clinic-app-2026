@@ -669,7 +669,7 @@
             showDashboard();
         }
         
-        function showDashboard() {
+        async function showDashboard() {
             const main = document.getElementById('mainPatientSection');
             const dash = document.getElementById('appDashboard');
             if (main) main.classList.add('hidden');
@@ -1323,7 +1323,7 @@
             window.print();
         }
 
-        function sendWhatsAppRx(p) {
+        async function sendWhatsAppRx(p) {
             if(!p.phone) { await showAlert('মোবাইল নম্বৰ পোৱা নগ’ল।', 'নম্বৰ নাই', '📵'); return; }
             
             const date = new Date(p.created_at).toLocaleDateString('en-IN');
@@ -1352,7 +1352,7 @@
             window.open(`https://api.whatsapp.com/send?phone=91${p.phone.replace(/\D/g, '')}&text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        function sendMedicineReminder(p) {
+        async function sendMedicineReminder(p) {
             if(!p.phone) { await showAlert('মোবাইল নম্বৰ পোৱা নগ’ল।', 'নম্বৰ নাই', '📵'); return; }
             
             const msg = `🏥 *DR. HARIS CLINIC*\n` +
