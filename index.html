@@ -12,6 +12,17 @@
         body { font-family: 'Poppins', sans-serif; overflow-x: hidden; }
         .premium-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
         .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        /* Custom Modal */
+        #customAlertOverlay { position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:9999; display:flex; align-items:center; justify-content:center; padding:16px; }
+        #customAlertBox { background:#fff; border-radius:20px; padding:24px 20px 20px; max-width:340px; width:100%; box-shadow:0 25px 50px rgba(0,0,0,0.25); text-align:center; }
+        #customAlertIcon { font-size:2rem; margin-bottom:10px; }
+        #customAlertTitle { font-size:0.95rem; font-weight:800; color:#0f172a; margin-bottom:6px; }
+        #customAlertMsg { font-size:0.78rem; color:#475569; line-height:1.6; margin-bottom:18px; }
+        #customAlertBtns { display:flex; gap:10px; justify-content:center; }
+        #customAlertBtns button { flex:1; padding:11px; border-radius:12px; font-size:0.78rem; font-weight:700; cursor:pointer; border:none; transition:opacity 0.15s; }
+        #customAlertBtns button:hover { opacity:0.85; }
+        #customAlertConfirmBtn { background:#0f172a; color:#fff; }
+        #customAlertCancelBtn { background:#f1f5f9; color:#475569; }
         @media print {
             body * { visibility: hidden; }
             #printArea, #printArea * { visibility: visible; }
@@ -135,6 +146,11 @@
                 <span id="qrBadge" class="text-[11px] premium-gradient text-white font-bold px-4 py-1.5 rounded-full uppercase tracking-wider mb-3 shadow-sm">ফীজ: ₹100</span>
                 <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-md mb-3 transition hover:scale-102">
                     <img id="paymentQRCode" src="" alt="UPI QR Code Scanner" class="w-40 h-40 sm:w-44 sm:h-44 object-contain">
+                    <div id="qrFallback" class="hidden w-40 h-40 sm:w-44 sm:h-44 flex flex-col items-center justify-center bg-slate-50 rounded-lg border-2 border-dashed border-slate-300 text-center p-3">
+                        <i class="fas fa-qrcode text-3xl text-slate-400 mb-2"></i>
+                        <p class="text-[10px] text-slate-500 font-medium">QR load হোৱা নাই</p>
+                        <p class="text-[10px] text-slate-400">তলৰ বুটামেৰে পেমেন্ট কৰক</p>
+                    </div>
                 </div>
                 <a id="upiPayBtn" href="#" class="inline-flex items-center gap-2 bg-[#E05300] hover:bg-orange-700 text-white px-5 py-3 rounded-xl text-xs font-bold shadow-md transition w-full justify-center">
                     <i class="fas fa-wallet"></i> মোবাইলৰ পৰা পেমেন্ট কৰক
@@ -257,9 +273,11 @@
                         </div>
                     </div>
                     <iframe
-                        src="https://udify.app/chatbot/16gM8VWGiBPoepSQ"
+                        data-src="https://udify.app/chatbot/16gM8VWGiBPoepSQ"
+                        src="about:blank"
                         style="width: 100%; height: 600px;"
                         frameborder="0"
+                        loading="lazy"
                         allow="microphone">
                     </iframe>
                 </div>
@@ -276,9 +294,11 @@
                         </div>
                     </div>
                     <iframe
-                        src="https://udify.app/chatbot/R8rIFep1K3KGPUbo"
+                        data-src="https://udify.app/chatbot/R8rIFep1K3KGPUbo"
+                        src="about:blank"
                         style="width: 100%; height: 600px;"
                         frameborder="0"
+                        loading="lazy"
                         allow="microphone">
                     </iframe>
                 </div>
@@ -375,8 +395,100 @@
 
     <div id="printArea" class="hidden p-8 bg-white text-black"></div>
 
+    <!-- Expense Edit Modal -->
+    <div id="expenseEditModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-5 w-full max-w-sm shadow-2xl">
+            <h3 class="font-bold text-base text-slate-900 mb-4 flex items-center gap-2">✏️ খৰচ সম্পাদনা কৰক</h3>
+            <input type="hidden" id="editExpId">
+            <div class="space-y-3">
+                <select id="editExpCategory" class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm focus:outline-none">
+                    <option value="Salary">দৰমহা (Salary)</option>
+                    <option value="Rent">ঘৰ ভাড়া (Rent)</option>
+                    <option value="Electricity Bill">বিজুলীৰ বিল (Electricity Bill)</option>
+                    <option value="Medicine Purchase">ঔষধ কিনা (Medicine Purchase)</option>
+                    <option value="Miscellaneous Expenses">অন্যান্য খৰচ (Miscellaneous Expenses)</option>
+                </select>
+                <input type="number" id="editExpAmount" placeholder="নতুন পৰিমাণ (₹)" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                <input type="text" id="editExpDesc" placeholder="বিৱৰণ" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                <div class="flex gap-2 mt-1">
+                    <button onclick="saveEditedExpense()" class="flex-1 bg-emerald-600 text-white py-3 rounded-xl font-bold text-sm">সংৰক্ষণ</button>
+                    <button onclick="document.getElementById('expenseEditModal').classList.add('hidden')" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">বাতিল</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Alert/Confirm Modal -->
+    <div id="customAlertOverlay" style="display:none;">
+        <div id="customAlertBox">
+            <div id="customAlertIcon">ℹ️</div>
+            <div id="customAlertTitle"></div>
+            <div id="customAlertMsg"></div>
+            <div id="customAlertBtns">
+                <button id="customAlertCancelBtn" style="display:none;">বাতিল</button>
+                <button id="customAlertConfirmBtn">ঠিক আছে</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // ============================================================
+        // CUSTOM MODAL SYSTEM — alert() / confirm() বাদ দিয়া হৈছে
+        // ============================================================
+        function showAlert(msg, title = 'জাননী', icon = 'ℹ️') {
+            return new Promise(resolve => {
+                document.getElementById('customAlertIcon').textContent = icon;
+                document.getElementById('customAlertTitle').textContent = title;
+                document.getElementById('customAlertMsg').textContent = msg;
+                document.getElementById('customAlertCancelBtn').style.display = 'none';
+                const overlay = document.getElementById('customAlertOverlay');
+                overlay.style.display = 'flex';
+                const btn = document.getElementById('customAlertConfirmBtn');
+                btn.textContent = 'ঠিক আছে';
+                btn.onclick = () => { overlay.style.display = 'none'; resolve(true); };
+            });
+        }
+        function showConfirm(msg, title = 'নিশ্চিত কৰক', icon = '⚠️') {
+            return new Promise(resolve => {
+                document.getElementById('customAlertIcon').textContent = icon;
+                document.getElementById('customAlertTitle').textContent = title;
+                document.getElementById('customAlertMsg').textContent = msg;
+                const cancelBtn = document.getElementById('customAlertCancelBtn');
+                cancelBtn.style.display = 'block';
+                cancelBtn.textContent = 'বাতিল';
+                const overlay = document.getElementById('customAlertOverlay');
+                overlay.style.display = 'flex';
+                const confirmBtn = document.getElementById('customAlertConfirmBtn');
+                confirmBtn.textContent = 'হয়, মচক';
+                confirmBtn.style.background = '#dc2626';
+                confirmBtn.onclick = () => { overlay.style.display = 'none'; confirmBtn.style.background = '#0f172a'; resolve(true); };
+                cancelBtn.onclick = () => { overlay.style.display = 'none'; confirmBtn.style.background = '#0f172a'; resolve(false); };
+            });
+        }
+
+        // ============================================================
+        // DEBOUNCE UTILITY — search query throttle
+        // ============================================================
+        function debounce(fn, delay) {
+            let timer;
+            return function(...args) { clearTimeout(timer); timer = setTimeout(() => fn.apply(this, args), delay); };
+        }
+
+        // ============================================================
+        // PHONE SANITIZER — +91, spaces, hyphens handle
+        // ============================================================
+        function sanitizePhone(raw) {
+            let p = raw.replace(/[\s\-()]/g, '');
+            if (p.startsWith('+91')) p = p.slice(3);
+            else if (p.startsWith('91') && p.length === 12) p = p.slice(2);
+            return p;
+        }
+
         const SUPABASE_URL = 'https://oblvgjnyecvvnnnesegl.supabase.co';
+        // ⚠️ SECURITY NOTE: এই ANON KEY publicly visible।
+        // Production deploy কৰাৰ আগতে Supabase RLS (Row Level Security) সক্ষম কৰা বাধ্যতামূলক।
+        // Supabase Dashboard → Authentication → Policies → Enable RLS on all tables.
+        // Anon key ব্যৱহাৰ acceptable যদি RLS শক্ত হয় — কিন্তু service_role key কেতিয়াও frontend-ত নিদিব।
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ibHZnam55ZWN2dm5ubmVzZWdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODMwODcsImV4cCI6MjA5NDI1OTA4N30.x_6poIOY9XfaJIkFj2dxPTnEW93MRAk5670-Ij7tGJI';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentEditId = null;
@@ -416,9 +528,9 @@
                 } else {
                     try {
                         await navigator.clipboard.writeText(window.location.href);
-                        alert('লিংক সফলতাৰে কপি কৰা হৈছে! আপুনি এতিয়া যিকোনো ঠাইত share কৰিব পাৰিব।');
+                        showAlert('লিংক কপি হৈছে!', 'সফল ✅', '🔗');
                     } catch (err) {
-                        alert('Link: ' + window.location.href);
+                        showAlert('Link: ' + window.location.href, 'লিংক', '🔗');
                     }
                 }
             });
@@ -442,7 +554,7 @@
                 btnProceedToPay.addEventListener('click', () => {
                     const name = safeGet('bName').value?.trim();
                     const phone = safeGet('bPhone').value?.trim();
-                    if(!name || !phone) return alert('অনুগ্ৰহ কৰি আগবাঢ়িবলৈ ৰোগীৰ নাম আৰু ম’বাইল নম্বৰ প্ৰদান কৰক।');
+                    if(!name || !phone) { showAlert('নাম আৰু মোবাইল নম্বৰ দিয়ক।', 'প্ৰয়োজনীয়', '⚠️'); return; }
                     generateLiveQR();
                     document.getElementById('bookingStep1').classList.add('hidden');
                     document.getElementById('bookingStep2').classList.remove('hidden');
@@ -460,7 +572,7 @@
             document.getElementById('btnSaveExpense')?.addEventListener('click', saveExpenseRecord);
             document.getElementById('btnSaveIncome')?.addEventListener('click', saveIncomeRecord);
             document.getElementById('btnLogout')?.addEventListener('click', handleLogout);
-            document.getElementById('searchBox')?.addEventListener('keyup', filterPatients);
+            document.getElementById('searchBox')?.addEventListener('keyup', debounce(filterPatients, 350));
             document.getElementById('btnScrollToEntry')?.addEventListener('click', openAddPatientModal);
             document.getElementById('savePatientBtn')?.addEventListener('click', savePatientRecord);
             document.getElementById('closeModalBtn')?.addEventListener('click', closePatientModal);
@@ -509,7 +621,20 @@
             const upiPayload = `upi://pay?pa=9954340102@okbizaxis&pn=Dr%20Harikanta%20Das&am=${currentFee}&cu=INR&tn=${encodeURIComponent(selectedBookingType)}`;
             const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=${encodeURIComponent(upiPayload)}&ecc=M`;
             const qrImageContainer = document.getElementById('paymentQRCode');
-            if(qrImageContainer) qrImageContainer.src = qrApiUrl;
+            if(qrImageContainer) {
+                qrImageContainer.src = qrApiUrl;
+                // Fallback: যদি QR load নহয়, UPI link text দেখুওৱা হ'ব
+                qrImageContainer.onerror = function() {
+                    this.style.display = 'none';
+                    const fallback = document.getElementById('qrFallback');
+                    if(fallback) fallback.classList.remove('hidden');
+                };
+                qrImageContainer.onload = function() {
+                    this.style.display = '';
+                    const fallback = document.getElementById('qrFallback');
+                    if(fallback) fallback.classList.add('hidden');
+                };
+            }
             const upiPayBtn = document.getElementById('upiPayBtn');
             if(upiPayBtn) upiPayBtn.href = upiPayload;
         }
@@ -537,9 +662,9 @@
         async function handleLogin() {
             const email = safeGet('loginEmail').value.trim();
             const password = safeGet('loginPassword').value.trim();
-            if (!email || !password) return alert('অনুগ্ৰহ কৰি ইমেইল আৰু পাছৱৰ্ড লিখক।');
+            if (!email || !password) { await showAlert('অনুগ্ৰহ কৰি ইমেইল আৰু পাছৱৰ্ড লিখক।', 'প্ৰয়োজনীয় তথ্য', '📋'); return; }
             const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) return alert('ভুল ইমেইল বা পাছৱৰ্ড।');
+            if (error) { await showAlert('ভুল ইমেইল বা পাছৱৰ্ড। পুনৰ চেষ্টা কৰক।', 'Login ব্যৰ্থ', '❌'); return; }
             await checkRole(email);
             showDashboard();
         }
@@ -555,29 +680,40 @@
         
         async function handleLogout() {
             await supabaseClient.auth.signOut();
-            location.reload();
+            safeGet('appDashboard').classList.add('hidden');
+            safeGet('mainPatientSection').style.display = '';
+            safeGet('loginEmail').value = '';
+            safeGet('loginPassword').value = '';
+            isDoctor = false;
         }
         
         async function submitBooking() {
             const name = safeGet('bName').value?.trim();
-            const phone = safeGet('bPhone').value?.trim();
+            const rawPhone = safeGet('bPhone').value?.trim();
+            const phone = sanitizePhone(rawPhone);
             const txn_id = safeGet('bTxnId').value?.trim();
             const problem = safeGet('bProblem').value?.trim();
             const namePattern = /^[A-Za-zÀ-ÿ\u0980-\u09FF\s.]{3,50}$/;
-            if (!namePattern.test(name)) return alert('সঠিক ৰোগীৰ নাম দিয়ক।');
+            if (!namePattern.test(name)) { await showAlert('সঠিক ৰোগীৰ নাম দিয়ক।', 'ভুল তথ্য', '⚠️'); return; }
             const phonePattern = /^[6-9]\d{9}$/;
-            if (!phonePattern.test(phone)) return alert('সঠিক 10 ডিজিট ম’বাইল নম্বৰ দিয়ক।');
-            if (!problem || problem.length < 5) return alert('স্বাস্থ্য সমস্যাটো সঠিককৈ লিখক।');
+            if (!phonePattern.test(phone)) { await showAlert('সঠিক 10 ডিজিট নম্বৰ দিয়ক (+91 বা space দিলেও চলিব)।', 'ভুল নম্বৰ', '📱'); return; }
+            if (!problem || problem.length < 5) { await showAlert('স্বাস্থ্য সমস্যাটো সঠিককৈ লিখক।', 'প্ৰয়োজনীয়', '📋'); return; }
             const txnPattern = /^[A-Za-z0-9]{10,30}$/;
-            if (!txnPattern.test(txn_id)) return alert('সঠিক Transaction ID দিয়ক।');
+            if (!txnPattern.test(txn_id)) { await showAlert('সঠিক Transaction ID দিয়ক।', 'ভুল ID', '🔢'); return; }
             const problemDesc = `[${selectedBookingType}] ${problem}`;
             const { error } = await supabaseClient.from('clinic_bookings').insert([{ name, phone, txn_id, problem: problemDesc }]);
-            if (error) alert('বুকিং ব্যৰ্থ হৈছে।');
-            else {
-                alert(`সফল হৈছে! বুকিং গ্ৰহণ কৰা হৈছে।`);
+            if (error) {
+                await showAlert('বুকিং ব্যৰ্থ হৈছে। পুনৰ চেষ্টা কৰক।', 'বুকিং ব্যৰ্থ', '❌');
+            } else {
+                await showAlert('সফল হৈছে! আপোনাৰ বুকিং গ্ৰহণ কৰা হৈছে।', 'বুকিং নিশ্চিত ✅', '🎉');
                 const flashMsg = ` 🏥  *DR. HARIS CLINIC*\n\nনমস্কাৰ ${name},\nআপোনাৰ *${selectedBookingType}* ৰ বুকিং পঞ্জীয়ন কৰা হৈছে।\nTxn ID: ${txn_id}`;
-                window.open(`https://api.whatsapp.com/send?phone=91${phone.replace(/\D/g, '')}&text=${encodeURIComponent(flashMsg)}`, '_blank');
-                location.reload();
+                window.open(`https://api.whatsapp.com/send?phone=91${phone}&text=${encodeURIComponent(flashMsg)}`, '_blank');
+                safeGet('bName').value = '';
+                safeGet('bPhone').value = '';
+                safeGet('bProblem').value = '';
+                safeGet('bTxnId').value = '';
+                document.getElementById('bookingStep2').classList.add('hidden');
+                document.getElementById('bookingStep1').classList.remove('hidden');
             }
         }
         
@@ -658,10 +794,10 @@
 
         async function deletePatientRecord(id) {
             if (!id) {
-                alert("ভুল হৈছে: ৰোগীৰ ID পোৱা নগ'ল!");
+                await showAlert("ভুল হৈছে: ৰোগীৰ ID পোৱা নগ'ল!", "ভুল", "❌");
                 return;
             }
-            if (!confirm('আপুনি সঁচাকৈয়ে এই ৰেকৰ্ডটো চিৰদিনৰ বাবে মচি পেলাব বিচাৰে নে?')) {
+            if (!await showConfirm('আপুনি সঁচাকৈয়ে এই ৰেকৰ্ডটো চিৰদিনৰ বাবে মচি পেলাব বিচাৰে নে?', 'নিশ্চিত কৰক', '🗑️')) {
                 return;
             }
 
@@ -671,14 +807,14 @@
                 .eq('id', id);
 
             if (error) {
-                alert('ডাটাবেচে ডিলিট কৰিবলৈ দিয়া নাই: ' + error.message);
+                await showAlert('ডাটাবেচে ডিলিট কৰিবলৈ দিয়া নাই: ' + error.message, 'ভুল', '❌');
             } else {
                 // patient delete হলে সকলো linked data একেলগে delete — orphan record নাথাকিব
                 await Promise.all([
                     supabaseClient.from('clinic_payments').delete().eq('patient_id', id),
                     supabaseClient.from('clinic_visits').delete().eq('patient_id', id),
                 ]);
-                alert("ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হ'ল।");
+                await showAlert("ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হ'ল।", 'সফল ✅', '✅');
                 loadPatients();
                 loadExpenses();
                 loadReport();
@@ -703,7 +839,7 @@
             const phone = document.getElementById('pPhone').value.trim();
 
             if (!name || !phone) {
-                return alert('অনুগ্ৰহ কৰি ৰোগীৰ নাম আৰু মোবাইল নম্বৰ দিয়ক।');
+                { await showAlert('অনুগ্ৰহ কৰি ৰোগীৰ নাম আৰু মোবাইল নম্বৰ দিয়ক।', 'প্ৰয়োজনীয়', '📋'); return; }
             }
 
             const fees = parseFloat(document.getElementById('pFees').value) || 0;
@@ -725,7 +861,7 @@
                     .eq('id', currentEditId);
 
                 if (error) {
-                    alert('আপডেট ব্যৰ্থ হৈছে: ' + error.message);
+                    await showAlert('আপডেট ব্যৰ্থ হৈছে: ' + error.message, 'ভুল', '❌');
                 } else {
                     // clinic_payments-এ fees update (fees এতিয়া clinic_data-ত নাই)
                     const { data: existingPay } = await supabaseClient
@@ -764,7 +900,7 @@
                         .eq('patient_id', currentEditId)
                         .eq('visit_type', 'new');
 
-                    alert('ৰোগীৰ তথ্য সফলতাৰে আপডেট কৰা হৈছে।');
+                    await showAlert('ৰোগীৰ তথ্য সফলতাৰে আপডেট কৰা হৈছে।', 'আপডেট সফল ✅', '🎉');
                     closePatientModal();
                     loadPatients();
                     loadExpenses();
@@ -778,7 +914,7 @@
                     .single();
 
                 if (error) {
-                   alert("সংৰক্ষণ কৰিব পৰা নগ'ল: " + error.message);
+                   await showAlert("সংৰক্ষণ কৰিব পৰা নগ'ল: " + error.message, 'ভুল', '❌');
                 } else {
                     // clinic_visits table-এ visit record কৰা হ'ব (payment থাকক বা নাথাকক)
                     // এইটোৱেই visit ≠ payment separation ৰ মূল ভিত্তি
@@ -802,7 +938,7 @@
                             .from('clinic_payments')
                             .insert([{ patient_name: name, fees, visit_date: new Date().toISOString().split('T')[0], patient_id: insertedData.id, income_source: 'patient' }]);
                     }
-                    alert('নতুন ৰোগীৰ ৰেকৰ্ড সফলতাৰে সংৰক্ষণ কৰা হৈছে।');
+                    await showAlert('নতুন ৰোগীৰ ৰেকৰ্ড সফলতাৰে সংৰক্ষণ কৰা হৈছে।', 'সফল ✅', '🎉');
                     closePatientModal();
                     loadPatients();
                     loadExpenses();
@@ -817,10 +953,10 @@
             const amount = parseFloat(document.getElementById('incomeAmount')?.value);
 
             if (!patientName) {
-                return alert('অনুগ্ৰহ কৰি ৰোগীৰ নাম লিখক।');
+                { await showAlert('অনুগ্ৰহ কৰি ৰোগীৰ নাম লিখক।', 'প্ৰয়োজনীয়', '📋'); return; }
             }
             if (isNaN(amount) || amount <= 0) {
-                return alert('অনুগ্ৰহ কৰি সঠিক আয়ৰ পৰিমাণ লিখক।');
+                { await showAlert('অনুগ্ৰহ কৰি সঠিক আয়ৰ পৰিমাণ লিখক।', 'ভুল পৰিমাণ', '💰'); return; }
             }
 
             // income_source = 'manual' — Patient-linked income ৰ পৰা আলাদা চিনাক্তকৰণ (Duplicate bug fix)
@@ -834,9 +970,9 @@
                 }]);
 
             if (error) {
-                alert('আয় সংৰক্ষণ কৰিব পৰা নগ’ল: ' + error.message);
+                await showAlert('আয় সংৰক্ষণ কৰিব পৰা নগ’ল: ' + error.message, 'ভুল', '❌');
             } else {
-                alert('আয় সফলতাৰে সংৰক্ষণ কৰা হৈছে।');
+                await showAlert('আয় সফলতাৰে সংৰক্ষণ কৰা হৈছে।', 'সফল ✅', '✅');
                 document.getElementById('incomePatientName').value = '';
                 document.getElementById('incomeAmount').value = '';
                 loadExpenses();
@@ -850,7 +986,7 @@
             const descEl = document.getElementById('expDesc');
 
             if (!amountEl || !amountEl.value) {
-                return alert('অনুগ্ৰহ কৰি খৰচৰ পৰিমাণ (Amount) লিখক।');
+                { await showAlert('অনুগ্ৰহ কৰি খৰচৰ পৰিমাণ লিখক।', 'প্ৰয়োজনীয়', '📋'); return; }
             }
 
             const category = categoryEl ? categoryEl.value : 'Miscellaneous Expenses';
@@ -858,7 +994,7 @@
             const description = descEl ? descEl.value.trim() : '';
 
             if (isNaN(amount) || amount <= 0) {
-                return alert('অনুগ্ৰহ কৰি সঠিক টকাৰ পৰিমাণ লিখক।');
+                { await showAlert('অনুগ্ৰহ কৰি সঠিক টকাৰ পৰিমাণ লিখক।', 'ভুল পৰিমাণ', '💰'); return; }
             }
 
             const { error } = await supabaseClient
@@ -866,9 +1002,9 @@
                 .insert([{ category, amount, description }]);
 
             if (error) {
-                alert('খৰচ সংৰক্ষণ কৰিব পৰা নগ’ল: ' + error.message);
+                await showAlert('খৰচ সংৰক্ষণ কৰিব পৰা নগ’ল: ' + error.message, 'ভুল', '❌');
             } else {
-                alert('দৈনিক খৰচ সফলতাৰে সংৰক্ষণ কৰা হৈছে।');
+                await showAlert('দৈনিক খৰচ সফলতাৰে সংৰক্ষণ কৰা হৈছে।', 'সফল ✅', '✅');
                 if (amountEl) amountEl.value = '';
                 if (descEl) descEl.value = '';
                 loadExpenses();
@@ -978,6 +1114,10 @@
                                     ${isDoctor ? `
                                     <td class="px-3 py-2 text-center">
                                         ${row.type === 'expense' ? `
+                                            <button onclick="editExpenseRecord('${row.id}', '${escapeHTML(row.name)}', ${row.expense}, '${escapeHTML(row.desc)}')" 
+                                                class="bg-blue-500 text-white px-2 py-1 rounded-lg text-[10px] font-bold hover:bg-blue-600 transition mr-1">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
                                             <button onclick="deleteExpenseRecord('${row.id}')" 
                                                 class="bg-red-500 text-white px-2 py-1 rounded-lg text-[10px] font-bold hover:bg-red-600 transition">
                                                 <i class="fas fa-trash"></i> মচক
@@ -1006,15 +1146,15 @@
 
         async function deleteExpenseRecord(expenseId) {
             if (!isDoctor) {
-                alert('কেবল ডাক্তৰে খৰচ মচিব পাৰে!');
+                await showAlert('কেবল ডাক্তৰে খৰচ মচিব পাৰে!', 'অনুমতি নাই', '🔒');
                 return;
             }
             if (!expenseId) {
-                alert("ভুল হৈছে: খৰচৰ ID পোৱা নগ'ল!");
+                await showAlert("ভুল হৈছে: খৰচৰ ID পোৱা নগ'ল!", 'ভুল', '❌');
                 return;
             }
             
-            if (!confirm('আপুনি সঁচাকৈয়ে এই খৰচটো চিৰদিনৰ বাবে মচি পেলাব বিচাৰে নে?')) {
+            if (!await showConfirm('আপুনি সঁচাকৈয়ে এই খৰচটো চিৰদিনৰ বাবে মচি পেলাব বিচাৰে নে?', 'নিশ্চিত কৰক', '🗑️')) {
                 return;
             }
             
@@ -1024,9 +1164,9 @@
                 .eq('id', expenseId);
             
             if (error) {
-                alert('খৰচ মচিব পৰা নগ’ল: ' + error.message);
+                await showAlert('খৰচ মচিব পৰা নগ’ল: ' + error.message, 'ভুল', '❌');
             } else {
-                alert('খৰচ সফলতাৰে মচি পেলোৱা হৈছে।');
+                await showAlert('খৰচ সফলতাৰে মচি পেলোৱা হৈছে।', 'সফল ✅', '✅');
                 loadExpenses();
                 loadReport();
             }
@@ -1034,15 +1174,15 @@
 
         async function deleteIncomeRecord(paymentId, patientName) {
             if (!isDoctor) {
-                alert('কেবল ডাক্তৰে আয় মচিব পাৰে!');
+                await showAlert('কেবল ডাক্তৰে আয় মচিব পাৰে!', 'অনুমতি নাই', '🔒');
                 return;
             }
             if (!paymentId) {
-                alert("ভুল হৈছে: Payment ID পোৱা নগ'ল!");
+                await showAlert("ভুল হৈছে: Payment ID পোৱা নগ'ল!", 'ভুল', '❌');
                 return;
             }
             
-            if (!confirm(`আপুনি সঁচাকৈয়ে "${patientName}" ৰ ভিজিট ফীজটো মচি পেলাব বিচাৰে নে?\n\nসাৱধান: এইটো স্থায়ীভাৱে মচি যাব!`)) {
+            if (!await showConfirm(`"${patientName}" ৰ ভিজিট ফীজটো স্থায়ীভাৱে মচিব বিচাৰে নে?`, 'নিশ্চিত কৰক', '⚠️')) {
                 return;
             }
 
@@ -1059,7 +1199,7 @@
                 .eq('id', paymentId);
             
             if (error) {
-                alert('আয় ৰেকৰ্ড মচিব পৰা নগ’ল: ' + error.message);
+                await showAlert('আয় ৰেকৰ্ড মচিব পৰা নগ’ল: ' + error.message, 'ভুল', '❌');
             } else {
                 // clinic_visits ত corresponding visit ৰ payment_status 'unpaid' কৰক
                 // visit record থাকিব — কেৱল payment বাতিল হ’ল বুলি mark হ’ব
@@ -1070,10 +1210,42 @@
                         .eq('patient_id', paymentRecord.patient_id)
                         .eq('visit_date', paymentRecord.visit_date);
                 }
-                alert('আয় ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হৈছে।');
+                await showAlert('আয় ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হৈছে।', 'সফল ✅', '✅');
                 loadExpenses();
                 loadReport();
                 loadPatients();
+            }
+        }
+
+        async function editExpenseRecord(expenseId, category, amount, description) {
+            if (!isDoctor) { await showAlert('কেবল ডাক্তৰে খৰচ সম্পাদনা কৰিব পাৰে!', 'অনুমতি নাই', '🔒'); return; }
+            // Show inline edit using expense modal
+            const modal = document.getElementById('expenseEditModal');
+            if (!modal) return;
+            document.getElementById('editExpId').value = expenseId;
+            document.getElementById('editExpAmount').value = amount;
+            document.getElementById('editExpDesc').value = description === '-' ? '' : description;
+            document.getElementById('editExpCategory').value = category;
+            modal.classList.remove('hidden');
+        }
+
+        async function saveEditedExpense() {
+            const expenseId = document.getElementById('editExpId').value;
+            const amount = parseFloat(document.getElementById('editExpAmount').value);
+            const description = document.getElementById('editExpDesc').value.trim();
+            const category = document.getElementById('editExpCategory').value;
+            if (!amount || amount <= 0) { await showAlert('সঠিক পৰিমাণ দিয়ক।', 'ভুল', '⚠️'); return; }
+            const { error } = await supabaseClient
+                .from('clinic_expenses')
+                .update({ amount, description, category })
+                .eq('id', expenseId);
+            if (error) {
+                await showAlert('আপডেট ব্যৰ্থ: ' + error.message, 'ভুল', '❌');
+            } else {
+                await showAlert('খৰচ সফলতাৰে আপডেট কৰা হৈছে।', 'সফল ✅', '✅');
+                document.getElementById('expenseEditModal').classList.add('hidden');
+                loadExpenses();
+                loadReport();
             }
         }
 
@@ -1101,46 +1273,54 @@
         function printPrescription(p) {
             const printArea = document.getElementById('printArea');
             if (!printArea) return;
+            const today = new Date().toLocaleDateString('en-IN');
             printArea.innerHTML = `
                 <div class="print-header">
                     <h1>DR. HARIS CLINIC</h1>
-                    <p>Homeopathic & Physiotherapy Center</p>
-                    <p>Gogamukh, Dhemaji, Assam | +91 70025 45678</p>
+                    <p><b>Dr. Harikanta Das</b></p>
+                    <p>BHMS, Diploma in Physiotherapy</p>
+                    <p>Reg. No: HMC/ASSAM/2014/XXXX</p>
+                    <p>Gogamukh, Dhemaji, Assam | Ph: +91 70025 45678</p>
+                    <p style="font-size:11px; color:#888;">Website: drhariswellfuture.com</p>
                 </div>
                 <div class="print-body">
-                    <table style="width:100%; font-size:13px;">
+                    <table style="width:100%; font-size:13px; margin-bottom:8px;">
                         <tr>
                             <td><b>ৰোগীৰ নাম:</b> ${escapeHTML(p.name)}</td>
                             <td><b>বয়স/লিংগ:</b> ${escapeHTML(p.age || 'N/A')}</td>
                         </tr>
                         <tr>
                             <td><b>ৰক্তচাপ (BP):</b> ${escapeHTML(p.bp || 'N/A')}</td>
-                            <td><b>তাৰিখ:</b> ${new Date(p.created_at).toLocaleDateString('en-IN')}</td>
+                            <td><b>তাৰিখ:</b> ${today}</td>
                         </tr>
                         <tr>
                             <td><b>মোবাইল:</b> ${escapeHTML(p.phone || 'N/A')}</td>
-                            <td></td>
+                            <td><b>পৰৱৰ্তী Visit:</b> ...................</td>
                         </tr>
                     </table>
-                    <div style="margin-top:10px;">
-                        <b>ৰোগৰ ইতিবৃত্ত:</b>
+                    <div style="margin-top:10px; border-top:1px dashed #ccc; padding-top:8px;">
+                        <b>ৰোগৰ ইতিবৃত্ত / Chief Complaint:</b>
                         <p style="margin:5px 0; color:#444;">${escapeHTML(p.history || 'N/A')}</p>
                     </div>
                     <div class="print-rx">
-                        <b style="font-size:16px;">Rx</b>
-                        <p>${escapeHTML(p.medicine || 'No prescription written.')}</p>
+                        <b style="font-size:18px; font-family: Georgia, serif;">℞</b>
+                        <p style="white-space:pre-wrap;">${escapeHTML(p.medicine || 'No prescription written.')}</p>
+                    </div>
+                    <div style="margin-top:15px; font-size:12px; color:#555; border:1px solid #eee; padding:8px; border-radius:6px;">
+                        <b>⚠️ নিৰ্দেশনা:</b> ঔষধ নিয়মিতভাৱে সেৱন কৰিব। অসুবিধা হ'লে তৎক্ষণাত যোগাযোগ কৰিব।
                     </div>
                 </div>
                 <div class="print-footer">
-                    <p>Signature: .........................</p>
-                    <p style="font-size:11px; color:#666;">DR. HARIS CLINIC | drhariswellfuture.com</p>
+                    <p>Dr. Harikanta Das</p>
+                    <p style="font-size:11px; color:#666;">BHMS, Diploma in Physiotherapy</p>
+                    <p style="font-size:11px; color:#666;">DR. HARIS CLINIC | Gogamukh, Dhemaji</p>
                 </div>
             `;
             window.print();
         }
 
         function sendWhatsAppRx(p) {
-            if(!p.phone) return alert('মোবাইল নম্বৰ নাই।');
+            if(!p.phone) { await showAlert('মোবাইল নম্বৰ পোৱা নগ’ল।', 'নম্বৰ নাই', '📵'); return; }
             
             const date = new Date(p.created_at).toLocaleDateString('en-IN');
             
@@ -1169,7 +1349,7 @@
         }
 
         function sendMedicineReminder(p) {
-            if(!p.phone) return alert('মোবাইল নম্বৰ নাই।');
+            if(!p.phone) { await showAlert('মোবাইল নম্বৰ পোৱা নগ’ল।', 'নম্বৰ নাই', '📵'); return; }
             
             const msg = `🏥 *DR. HARIS CLINIC*\n` +
                         `---------------------------\n` +
@@ -1194,6 +1374,14 @@
                     
                     document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
                     if (targetTab === 'report') loadReport();
+                    // Lazy load iframes when profile tab activated
+                    if (targetTab === 'profile') {
+                        document.querySelectorAll('iframe[data-src]').forEach(iframe => {
+                            if (iframe.src === 'about:blank' && iframe.dataset.src) {
+                                iframe.src = iframe.dataset.src;
+                            }
+                        });
+                    }
                     document.getElementById(`tab-${targetTab}`)?.classList.remove('hidden');
 
                     buttons.forEach(b => {
