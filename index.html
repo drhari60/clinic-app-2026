@@ -670,8 +670,10 @@
         }
         
         function showDashboard() {
-            safeGet('mainPatientSection').style.display = 'none';
-            safeGet('appDashboard').classList.remove('hidden');
+            const main = document.getElementById('mainPatientSection');
+            const dash = document.getElementById('appDashboard');
+            if (main) main.classList.add('hidden');
+            if (dash) dash.classList.remove('hidden');
             loadPatients();
             loadBookings();
             loadExpenses();
@@ -680,8 +682,10 @@
         
         async function handleLogout() {
             await supabaseClient.auth.signOut();
-            safeGet('appDashboard').classList.add('hidden');
-            safeGet('mainPatientSection').style.display = '';
+            const main = document.getElementById('mainPatientSection');
+            const dash = document.getElementById('appDashboard');
+            if (dash) dash.classList.add('hidden');
+            if (main) main.classList.remove('hidden');
             safeGet('loginEmail').value = '';
             safeGet('loginPassword').value = '';
             isDoctor = false;
