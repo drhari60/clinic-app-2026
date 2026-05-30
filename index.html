@@ -674,10 +674,9 @@
             const dash = document.getElementById('appDashboard');
             if (main) main.classList.add('hidden');
             if (dash) dash.classList.remove('hidden');
-            loadPatients();
-            loadBookings();
-            loadExpenses();
-            loadReport();
+            // Free tier-ৰ বাবে: login হোঁতে কেৱল home tab load কৰক
+            // বাকী tabs click কৰিলেহে load হ'ব — DB-এ অপ্ৰয়োজনীয় চাপ নপৰে
+            await loadPatients();
         }
         
         async function handleLogout() {
@@ -849,10 +848,14 @@
         }
         
         async function loadPatients() {
-            const { data, error } = await supabaseClient.from('clinic_data').select('*').order('created_at', { ascending: false });
+            // Free tier safety: limit 200 — search box-এৰে বাকী বিচাৰক
+            const { data, error } = await supabaseClient
+                .from('clinic_data').select('*')
+                .order('created_at', { ascending: false })
+                .limit(200);
             if (error || !data) return;
             const container = document.getElementById('listPatients');
-            if(!container) return;
+            if (!container) return;
             container.innerHTML = '';
             data.forEach(p => container.appendChild(createPatientCard(p)));
         }
@@ -1493,7 +1496,13 @@
                     const targetTab = btn.getAttribute('data-tab');
                     
                     document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+
+                    // Lazy load — tab click কৰিলেহে DB call হ'ব, free tier safe
+                    if (targetTab === 'booking') loadBookings();
+                    if (targetTab === 'expenses') loadExpenses();
                     if (targetTab === 'report') loadReport();
+                    if (targetTab === 'home') loadPatients();
+
                     // Lazy load iframes when profile tab activated
                     if (targetTab === 'profile') {
                         document.querySelectorAll('iframe[data-src]').forEach(iframe => {
