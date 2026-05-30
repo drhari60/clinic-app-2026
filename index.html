@@ -431,14 +431,13 @@
         </div>
     </div>
 
-    <script>
+   <script>
     // ============================================================
     // ১. ছুপাবেচ কনেকচন কনফিগিয়েৰেচন (Supabase Integration)
     // ============================================================
     const SUPABASE_URL = 'https://ntvstfofpbyunvjuzjli.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ibHZnam55ZWN2dm5ubmVzZWdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODMwODcsImV4cCI6MjA5NDI1OTA4N30.x_6poIOY9XfaJIkFj2dxPTnEW93MRAk5670-Ij7tGJI';
     
-    // ফিক্সড: গোটেই এপ্পটোত গোলকীয়ভাৱে ব্যৱহাৰ হ'বলগীয়া ক্লায়েন্ট অবজেক্ট 'supabase' কৰা হ'ল
     const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let CURRENT_USER_ROLE = 'staff';
@@ -482,7 +481,7 @@
     }
 
     // ============================================================
-    // ৩. অনলাইন বুকিং মেনেজমেণ্ট (Online Booking Panel)
+    // ৩. অনলাইন বুকিং মেনেজমেণ্ট (Online Booking - Verified with clinic_bookings)
     // ============================================================
     const btnSelectRegular = document.getElementById('btnSelectRegular');
     const btnSelectOnline = document.getElementById('btnSelectOnline');
@@ -515,56 +514,63 @@
         if(upiPayBtn) upiPayBtn.href = upiUrl;
     }
 
-    document.getElementById('btnProceedToPay').onclick = async function() {
-        const name = document.getElementById('bName').value.trim();
-        const phone = document.getElementById('bPhone').value.trim();
-        if(!name || !phone) {
-            await showAlert('অনুগ্ৰহ কৰি ৰোগীৰ নাম আৰু ম’বাইল নম্বৰ শুদ্ধকৈ দিয়ক।', 'তথ্য আধৰুৱা', '⚠️');
-            return;
-        }
-        updateQR();
-        document.getElementById('bookingStep1').classList.add('hidden');
-        document.getElementById('bookingStep2').classList.remove('hidden');
-    };
+    if(document.getElementById('btnProceedToPay')) {
+        document.getElementById('btnProceedToPay').onclick = async function() {
+            const name = document.getElementById('bName').value.trim();
+            const phone = document.getElementById('bPhone').value.trim();
+            if(!name || !phone) {
+                await showAlert('অনুগ্ৰহ কৰি ৰোগীৰ নাম আৰু ম’বাইল নম্বৰ শুদ্ধকৈ দিয়ক।', 'তথ্য আধৰুৱা', '⚠️');
+                return;
+            }
+            updateQR();
+            document.getElementById('bookingStep1').classList.add('hidden');
+            document.getElementById('bookingStep2').classList.remove('hidden');
+        };
+    }
 
-    document.getElementById('btnBackToStep1').onclick = function() {
-        document.getElementById('bookingStep2').classList.add('hidden');
-        document.getElementById('bookingStep1').classList.remove('hidden');
-    };
+    if(document.getElementById('btnBackToStep1')) {
+        document.getElementById('btnBackToStep1').onclick = function() {
+            document.getElementById('bookingStep2').classList.add('hidden');
+            document.getElementById('bookingStep1').classList.remove('hidden');
+        };
+    }
 
-    document.getElementById('btnSubmitBooking').onclick = async function() {
-        const name = document.getElementById('bName').value.trim();
-        const phone = cleanPhoneNumber(document.getElementById('bPhone').value.trim());
-        const problem = document.getElementById('bProblem').value.trim();
-        const txnId = document.getElementById('bTxnId').value.trim();
-        const amt = currentBookingType === 'Regular Appointment' ? 100 : 300;
+    if(document.getElementById('btnSubmitBooking')) {
+        document.getElementById('btnSubmitBooking').onclick = async function() {
+            const name = document.getElementById('bName').value.trim();
+            const phone = cleanPhoneNumber(document.getElementById('bPhone').value.trim());
+            const problem = document.getElementById('bProblem').value.trim();
+            const txnId = document.getElementById('bTxnId').value.trim();
+            const amt = currentBookingType === 'Regular Appointment' ? 100 : 300;
 
-        if(!txnId || txnId.length < 6) {
-            await showAlert('অনুগ্ৰহ কৰি আপোনাৰ ১২ ডিজিটৰ UPI Transaction ID টো লিখক।', 'ট্ৰেনজেকচন প্ৰয়োজন', '❌');
-            return;
-        }
+            if(!txnId || txnId.length < 6) {
+                await showAlert('অনুগ্ৰহ কৰি আপোনাৰ ১২ ডিজিটৰ UPI Transaction ID টো লিখক।', 'ট্ৰেনজেকচন প্ৰয়োজন', '❌');
+                return;
+            }
 
-        try {
-            const { error } = await supabase.from('online_bookings').insert([{
-                patient_name: name,
-                patient_phone: phone,
-                problem: problem,
-                booking_type: currentBookingType,
-                transaction_id: txnId,
-                amount_paid: amt,
-                status: 'pending'
-            }]);
-            if(error) throw error;
-            await showAlert('আপোনাৰ বুকিং সফলতাৰে সম্পন্ন হৈছে। ক্লিনিকৰ পৰা আপোনাক সোনকালেই যোগাযোগ কৰা হ’ব।', 'সফল বুকিং', '✅');
-            location.reload();
-        } catch(err) {
-            console.error(err);
-            await showAlert('বুকিং কৰোঁতে কিবা ত্ৰুটি হৈছে। অনুগ্ৰহ কৰি আকৌ চেষ্টা কৰক।', 'ব্যৰ্থ হৈছে', '❌');
-        }
-    };
+            try {
+                // ফিক্সড: টেবুলৰ নাম আপোনাৰ RLS অনুসৰি 'clinic_bookings' কৰা হ'ল
+                const { error } = await supabase.from('clinic_bookings').insert([{
+                    patient_name: name,
+                    patient_phone: phone,
+                    problem: problem,
+                    booking_type: currentBookingType,
+                    transaction_id: txnId,
+                    amount_paid: amt,
+                    status: 'pending'
+                }]);
+                if(error) throw error;
+                await showAlert('আপোনাৰ বুকিং সফলতাৰে সম্পন্ন হৈছে। ক্লিনিকৰ পৰা সোনকালেই যোগাযোগ কৰা হ’ব।', 'সফল বুকিং', '✅');
+                location.reload();
+            } catch(err) {
+                console.error(err);
+                await showAlert('বুকিং কৰোঁতে কিবা ত্ৰুটি হৈছে। অনুগ্ৰহ কৰি আকৌ চেষ্টা কৰক।', 'ব্যৰ্থ হৈছে', '❌');
+            }
+        };
+    }
 
     // ============================================================
-    // ৪. এডমিন এণ্ড ষ্টাফ লগ-ইন চিষ্টেম (Staff Login / Dashboard Control)
+    // ৪. এডমিন এণ্ড ষ্টাফ লগ-ইন চিষ্টেম
     // ============================================================
     async function handleStaffLogin() {
         const email = document.getElementById('loginEmail').value.trim();
@@ -589,16 +595,21 @@
 
             const badge = document.getElementById('accessBadge');
             if (CURRENT_USER_ROLE === 'doctor') {
-                badge.textContent = "DOCTOR 👑";
-                badge.className = "text-[9px] sm:text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider";
+                if(badge) {
+                    badge.textContent = "DOCTOR 👑";
+                    badge.className = "text-[9px] sm:text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider";
+                }
             } else {
-                badge.textContent = "STAFF 💼";
-                badge.className = "text-[9px] sm:text-[10px] bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider";
+                if(badge) {
+                    badge.textContent = "STAFF 💼";
+                    badge.className = "text-[9px] sm:text-[10px] bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider";
+                }
             }
 
             document.getElementById('mainPatientSection').classList.add('hidden');
             document.getElementById('appDashboard').classList.remove('hidden');
             
+            // লগ-ইন হোৱাৰ পিছতহে ডাটা ল’ড কৰিব পাৰিব (RLS Restriction Fix)
             loadPatients();
         } catch (err) {
             console.error(err);
@@ -614,7 +625,7 @@
     }
 
     // ============================================================
-    // ৫. ডেশ্বব’ৰ্ড টেব নেভিগেশ্যন এণ্ড চাটবট ল’ড
+    // ৫. ডেশ্বব’ৰ্ড টেব নেভিগেশ্যন
     // ============================================================
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.onclick = function() {
@@ -645,59 +656,65 @@
     });
 
     // ============================================================
-    // ৬. ৰোগী ব্যৱস্থাপনা কোড (Patient Ledger DB Operations)
+    // ৬. ৰোগী ব্যৱস্থাপনা কোড (Patient DB Operations)
     // ============================================================
     const patientModal = document.getElementById('patientModal');
-    document.getElementById('btnScrollToEntry').onclick = () => {
-        editingPatientId = null;
-        document.getElementById('modalTitle').textContent = "➕ নতুন ৰোগী যোগ কৰক";
-        document.getElementById('pName').value = '';
-        document.getElementById('pAgeSex').value = '';
-        document.getElementById('pBP').value = '';
-        document.getElementById('pPhone').value = '';
-        document.getElementById('pHistory').value = '';
-        document.getElementById('pMedicine').value = '';
-        document.getElementById('pFees').value = '';
-        patientModal.classList.remove('hidden');
-    };
+    if(document.getElementById('btnScrollToEntry')) {
+        document.getElementById('btnScrollToEntry').onclick = () => {
+            editingPatientId = null;
+            document.getElementById('modalTitle').textContent = "➕ নতুন ৰোগী যোগ কৰক";
+            document.getElementById('pName').value = '';
+            document.getElementById('pAgeSex').value = '';
+            document.getElementById('pBP').value = '';
+            document.getElementById('pPhone').value = '';
+            document.getElementById('pHistory').value = '';
+            document.getElementById('pMedicine').value = '';
+            document.getElementById('pFees').value = '';
+            patientModal.classList.remove('hidden');
+        };
+    }
 
-    document.getElementById('closeModalBtn').onclick = () => patientModal.classList.add('hidden');
+    if(document.getElementById('closeModalBtn')) {
+        document.getElementById('closeModalBtn').onclick = () => patientModal.classList.add('hidden');
+    }
 
-    document.getElementById('savePatientBtn').onclick = async function() {
-        const name = document.getElementById('pName').value.trim();
-        const ageSex = document.getElementById('pAgeSex').value.trim();
-        const bp = document.getElementById('pBP').value.trim();
-        const phone = cleanPhoneNumber(document.getElementById('pPhone').value.trim());
-        const history = document.getElementById('pHistory').value.trim();
-        const medicine = document.getElementById('pMedicine').value.trim();
-        const fees = parseFloat(document.getElementById('pFees').value) || 0;
+    if(document.getElementById('savePatientBtn')) {
+        document.getElementById('savePatientBtn').onclick = async function() {
+            const name = document.getElementById('pName').value.trim();
+            const ageSex = document.getElementById('pAgeSex').value.trim();
+            const bp = document.getElementById('pBP').value.trim();
+            const phone = cleanPhoneNumber(document.getElementById('pPhone').value.trim());
+            const history = document.getElementById('pHistory').value.trim();
+            const medicine = document.getElementById('pMedicine').value.trim();
+            const fees = parseFloat(document.getElementById('pFees').value) || 0;
 
-        if(!name || !phone) {
-            await showAlert('ৰোগীৰ নাম আৰু মোবাইল নম্বৰ দিয়াটো বাধ্যতামূলক।', 'প্ৰয়োজনীয় তথ্য', '⚠️');
-            return;
-        }
-
-        try {
-            if(editingPatientId) {
-                const { error } = await supabase.from('clinic_data').update({
-                    patient_name: name, age_sex: ageSex, bp: bp, patient_phone: phone,
-                    case_history: history, medicine_rx: medicine, fees_paid: fees
-                }).eq('id', editingPatientId);
-                if(error) throw error;
-            } else {
-                const { error } = await supabase.from('clinic_data').insert([{
-                    patient_name: name, age_sex: ageSex, bp: bp, patient_phone: phone,
-                    case_history: history, medicine_rx: medicine, fees_paid: fees
-                }]);
-                if(error) throw error;
+            if(!name || !phone) {
+                await showAlert('ৰোগীৰ নাম আৰু মোবাইল নম্বৰ দিয়াটো বাধ্যতামূলক।', 'প্ৰয়োজনীয় তথ্য', '⚠️');
+                return;
             }
-            patientModal.classList.add('hidden');
-            loadPatients();
-            await showAlert('ৰোগীৰ ৰেকৰ্ড সফলতাৰে সংৰক্ষণ কৰা হৈছে।', 'সফল হ’ল', '✅');
-        } catch(err) {
-            console.error(err);
-        }
-    };
+
+            try {
+                if(editingPatientId) {
+                    const { error } = await supabase.from('clinic_data').update({
+                        patient_name: name, age_sex: ageSex, bp: bp, patient_phone: phone,
+                        case_history: history, medicine_rx: medicine, fees_paid: fees
+                    }).eq('id', editingPatientId);
+                    if(error) throw error;
+                } else {
+                    const { error } = await supabase.from('clinic_data').insert([{
+                        patient_name: name, age_sex: ageSex, bp: bp, patient_phone: phone,
+                        case_history: history, medicine_rx: medicine, fees_paid: fees
+                    }]);
+                    if(error) throw error;
+                }
+                patientModal.classList.add('hidden');
+                loadPatients();
+                await showAlert('ৰোগীৰ ৰেকৰ্ড সফলতাৰে সংৰক্ষণ কৰা হৈছে।', 'সফল হ’ল', '✅');
+            } catch(err) {
+                console.error(err);
+            }
+        };
+    }
 
     async function loadPatients(query = '') {
         try {
@@ -709,13 +726,15 @@
             if (error) throw error;
 
             const container = document.getElementById('listPatients');
+            if(!container) return;
+            
             if (!data || data.length === 0) {
                 container.innerHTML = `<p class="text-center text-gray-400 text-xs py-8">কোনো ৰোগীৰ তথ্য পোৱা নগ’ল।</p>`;
                 return;
             }
 
             container.innerHTML = data.map(p => `
-                <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 space-y-3 relative overflow-hidden transition hover:shadow-md">
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 space-y-3 relative overflow-hidden">
                     <div class="flex justify-between items-start">
                         <div>
                             <h4 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
@@ -741,7 +760,7 @@
                 </div>
             `).join('');
         } catch (err) {
-            console.error(err);
+            console.error("Patient loading failed due to RLS/Auth constraints:", err);
         }
     }
 
@@ -773,18 +792,21 @@
         } catch(e) { console.error(e); }
     };
 
-    document.getElementById('searchBox').oninput = debounce((e) => {
-        loadPatients(e.target.value.trim());
-    }, 400);
+    if(document.getElementById('searchBox')) {
+        document.getElementById('searchBox').oninput = debounce((e) => {
+            loadPatients(e.target.value.trim());
+        }, 400);
+    }
 
     // ============================================================
-    // ৭. অনলাইন বুকিং মেনেজাৰ (Dashboard Booking Verification)
+    // 🔍 ৭. অনলাইন বুকিং পৰীক্ষণ (Using clinic_bookings Table)
     // ============================================================
     async function loadBookings() {
         try {
-            const { data, error } = await supabase.from('online_bookings').select('*').order('created_at', {ascending:false});
+            const { data, error } = await supabase.from('clinic_bookings').select('*').order('created_at', {ascending:false});
             if(error) throw error;
             const container = document.getElementById('listBookings');
+            if(!container) return;
             if(!data || data.length===0) {
                 container.innerHTML = `<p class="text-center text-gray-400 text-xs py-8">কোনো অনলাইন বুকিং অহা নাই।</p>`;
                 return;
@@ -812,7 +834,7 @@
 
     window.approveBooking = async function(id, name, phone) {
         try {
-            const { error: updErr } = await supabase.from('online_bookings').update({status:'approved'}).eq('id', id);
+            const { error: updErr } = await supabase.from('clinic_bookings').update({status:'approved'}).eq('id', id);
             if(updErr) throw updErr;
             await supabase.from('clinic_data').insert([{
                 patient_name: name,
@@ -826,36 +848,40 @@
     };
 
     // ============================================================
-    // ৮. আয়-ব্যয় আৰু ফাইনেন্স মেনেজমেন্ট (Dashboard Ledger System)
+    // 💰 ৮. আয়-ব্যয় আৰু ফাইনেন্স মেনেজমেন্ট (clinic_expenses Table)
     // ============================================================
-    document.getElementById('btnSaveIncome').onclick = async function() {
-        const desc = document.getElementById('incomePatientName').value.trim();
-        const amt = parseFloat(document.getElementById('incomeAmount').value);
-        if(!desc || !amt) return;
-        try {
-            const { error } = await supabase.from('clinic_expenses').insert([{ category: 'Extra Income', amount: amt, description: desc, is_income: true }]);
-            if(error) throw error;
-            document.getElementById('incomePatientName').value = '';
-            document.getElementById('incomeAmount').value = '';
-            loadExpensesAndSummary();
-            await showAlert('অতিৰিক্ত আয় সংৰক্ষণ কৰা হৈছে।', 'সফল', '✅');
-        } catch(e) { console.error(e); }
-    };
+    if(document.getElementById('btnSaveIncome')) {
+        document.getElementById('btnSaveIncome').onclick = async function() {
+            const desc = document.getElementById('incomePatientName').value.trim();
+            const amt = parseFloat(document.getElementById('incomeAmount').value);
+            if(!desc || !amt) return;
+            try {
+                const { error } = await supabase.from('clinic_expenses').insert([{ category: 'Extra Income', amount: amt, description: desc, is_income: true }]);
+                if(error) throw error;
+                document.getElementById('incomePatientName').value = '';
+                document.getElementById('incomeAmount').value = '';
+                loadExpensesAndSummary();
+                await showAlert('অতিৰিক্ত আয় সংৰক্ষণ কৰা হৈছে।', 'সফল', '✅');
+            } catch(e) { console.error(e); }
+        };
+    }
 
-    document.getElementById('btnSaveExpense').onclick = async function() {
-        const cat = document.getElementById('expCategory').value;
-        const amt = parseFloat(document.getElementById('expAmount').value);
-        const desc = document.getElementById('expDesc').value.trim();
-        if(!amt) return;
-        try {
-            const { error } = await supabase.from('clinic_expenses').insert([{ category: cat, amount: amt, description: desc, is_income: false }]);
-            if(error) throw error;
-            document.getElementById('expAmount').value = '';
-            document.getElementById('expDesc').value = '';
-            loadExpensesAndSummary();
-            await showAlert('দৈনিক খৰচ সংৰক্ষণ কৰা হৈছে।', 'সফল', '✅');
-        } catch(e) { console.error(e); }
-    };
+    if(document.getElementById('btnSaveExpense')) {
+        document.getElementById('btnSaveExpense').onclick = async function() {
+            const cat = document.getElementById('expCategory').value;
+            const amt = parseFloat(document.getElementById('expAmount').value);
+            const desc = document.getElementById('expDesc').value.trim();
+            if(!amt) return;
+            try {
+                const { error } = await supabase.from('clinic_expenses').insert([{ category: cat, amount: amt, description: desc, is_income: false }]);
+                if(error) throw error;
+                document.getElementById('expAmount').value = '';
+                document.getElementById('expDesc').value = '';
+                loadExpensesAndSummary();
+                await showAlert('দৈনিক খৰচ সংৰক্ষণ কৰা হৈছে।', 'সফল', '✅');
+            } catch(e) { console.error(e); }
+        };
+    }
 
     async function loadExpensesAndSummary() {
         try {
@@ -867,17 +893,21 @@
             let totalExpenses = (expData || []).filter(x => !x.is_income).reduce((acc, curr) => acc + (curr.amount || 0), 0);
             let totalIncome = patientIncome + extraIncome;
 
-            document.getElementById('expenseSummaryText').innerHTML = `
-                <p><b>🩺 ৰোগীৰ পৰা অহা মুঠ ভিজিট ফীজ:</b> ₹${patientIncome}</p>
-                <p><b>➕ অন্যান্য অতিৰিক্ত উপাৰ্জন:</b> ₹${extraIncome}</p>
-                <p class="text-green-700"><b>💰 সৰ্বমুঠ উপাৰ্জন (Total Revenue):</b> ₹${totalIncome}</p>
-                <p class="text-red-600"><b>📉 সৰ্বমুঠ খৰচ (Total Expenses):</b> ₹${totalExpenses}</p>
-                <p class="text-sm font-bold border-t pt-1 mt-1 ${totalIncome - totalExpenses >= 0 ? 'text-emerald-700' : 'text-rose-600'}">
-                    ⚖️ শুদ্ধ লাভ (Net Profit): ₹${totalIncome - totalExpenses}
-                </p>
-            `;
+            const summaryText = document.getElementById('expenseSummaryText');
+            if(summaryText) {
+                summaryText.innerHTML = `
+                    <p><b>🩺 ৰোগীৰ পৰা অহা মুঠ ভিジット ফীজ:</b> ₹${patientIncome}</p>
+                    <p><b>➕ অন্যান্য অতিৰিক্ত উপাৰ্জন:</b> ₹${extraIncome}</p>
+                    <p class="text-green-700"><b>💰 সৰ্বমুঠ উপাৰ্জন (Total Revenue):</b> ₹${totalIncome}</p>
+                    <p class="text-red-600"><b>📉 সৰ্বমুঠ খৰচ (Total Expenses):</b> ₹${totalExpenses}</p>
+                    <p class="text-sm font-bold border-t pt-1 mt-1 ${totalIncome - totalExpenses >= 0 ? 'text-emerald-700' : 'text-rose-600'}">
+                        ⚖️ শুদ্ধ লাভ (Net Profit): ₹${totalIncome - totalExpenses}
+                    </p>
+                `;
+            }
 
             const container = document.getElementById('listExpenses');
+            if(!container) return;
             const filteredExps = (expData || []).filter(x => !x.is_income);
             if(filteredExps.length === 0) {
                 container.innerHTML = `<p class="text-center text-gray-400 text-[11px] py-4">কোনো দৈনিক খৰচৰ তালিকা নাই।</p>`;
@@ -905,7 +935,7 @@
     };
 
     // ============================================================
-    // ৯. মান্থলি ৰিপোৰ্ট মডিউল (Report Generator)
+    // 📈 ৯. মান্থলি ৰিপোৰ্ট মডিউল
     // ============================================================
     async function generateReport() {
         const year = document.getElementById('reportYear').value;
@@ -990,8 +1020,8 @@
         } catch(e) { console.error(e); }
     }
 
-    document.getElementById('reportYear').onchange = generateReport;
-    document.getElementById('reportMonth').onchange = generateReport;
+    if(document.getElementById('reportYear')) document.getElementById('reportYear').onchange = generateReport;
+    if(document.getElementById('reportMonth')) document.getElementById('reportMonth').onchange = generateReport;
 
     window.printReport = () => {
         const year = document.getElementById('reportYear').value;
@@ -1024,7 +1054,7 @@
     };
 
     // ============================================================
-    // ১০. ইতিবৃত্ত বা ভিজিট হিষ্ট্ৰী (Patient Check-in Timeline)
+    // 📋 ১০. ইতিবৃত্ত বা ভিজিট হিষ্ট্ৰী
     // ============================================================
     window.openHistoryModal = async function(id, name) {
         document.getElementById('visitHistoryTitle').textContent = `📋 ${name} - Visit History`;
@@ -1072,13 +1102,13 @@
     };
 
     // ============================================================
-    // ১১. হেল্থ টিপছ ৰোটেশ্যন (Health Tips Systems)
+    // 🌱 ১১. হেল্থ টিপছ ৰোটেশ্যন
     // ============================================================
     const HEALTH_TIPS = [
         { title: "হৃদযন্ত্ৰ সুস্থ ৰাখক", content: "দৈনিক পুৱা ৩০ মিনিট খোজ কাঢ়ক আৰু তেল-নিমখ কমাই খাওক।" },
         { title: "পানীৰ প্ৰয়োজনীয়তা", content: "দিনটোত অন্ততঃ ৩-৪ লিটাৰ পৰিস্কাৰ পানী খোৱাৰ অভ্যাস কৰক।" },
         { title: "মেদবহুলতাৰ পৰা সাৱধান", content: "ফাষ্ট ফুড আৰু চেনিযুক্ত খাদ্য খোৱাৰ পৰা বিৰত থাকক।" },
-        { title: "হાળ আৰু গাঁঠিৰ যত্ন", content: "কেলচিয়াম আৰু ভিটামিন ডি যুক্ত আহাৰ লওক, দৈনিক ৰ'দত বহক।" }
+        { title: "হাড় আৰু গাঁঠিৰ যত্ন", content: "কেলচিয়াম আৰু ভিটামিন ডি যুক্ত আহাৰ লওক, দৈনিক ৰ'দত বহক।" }
     ];
 
     function rotateHealthTips() {
@@ -1096,7 +1126,7 @@
     }
 
     // ============================================================
-    // ১২. ইউটিলিটি মডিউলছ (Debounce, Clean Phone, Escape)
+    // ⚙️ ১২. ইউটিলিটি মডিউলছ
     // ============================================================
     function debounce(fn, delay) {
         let timer;
@@ -1151,7 +1181,7 @@
     };
 
     // ============================================================
-    // ১৩. ইনিচিয়েলাইজেচন (Window Load Engine)
+    // 🚀 ১৩. ইনিচিয়েলাইজেচন (Window Load Engine)
     // ============================================================
     window.onload = () => {
         rotateHealthTips();
@@ -1162,7 +1192,7 @@
         const logoutBtn = document.getElementById('btnLogout');
         if(logoutBtn) logoutBtn.onclick = handleLogout;
 
-        console.log("Dr. Haris Clinic Application Engine Core fully integrated.");
+        console.log("Dr. Haris Clinic Application Engine fully synced with Supabase RLS.");
     };
 </script>
 
