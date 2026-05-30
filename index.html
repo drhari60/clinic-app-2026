@@ -689,6 +689,11 @@
             safeGet('loginEmail').value = '';
             safeGet('loginPassword').value = '';
             isDoctor = false;
+            // UI clear — logout কৰাৰ পিছত পুৰণি data নাদেখাওক
+            const lp = document.getElementById('listPatients');
+            const lb = document.getElementById('listBookings');
+            if (lp) lp.innerHTML = '';
+            if (lb) lb.innerHTML = '';
         }
         
         async function submitBooking() {
@@ -722,20 +727,125 @@
         }
         
         async function loadBookings() {
-            const { data, error } = await supabaseClient.from('clinic_bookings').select('*').order('created_at', { ascending: false });
-            if(error || !data) return;
+            const { data, error } = await supabaseClient
+                .from('clinic_bookings').select('*').order('created_at', { ascending: false });
+            if (error || !data) return;
             const container = document.getElementById('listBookings');
-            if(!container) return;
-            container.innerHTML = data.map(b => `
-                <div class="p-4 border rounded-xl bg-white flex justify-between items-center shadow-sm text-xs">
-                    <div>
-                        <h5 class="font-bold text-gray-900">${escapeHTML(b.name)} (${escapeHTML(b.phone)})</h5>
-                        <p class="text-emerald-600 font-mono mt-0.5 font-bold">Txn ID: ${escapeHTML(b.txn_id)}</p>
-                        <p class="text-gray-600 mt-1">${escapeHTML(b.problem || 'No description')}</p>
+            if (!container) return;
+
+            if (data.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-400 text-sm py-8">কোনো বুকিং নাই।</p>';
+                return;
+            }
+
+            // Filter buttons HTML
+            const filterBar = `
+                <div class="flex gap-2 mb-3 flex-wrap">
+                    <button onclick="filterBookings('all')" id="fb-all" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-slate-900 text-white transition">সকলো</button>
+                    <button onclick="filterBookings('pending')" id="fb-pending" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-yellow-100 text-yellow-700 transition">⏳ Pending</button>
+                    <button onclick="filterBookings('verified')" id="fb-verified" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-emerald-100 text-emerald-700 transition">✅ Verified</button>
+                    <button onclick="filterBookings('rejected')" id="fb-rejected" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-red-100 text-red-600 transition">❌ Rejected</button>
+                </div>`;
+
+            const cards = data.map(b => {
+                const statusColor = b.status === 'verified' ? 'bg-emerald-100 text-emerald-700'
+                    : b.status === 'rejected' ? 'bg-red-100 text-red-600'
+                    : 'bg-yellow-100 text-yellow-700';
+                const statusLabel = b.status === 'verified' ? '✅ Verified'
+                    : b.status === 'rejected' ? '❌ Rejected' : '⏳ Pending';
+                const date = new Date(b.created_at).toLocaleDateString('en-IN');
+
+                return `
+                <div class="booking-card p-4 border rounded-xl bg-white shadow-sm text-xs space-y-2" data-status="${b.status || 'pending'}">
+                    <div class="flex justify-between items-start gap-2">
+                        <div>
+                            <h5 class="font-bold text-gray-900 text-sm">${escapeHTML(b.name)}</h5>
+                            <p class="text-gray-500 mt-0.5">${escapeHTML(b.phone)} · ${date}</p>
+                        </div>
+                        <span class="px-2 py-1 rounded-full font-bold text-[10px] shrink-0 ${statusColor}">${statusLabel}</span>
                     </div>
-                    <span class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded font-bold">Verified</span>
-                </div>
-            `).join('');
+                    <p class="text-emerald-700 font-mono font-bold bg-emerald-50 px-2 py-1 rounded-lg">Txn: ${escapeHTML(b.txn_id)}</p>
+                    <p class="text-gray-600">${escapeHTML(b.problem || '')}</p>
+                    <div class="flex gap-2 pt-1 border-t flex-wrap">
+                        ${b.status !== 'verified' ? `
+                        <button onclick="updateBookingStatus('${b.id}', 'verified')"
+                            class="flex-1 bg-emerald-600 text-white py-2 rounded-lg font-bold text-[11px] hover:bg-emerald-700 transition min-w-[80px]">
+                            ✅ Verify
+                        </button>` : ''}
+                        ${b.status !== 'rejected' ? `
+                        <button onclick="updateBookingStatus('${b.id}', 'rejected')"
+                            class="flex-1 bg-red-500 text-white py-2 rounded-lg font-bold text-[11px] hover:bg-red-600 transition min-w-[80px]">
+                            ❌ Reject
+                        </button>` : ''}
+                        ${b.status === 'verified' ? `
+                        <button onclick="convertBookingToPatient('${b.id}')"
+                            class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold text-[11px] hover:bg-blue-700 transition">
+                            ➕ ক্লিনিকত ৰোগী হিচাপে যোগ কৰক
+                        </button>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+
+            container.innerHTML = filterBar + `<div id="bookingCardList">${cards}</div>`;
+        }
+
+        function filterBookings(status) {
+            const cards = document.querySelectorAll('.booking-card');
+            cards.forEach(card => {
+                card.style.display = (status === 'all' || card.dataset.status === status) ? '' : 'none';
+            });
+            // active button highlight
+            ['all','pending','verified','rejected'].forEach(s => {
+                const btn = document.getElementById('fb-' + s);
+                if (!btn) return;
+                btn.className = s === status
+                    ? 'px-3 py-1.5 rounded-lg text-[11px] font-bold bg-slate-900 text-white transition'
+                    : btn.className.replace('bg-slate-900 text-white', '');
+            });
+        }
+
+        async function updateBookingStatus(bookingId, newStatus) {
+            const { error } = await supabaseClient
+                .from('clinic_bookings').update({ status: newStatus }).eq('id', bookingId);
+            if (error) {
+                await showAlert('Status update কৰিব পৰা নগ\'ল।', 'ভুল', '❌');
+            } else {
+                await showAlert(
+                    newStatus === 'verified' ? 'বুকিং Verify কৰা হৈছে! ✅' : 'বুকিং Reject কৰা হৈছে।',
+                    'সফল', newStatus === 'verified' ? '✅' : '❌'
+                );
+                loadBookings();
+            }
+        }
+
+        async function convertBookingToPatient(bookingId) {
+            const { data: b, error } = await supabaseClient
+                .from('clinic_bookings').select('*').eq('id', bookingId).single();
+            if (error || !b) { await showAlert('Booking তথ্য পোৱা নগ\'ল।', 'ভুল', '❌'); return; }
+
+            currentEditId = null;
+            document.getElementById('pName').value = b.name || '';
+            document.getElementById('pPhone').value = b.phone || '';
+            document.getElementById('pHistory').value = b.problem || '';
+            document.getElementById('pAgeSex').value = '';
+            document.getElementById('pBP').value = '';
+            document.getElementById('pMedicine').value = '';
+            document.getElementById('pFees').value = '';
+            document.getElementById('modalTitle').innerHTML = '➕ Booking ৰ পৰা নতুন ৰোগী';
+            document.getElementById('patientModal').classList.remove('hidden');
+
+            // Home tab-লৈ যাওক
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById('tab-home').classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('text-slate-900', 'border-b-2', 'border-slate-900');
+                btn.classList.add('text-gray-400');
+            });
+            const homeBtn = document.querySelector('[data-tab="home"]');
+            if (homeBtn) {
+                homeBtn.classList.add('text-slate-900', 'border-b-2', 'border-slate-900');
+                homeBtn.classList.remove('text-gray-400');
+            }
         }
         
         async function loadPatients() {
@@ -776,7 +886,13 @@
             btnHistory.className = 'bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1';
             btnHistory.innerHTML = '<i class="fas fa-history"></i> History';
             btnHistory.onclick = () => showVisitHistory(p);
-            actions.append(btnPrint, btnWA, btnReminder, btnHistory);
+
+            const btnRevisit = document.createElement('button');
+            btnRevisit.className = 'bg-teal-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1';
+            btnRevisit.innerHTML = '<i class="fas fa-redo"></i> Revisit';
+            btnRevisit.onclick = () => openRevisitModal(p);
+
+            actions.append(btnPrint, btnWA, btnReminder, btnHistory, btnRevisit);
 
             if (isDoctor) {
                 const btnEdit = document.createElement('button');
@@ -1701,6 +1817,66 @@
             }).join('');
         }
 
+        function openRevisitModal(p) {
+            document.getElementById('revisitPatientId').value = p.id;
+            document.getElementById('revisitPatientName').value = p.name;
+            document.getElementById('revisitModalTitle').innerHTML = `🔄 ${escapeHTML(p.name)} — নতুন Visit`;
+            document.getElementById('revisitBP').value = '';
+            document.getElementById('revisitHistory').value = '';
+            document.getElementById('revisitMedicine').value = '';
+            document.getElementById('revisitFees').value = '';
+            document.getElementById('revisitModal').classList.remove('hidden');
+        }
+
+        async function saveRevisit() {
+            const patientId = document.getElementById('revisitPatientId').value;
+            const patientName = document.getElementById('revisitPatientName').value;
+            const bp = document.getElementById('revisitBP').value.trim();
+            const notes = document.getElementById('revisitHistory').value.trim();
+            const medicine = document.getElementById('revisitMedicine').value.trim();
+            const fees = parseFloat(document.getElementById('revisitFees').value) || 0;
+            const today = new Date().toISOString().split('T')[0];
+
+            if (!notes) { await showAlert('আজিৰ সমস্যা লিখক।', 'প্ৰয়োজনীয়', '📋'); return; }
+
+            const visitRecord = {
+                patient_id: patientId,
+                patient_name: patientName,
+                visit_date: today,
+                visit_type: 'follow_up',
+                fees_paid: fees,
+                payment_status: fees > 0 ? 'paid' : 'free',
+                bp, medicine, notes
+            };
+
+            const { error: visitErr } = await supabaseClient.from('clinic_visits').insert([visitRecord]);
+            if (visitErr) { await showAlert('Visit সংৰক্ষণ ব্যৰ্থ: ' + visitErr.message, 'ভুল', '❌'); return; }
+
+            // Fees থাকিলে payment record যোগ কৰক
+            if (fees > 0) {
+                await supabaseClient.from('clinic_payments').insert([{
+                    patient_name: patientName,
+                    fees, visit_date: today,
+                    patient_id: patientId,
+                    income_source: 'patient'
+                }]);
+            }
+
+            // clinic_data ত latest medicine/bp update কৰক
+            const updateData = {};
+            if (bp) updateData.bp = bp;
+            if (medicine) updateData.medicine = medicine;
+            if (Object.keys(updateData).length > 0) {
+                await supabaseClient.from('clinic_data').update(updateData).eq('id', patientId);
+            }
+
+            await showAlert('Revisit সফলতাৰে সংৰক্ষণ হৈছে।', 'সফল ✅', '🎉');
+            document.getElementById('revisitModal').classList.add('hidden');
+            loadPatients();
+            loadExpenses();
+            loadReport();
+        }
+
         function escapeHTML(str) {
             if (!str) return '';
             return str.replace(/[&<>'"]/g, 
@@ -1708,5 +1884,24 @@
             );
         }
     </script>
+    <!-- Revisit Modal -->
+    <div id="revisitModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-5 w-full max-w-md shadow-2xl">
+            <h3 id="revisitModalTitle" class="font-bold text-base text-slate-900 mb-4">🔄 নতুন Visit যোগ কৰক</h3>
+            <input type="hidden" id="revisitPatientId">
+            <input type="hidden" id="revisitPatientName">
+            <div class="space-y-3">
+                <input type="text" id="revisitBP" placeholder="ৰক্তচাপ (BP) — যদি নতুন" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                <textarea id="revisitHistory" placeholder="আজিৰ সমস্যা / Chief Complaint" class="w-full p-3 border border-gray-200 rounded-xl text-sm h-20 resize-none focus:outline-none shadow-inner"></textarea>
+                <textarea id="revisitMedicine" placeholder="আজিৰ Rx (ঔষধ)" class="w-full p-3 border border-gray-200 rounded-xl text-sm h-24 resize-none focus:outline-none shadow-inner"></textarea>
+                <input type="number" id="revisitFees" placeholder="Visit ফীজ (₹) — নাথাকিলে খালী ৰাখক" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                <div class="flex gap-2">
+                    <button onclick="saveRevisit()" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-xl font-bold text-sm transition">সংৰক্ষণ কৰক</button>
+                    <button onclick="document.getElementById('revisitModal').classList.add('hidden')" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">বাতিল</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
