@@ -435,13 +435,113 @@
 <!-- ...তাৰ ঠিক পিছতেই তলৰ এই অংশটো থাকিব -->
 
 <script>
-    // মই দিয়া গোটেই নতুন ক'ডখিনি ইয়াত পেষ্ট হ'ব...
-    // ১. কাষ্টম মডাল চিষ্টেম...
-    // ২. ডিবাউন্স এণ্ড ফোন নম্বৰ ফিল্টাৰ...
-    // (গোটেই ক'ডখিনি ইয়াৰ মাজত বহিব)
-    
+    // ============================================================
+    // SUPABASE SETUP & CONFIGURATION
+    // ============================================================
+    const SUPABASE_URL = 'https://ntvstfofpbyunvjuzjli.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ibHZnam55ZWN2dm5ubmVzZWdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODMwODcsImV4cCI6MjA5NDI1OTA4N30.x_6poIOY9XfaJIkFj2dxPTnEW93MRAk5670-Ij7tGJI'; // <--- আপোনাৰ আচল Key টো ইয়াত বহুৱাব
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentSession = null;
+    let activeTab = 'home';
+    let patientsCache = [];
+
+    // ============================================================
+    // CUSTOM MODAL SYSTEM — Replacement for alert/confirm
+    // ============================================================
+    function showAlert(msg, title = 'জাননী', icon = 'ℹ️') {
+        return new Promise(resolve => {
+            document.getElementById('customAlertIcon').textContent = icon;
+            document.getElementById('customAlertTitle').textContent = title;
+            document.getElementById('customAlertMsg').textContent = msg;
+            document.getElementById('customAlertCancelBtn').style.display = 'none';
+            const overlay = document.getElementById('customAlertOverlay');
+            overlay.style.display = 'flex';
+            const btn = document.getElementById('customAlertConfirmBtn');
+            btn.textContent = 'ঠিক আছে';
+            btn.onclick = () => { overlay.style.display = 'none'; resolve(true); };
+        });
+    }
+
+    function showConfirm(msg, title = 'নিশ্চিত কৰক', icon = '⚠️') {
+        return new Promise(resolve => {
+            document.getElementById('customAlertIcon').textContent = icon;
+            document.getElementById('customAlertTitle').textContent = title;
+            document.getElementById('customAlertMsg').textContent = msg;
+            const cancelBtn = document.getElementById('customAlertCancelBtn');
+            cancelBtn.style.display = 'block';
+            cancelBtn.textContent = 'বাতিল';
+            const overlay = document.getElementById('customAlertOverlay');
+            overlay.style.display = 'flex';
+            
+            document.getElementById('customAlertConfirmBtn').onclick = () => { overlay.style.display = 'none'; resolve(true); };
+            cancelBtn.onclick = () => { overlay.style.display = 'none'; resolve(false); };
+        });
+    }
+
+    // ============================================================
+    // HEALTH TIPS ROTATION SYSTEM
+    // ============================================================
+    const HEALTH_TIPS = [
+        { title: "হৃদযন্ত্ৰ সুস্থ ৰাখক", content: "দৈনিক পুৱা ৩০ মিনিট খোজ কাঢ়ক।" },
+        { title: "পানী পৰ্যাপ্ত পৰিমাণে খাওক", content: "সুস্থ শৰীৰৰ বাবে দৈনিক ৩-৪ লিটাৰ পানী খোৱাটো জৰুৰী।" },
+        { title: "মেৰুদণ্ড পোনকৈ বহক", content: "কঁকাল আৰু ডিঙিৰ বিষৰ পৰা বাচিবলৈ বহাৰ অভ্যাস সলনি কৰক।" },
+        { title: "পৰ্যাপ্ত টোপনি প্ৰয়োজন", content: "প্ৰতিদিনে ৭-৮ ঘণ্টা গভীৰ টোপনিয়ে শৰীৰ সতেজ ৰাখে।" },
+        { title: "নিমখ আৰু চেনি কমাব", content: "উচ্চ ৰক্তচাপ আৰু বহুমূত্ৰ ৰোগ প্ৰতিৰোধ কৰিবলৈ নিমখ-চেনি কমকৈ খাওক।" }
+    ];
+
+    function rotateHealthTips() {
+        try {
+            const tipTitleEl = document.getElementById('tipTitle');
+            const tipContentEl = document.getElementById('tipContent');
+            if (!tipTitleEl || !tipContentEl) return;
+            let index = 0;
+            setInterval(() => {
+                index = (index + 1) % HEALTH_TIPS.length;
+                tipTitleEl.textContent = HEALTH_TIPS[index].title;
+                tipContentEl.textContent = HEALTH_TIPS[index].content;
+            }, 7000);
+        } catch (e) {
+            console.error("Health tips error:", e);
+        }
+    }
+
+    // ============================================================
+    // DEBOUNCE & PHONE FILTER FOR SECURITY
+    // ============================================================
+    function debounce(func, delay = 300) {
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    function cleanPhoneNumber(num) {
+        if (!num) return '';
+        let cleaned = num.toString().replace(/\D/g, '');
+        if (cleaned.length === 12 && cleaned.startsWith('91')) {
+            cleaned = cleaned.substring(2);
+        }
+        return cleaned;
+    }
+
+    function escapeHTML(str) {
+        if (!str) return '';
+        return str.replace(/[&<>'"]/g, 
+            tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+        );
+    }
+
+    // ============================================================
+    // INITIALIZATION ON WINDOW LOAD
+    // ============================================================
     window.onload = () => {
+        // ৰোটেট হেল্থ টিপছ সক্ৰিয় কৰা হ'ল
         rotateHealthTips();
+        
+        // আপোনাৰ বাকী থকা ইনিচিয়েলাইজেচন কোড ইয়াৰ তলত চলিব
+        console.log("Dr. Haris Clinic App Initialized successfully.");
     };
 </script>
 
