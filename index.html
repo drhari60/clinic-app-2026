@@ -489,6 +489,38 @@
         // Production deploy কৰাৰ আগতে Supabase RLS (Row Level Security) সক্ষম কৰা বাধ্যতামূলক।
         // Supabase Dashboard → Authentication → Policies → Enable RLS on all tables.
         // Anon key ব্যৱহাৰ acceptable যদি RLS শক্ত হয় — কিন্তু service_role key কেতিয়াও frontend-ত নিদিব।
+        //
+        // ✅ SUPABASE-ত এই SQL চলাওক (user_roles + RLS setup):
+        // ---------------------------------------------------------
+        // -- 1. user_roles table (নথকিলে বনাওক)
+        // create table if not exists public.user_roles (
+        //   id uuid primary key default gen_random_uuid(),
+        //   user_id uuid references auth.users(id) on delete cascade,
+        //   role text not null default 'staff',
+        //   unique(user_id)
+        // );
+        // alter table public.user_roles enable row level security;
+        //
+        // -- 2. Doctor ৰ user_id যোগ কৰক (এবাৰ কৰিলেই হ'ব):
+        // insert into public.user_roles (user_id, role)
+        // select id, 'doctor' from auth.users where email = 'das.harikanta60@gmail.com'
+        // on conflict (user_id) do update set role = 'doctor';
+        //
+        // -- 3. user_roles READ policy (আপোনাৰটো আছে, এইটো confirm কৰক):
+        // create policy "users_read_own_role" on public.user_roles
+        // to authenticated using (auth.uid() = user_id);
+        //
+        // -- 4. clinic_data: authenticated users পঢ়িব পাৰিব, doctor-হে মচিব পাৰিব
+        // alter table public.clinic_data enable row level security;
+        // create policy "staff_read_clinic_data" on public.clinic_data for select to authenticated using (true);
+        // create policy "staff_insert_clinic_data" on public.clinic_data for insert to authenticated with check (true);
+        // create policy "doctor_update_clinic_data" on public.clinic_data for update to authenticated
+        //   using (exists (select 1 from public.user_roles where user_id = auth.uid() and role = 'doctor'));
+        // create policy "doctor_delete_clinic_data" on public.clinic_data for delete to authenticated
+        //   using (exists (select 1 from public.user_roles where user_id = auth.uid() and role = 'doctor'));
+        //
+        // -- 5. clinic_payments, clinic_expenses, clinic_visits, clinic_bookings-তো একেদৰে RLS দিয়ক।
+        // ---------------------------------------------------------
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ibHZnam55ZWN2dm5ubmVzZWdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODMwODcsImV4cCI6MjA5NDI1OTA4N30.x_6poIOY9XfaJIkFj2dxPTnEW93MRAk5670-Ij7tGJI';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentEditId = null;
@@ -579,11 +611,41 @@
             
             startHealthTipsRotation();
             setupTabs();
+
+            // ✅ FIX: reportMonth/reportYear default এতিয়া DOMContentLoaded-ৰ ভিতৰত
+            const _reportMonthEl = document.getElementById('reportMonth');
+            if (_reportMonthEl) {
+                _reportMonthEl.value = new Date().getMonth();
+                _reportMonthEl.addEventListener('change', loadReport);
+            }
+            const _reportYearEl = document.getElementById('reportYear');
+            if (_reportYearEl) {
+                _reportYearEl.value = new Date().getFullYear();
+                _reportYearEl.addEventListener('change', loadReport);
+            }
         });
 
         async function checkRole(userEmail) {
             if (!userEmail) return;
-            isDoctor = (userEmail.toLowerCase() === 'das.harikanta60@gmail.com');
+            // ✅ FIX: user_roles table ৰ পৰা role fetch কৰা হ'ব — hardcoded email নহয়
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (user) {
+                    const { data: roleData } = await supabaseClient
+                        .from('user_roles')
+                        .select('role')
+                        .eq('user_id', user.id)
+                        .single();
+                    isDoctor = roleData?.role === 'doctor';
+                } else {
+                    // Fallback: session আছে কিন্তু user নাই — staff হিচাপে গণ্য
+                    isDoctor = false;
+                }
+            } catch (err) {
+                // user_roles table নাথাকিলে বা error হ'লে — safe fallback
+                isDoctor = false;
+                console.warn('user_roles fetch failed:', err.message);
+            }
             const badge = document.getElementById('accessBadge');
             if (badge) {
                 badge.innerText = isDoctor ? 'Doctor (Full Access)' : 'Staff Mode (Restricted)';
@@ -652,13 +714,6 @@
             }, 5000);
         }
         
-        document.getElementById('reportMonth')?.addEventListener('change', loadReport);
-        document.getElementById('reportYear')?.addEventListener('change', loadReport);
-        const reportMonthEl = document.getElementById('reportMonth');
-        if (reportMonthEl) reportMonthEl.value = new Date().getMonth();
-        const reportYearEl = document.getElementById('reportYear');
-        if (reportYearEl) reportYearEl.value = new Date().getFullYear();
-        
         async function handleLogin() {
             const email = safeGet('loginEmail').value.trim();
             const password = safeGet('loginPassword').value.trim();
@@ -704,6 +759,18 @@
             if (!problem || problem.length < 5) { await showAlert('স্বাস্থ্য সমস্যাটো সঠিককৈ লিখক।', 'প্ৰয়োজনীয়', '📋'); return; }
             const txnPattern = /^[A-Za-z0-9]{10,30}$/;
             if (!txnPattern.test(txn_id)) { await showAlert('সঠিক Transaction ID দিয়ক।', 'ভুল ID', '🔢'); return; }
+            
+            // ✅ FIX: Duplicate txn_id check — একে ID দি দুবাৰ submit হোৱা ৰোধ কৰা হৈছে
+            const { data: existingBooking } = await supabaseClient
+                .from('clinic_bookings')
+                .select('id')
+                .eq('txn_id', txn_id)
+                .maybeSingle();
+            if (existingBooking) {
+                await showAlert('এই Transaction ID আগতেই ব্যৱহাৰ হৈছে! অনুগ্ৰহ কৰি সঠিক ID দিয়ক।', 'Duplicate Booking', '⚠️');
+                return;
+            }
+            
             const problemDesc = `[${selectedBookingType}] ${problem}`;
             const { error } = await supabaseClient.from('clinic_bookings').insert([{ name, phone, txn_id, problem: problemDesc }]);
             if (error) {
@@ -797,6 +864,11 @@
         }
 
         async function deletePatientRecord(id) {
+            // ✅ FIX: Double-check isDoctor — frontend manipulation ৰ বিৰুদ্ধে extra guard
+            if (!isDoctor) {
+                await showAlert('কেৱল ডাক্তৰে ৰোগীৰ ৰেকৰ্ড মচিব পাৰে!', 'অনুমতি নাই', '🔒');
+                return;
+            }
             if (!id) {
                 await showAlert("ভুল হৈছে: ৰোগীৰ ID পোৱা নগ'ল!", "ভুল", "❌");
                 return;
@@ -826,6 +898,11 @@
         }
         
         function editPatientRecord(p) {
+            // ✅ FIX: Staff-এ edit কৰিব নোৱাৰে
+            if (!isDoctor) {
+                showAlert('কেৱল ডাক্তৰে ৰোগীৰ তথ্য সম্পাদনা কৰিব পাৰে!', 'অনুমতি নাই', '🔒');
+                return;
+            }
             currentEditId = p.id;
             document.getElementById('modalTitle').innerHTML = '✏️ ৰোগীৰ তথ্য আপডেট কৰক';
             document.getElementById('pName').value = p.name || '';
@@ -844,6 +921,13 @@
 
             if (!name || !phone) {
                 { await showAlert('অনুগ্ৰহ কৰি ৰোগীৰ নাম আৰু মোবাইল নম্বৰ দিয়ক।', 'প্ৰয়োজনীয়', '📋'); return; }
+            }
+
+            // ✅ FIX: Edit mode-ত isDoctor check — Staff-এ নতুন যোগ কৰিব পাৰিব, কিন্তু edit/delete নহয়
+            if (currentEditId && !isDoctor) {
+                await showAlert('কেৱল ডাক্তৰে ৰোগীৰ তথ্য সম্পাদনা কৰিব পাৰে!', 'অনুমতি নাই', '🔒');
+                closePatientModal();
+                return;
             }
 
             const fees = parseFloat(document.getElementById('pFees').value) || 0;
@@ -884,10 +968,18 @@
                             .eq('patient_id', currentEditId)
                             .eq('income_source', 'patient');
                     } else if (fees > 0) {
-                        // Payment নাই, কিন্তু এতিয়া fees দিছে → নতুন insert
+                        // ✅ FIX: Payment নাই, কিন্তু এতিয়া fees দিছে → নতুন insert
                         await supabaseClient
                             .from('clinic_payments')
                             .insert([{ patient_name: name, fees, visit_date: new Date().toISOString().split('T')[0], patient_id: currentEditId, income_source: 'patient' }]);
+                    } else if (fees === 0 && existingPay === null) {
+                        // fees শূন্য আৰু payment নাই — কিছু নকৰিব, কিন্তু silent নহ'ব
+                        // visit record payment_status 'free' কৰিব
+                        await supabaseClient
+                            .from('clinic_visits')
+                            .update({ payment_status: 'free', fees_paid: 0 })
+                            .eq('patient_id', currentEditId)
+                            .eq('visit_type', 'new');
                     }
 
                     // clinic_visits-এ latest visit ত সকলো update — medical history sync
