@@ -84,7 +84,7 @@
         <div class="text-center w-full mt-2 flex flex-col items-center">
             <div class="relative mb-4">
                 <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 border-slate-900 shadow-xl overflow-hidden bg-slate-100 flex items-center justify-center">
-                    <img src="doctor.jpg" alt="Dr. Harikanta Das" class="w-full h-full object-cover" onerror="this.src='https://img.icons8.com/illustrations/lexicon/96/null/doctor-male.png'">
+                    <img src="doctor.jpg.jpeg" alt="Dr. Harikanta Das" class="w-full h-full object-cover" onerror="this.src='https://img.icons8.com/illustrations/lexicon/96/null/doctor-male.png'">
                 </div>
                 <div class="absolute -bottom-1 right-2 bg-emerald-500 w-5 h-5 rounded-full border-4 border-white animate-pulse"></div>
             </div>
@@ -275,7 +275,7 @@
                     <iframe
                         data-src="https://udify.app/chatbot/16gM8VWGiBPoepSQ"
                         src="about:blank"
-                        style="width: 100%; height: 60vh; min-height: 400px; max-height: 600px;"
+                        style="width: 100%; height: 600px;"
                         frameborder="0"
                         loading="lazy"
                         allow="microphone">
@@ -296,7 +296,7 @@
                     <iframe
                         data-src="https://udify.app/chatbot/R8rIFep1K3KGPUbo"
                         src="about:blank"
-                        style="width: 100%; height: 60vh; min-height: 400px; max-height: 600px;"
+                        style="width: 100%; height: 600px;"
                         frameborder="0"
                         loading="lazy"
                         allow="microphone">
@@ -489,38 +489,6 @@
         // Production deploy কৰাৰ আগতে Supabase RLS (Row Level Security) সক্ষম কৰা বাধ্যতামূলক।
         // Supabase Dashboard → Authentication → Policies → Enable RLS on all tables.
         // Anon key ব্যৱহাৰ acceptable যদি RLS শক্ত হয় — কিন্তু service_role key কেতিয়াও frontend-ত নিদিব।
-        //
-        // ✅ SUPABASE-ত এই SQL চলাওক (user_roles + RLS setup):
-        // ---------------------------------------------------------
-        // -- 1. user_roles table (নথকিলে বনাওক)
-        // create table if not exists public.user_roles (
-        //   id uuid primary key default gen_random_uuid(),
-        //   user_id uuid references auth.users(id) on delete cascade,
-        //   role text not null default 'staff',
-        //   unique(user_id)
-        // );
-        // alter table public.user_roles enable row level security;
-        //
-        // -- 2. Doctor ৰ user_id যোগ কৰক (এবাৰ কৰিলেই হ'ব):
-        // insert into public.user_roles (user_id, role)
-        // select id, 'doctor' from auth.users where email = 'das.harikanta60@gmail.com'
-        // on conflict (user_id) do update set role = 'doctor';
-        //
-        // -- 3. user_roles READ policy (আপোনাৰটো আছে, এইটো confirm কৰক):
-        // create policy "users_read_own_role" on public.user_roles
-        // to authenticated using (auth.uid() = user_id);
-        //
-        // -- 4. clinic_data: authenticated users পঢ়িব পাৰিব, doctor-হে মচিব পাৰিব
-        // alter table public.clinic_data enable row level security;
-        // create policy "staff_read_clinic_data" on public.clinic_data for select to authenticated using (true);
-        // create policy "staff_insert_clinic_data" on public.clinic_data for insert to authenticated with check (true);
-        // create policy "doctor_update_clinic_data" on public.clinic_data for update to authenticated
-        //   using (exists (select 1 from public.user_roles where user_id = auth.uid() and role = 'doctor'));
-        // create policy "doctor_delete_clinic_data" on public.clinic_data for delete to authenticated
-        //   using (exists (select 1 from public.user_roles where user_id = auth.uid() and role = 'doctor'));
-        //
-        // -- 5. clinic_payments, clinic_expenses, clinic_visits, clinic_bookings-তো একেদৰে RLS দিয়ক।
-        // ---------------------------------------------------------
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ibHZnam55ZWN2dm5ubmVzZWdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODMwODcsImV4cCI6MjA5NDI1OTA4N30.x_6poIOY9XfaJIkFj2dxPTnEW93MRAk5670-Ij7tGJI';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentEditId = null;
@@ -611,41 +579,11 @@
             
             startHealthTipsRotation();
             setupTabs();
-
-            // ✅ FIX: reportMonth/reportYear default এতিয়া DOMContentLoaded-ৰ ভিতৰত
-            const _reportMonthEl = document.getElementById('reportMonth');
-            if (_reportMonthEl) {
-                _reportMonthEl.value = new Date().getMonth();
-                _reportMonthEl.addEventListener('change', loadReport);
-            }
-            const _reportYearEl = document.getElementById('reportYear');
-            if (_reportYearEl) {
-                _reportYearEl.value = new Date().getFullYear();
-                _reportYearEl.addEventListener('change', loadReport);
-            }
         });
 
         async function checkRole(userEmail) {
             if (!userEmail) return;
-            // ✅ FIX: user_roles table ৰ পৰা role fetch কৰা হ'ব — hardcoded email নহয়
-            try {
-                const { data: { user } } = await supabaseClient.auth.getUser();
-                if (user) {
-                    const { data: roleData } = await supabaseClient
-                        .from('user_roles')
-                        .select('role')
-                        .eq('user_id', user.id)
-                        .single();
-                    isDoctor = roleData?.role === 'doctor';
-                } else {
-                    // Fallback: session আছে কিন্তু user নাই — staff হিচাপে গণ্য
-                    isDoctor = false;
-                }
-            } catch (err) {
-                // user_roles table নাথাকিলে বা error হ'লে — safe fallback
-                isDoctor = false;
-                console.warn('user_roles fetch failed:', err.message);
-            }
+            isDoctor = (userEmail.toLowerCase() === 'das.harikanta60@gmail.com');
             const badge = document.getElementById('accessBadge');
             if (badge) {
                 badge.innerText = isDoctor ? 'Doctor (Full Access)' : 'Staff Mode (Restricted)';
@@ -714,6 +652,13 @@
             }, 5000);
         }
         
+        document.getElementById('reportMonth')?.addEventListener('change', loadReport);
+        document.getElementById('reportYear')?.addEventListener('change', loadReport);
+        const reportMonthEl = document.getElementById('reportMonth');
+        if (reportMonthEl) reportMonthEl.value = new Date().getMonth();
+        const reportYearEl = document.getElementById('reportYear');
+        if (reportYearEl) reportYearEl.value = new Date().getFullYear();
+        
         async function handleLogin() {
             const email = safeGet('loginEmail').value.trim();
             const password = safeGet('loginPassword').value.trim();
@@ -759,18 +704,6 @@
             if (!problem || problem.length < 5) { await showAlert('স্বাস্থ্য সমস্যাটো সঠিককৈ লিখক।', 'প্ৰয়োজনীয়', '📋'); return; }
             const txnPattern = /^[A-Za-z0-9]{10,30}$/;
             if (!txnPattern.test(txn_id)) { await showAlert('সঠিক Transaction ID দিয়ক।', 'ভুল ID', '🔢'); return; }
-            
-            // ✅ FIX: Duplicate txn_id check — একে ID দি দুবাৰ submit হোৱা ৰোধ কৰা হৈছে
-            const { data: existingBooking } = await supabaseClient
-                .from('clinic_bookings')
-                .select('id')
-                .eq('txn_id', txn_id)
-                .maybeSingle();
-            if (existingBooking) {
-                await showAlert('এই Transaction ID আগতেই ব্যৱহাৰ হৈছে! অনুগ্ৰহ কৰি সঠিক ID দিয়ক।', 'Duplicate Booking', '⚠️');
-                return;
-            }
-            
             const problemDesc = `[${selectedBookingType}] ${problem}`;
             const { error } = await supabaseClient.from('clinic_bookings').insert([{ name, phone, txn_id, problem: problemDesc }]);
             if (error) {
@@ -864,11 +797,6 @@
         }
 
         async function deletePatientRecord(id) {
-            // ✅ FIX: Double-check isDoctor — frontend manipulation ৰ বিৰুদ্ধে extra guard
-            if (!isDoctor) {
-                await showAlert('কেৱল ডাক্তৰে ৰোগীৰ ৰেকৰ্ড মচিব পাৰে!', 'অনুমতি নাই', '🔒');
-                return;
-            }
             if (!id) {
                 await showAlert("ভুল হৈছে: ৰোগীৰ ID পোৱা নগ'ল!", "ভুল", "❌");
                 return;
@@ -898,11 +826,6 @@
         }
         
         function editPatientRecord(p) {
-            // ✅ FIX: Staff-এ edit কৰিব নোৱাৰে
-            if (!isDoctor) {
-                showAlert('কেৱল ডাক্তৰে ৰোগীৰ তথ্য সম্পাদনা কৰিব পাৰে!', 'অনুমতি নাই', '🔒');
-                return;
-            }
             currentEditId = p.id;
             document.getElementById('modalTitle').innerHTML = '✏️ ৰোগীৰ তথ্য আপডেট কৰক';
             document.getElementById('pName').value = p.name || '';
@@ -917,24 +840,10 @@
         
         async function savePatientRecord() {
             const name = document.getElementById('pName').value.trim();
-            // ✅ FIX 1: phone sanitize কৰা হ'ল — +91, space, হাইফেন আঁতৰিব
-            const phone = sanitizePhone(document.getElementById('pPhone').value.trim());
+            const phone = document.getElementById('pPhone').value.trim();
 
             if (!name || !phone) {
                 { await showAlert('অনুগ্ৰহ কৰি ৰোগীৰ নাম আৰু মোবাইল নম্বৰ দিয়ক।', 'প্ৰয়োজনীয়', '📋'); return; }
-            }
-            // ✅ FIX 1 (continued): phone format validate কৰক
-            const phonePattern = /^[6-9]\d{9}$/;
-            if (!phonePattern.test(phone)) {
-                await showAlert('সঠিক 10 ডিজিট মোবাইল নম্বৰ দিয়ক।', 'ভুল নম্বৰ', '📱');
-                return;
-            }
-
-            // ✅ FIX: Edit mode-ত isDoctor check — Staff-এ নতুন যোগ কৰিব পাৰিব, কিন্তু edit/delete নহয়
-            if (currentEditId && !isDoctor) {
-                await showAlert('কেৱল ডাক্তৰে ৰোগীৰ তথ্য সম্পাদনা কৰিব পাৰে!', 'অনুমতি নাই', '🔒');
-                closePatientModal();
-                return;
             }
 
             const fees = parseFloat(document.getElementById('pFees').value) || 0;
@@ -975,18 +884,10 @@
                             .eq('patient_id', currentEditId)
                             .eq('income_source', 'patient');
                     } else if (fees > 0) {
-                        // ✅ FIX: Payment নাই, কিন্তু এতিয়া fees দিছে → নতুন insert
+                        // Payment নাই, কিন্তু এতিয়া fees দিছে → নতুন insert
                         await supabaseClient
                             .from('clinic_payments')
                             .insert([{ patient_name: name, fees, visit_date: new Date().toISOString().split('T')[0], patient_id: currentEditId, income_source: 'patient' }]);
-                    } else if (fees === 0 && existingPay === null) {
-                        // fees শূন্য আৰু payment নাই — কিছু নকৰিব, কিন্তু silent নহ'ব
-                        // visit record payment_status 'free' কৰিব
-                        await supabaseClient
-                            .from('clinic_visits')
-                            .update({ payment_status: 'free', fees_paid: 0 })
-                            .eq('patient_id', currentEditId)
-                            .eq('visit_type', 'new');
                     }
 
                     // clinic_visits-এ latest visit ত সকলো update — medical history sync
@@ -1056,18 +957,11 @@
             const amount = parseFloat(document.getElementById('incomeAmount')?.value);
 
             if (!patientName) {
-                { await showAlert('অনুগ্ৰহ কৰি ৰোগীৰ নাম / বিৱৰণ লিখক।', 'প্ৰয়োজনীয়', '📋'); return; }
+                { await showAlert('অনুগ্ৰহ কৰি ৰোগীৰ নাম লিখক।', 'প্ৰয়োজনীয়', '📋'); return; }
             }
             if (isNaN(amount) || amount <= 0) {
                 { await showAlert('অনুগ্ৰহ কৰি সঠিক আয়ৰ পৰিমাণ লিখক।', 'ভুল পৰিমাণ', '💰'); return; }
             }
-
-            // ✅ FIX 2: Duplicate income warning — ৰোগী যোগ কৰোঁতে fees দিলে এইঠাইত নিদিব
-            const confirmed = await showConfirm(
-                '⚠️ সতৰ্কতা: নতুন ৰোগী যোগ কৰোঁতে যদি fees দিছে, তেন্তে ইয়াত আকৌ নিদিব — duplicate আয় হ'ব!\n\nকেৱল certificate fee, test fee বা অন্য extra আয়ৰ বাবে ইয়াত দিয়ক। আগবাঢ়িব নে?',
-                'Duplicate আয় সতৰ্কতা', '⚠️'
-            );
-            if (!confirmed) return;
 
             // income_source = 'manual' — Patient-linked income ৰ পৰা আলাদা চিনাক্তকৰণ (Duplicate bug fix)
             const { error } = await supabaseClient
@@ -1080,7 +974,7 @@
                 }]);
 
             if (error) {
-                await showAlert(`আয় সংৰক্ষণ কৰিব পৰা নগ'ল: ${error.message}`, 'ভুল', '❌');
+                await showAlert('আয় সংৰক্ষণ কৰিব পৰা নগ’ল: ' + error.message, 'ভুল', '❌');
             } else {
                 await showAlert('আয় সফলতাৰে সংৰক্ষণ কৰা হৈছে।', 'সফল ✅', '✅');
                 document.getElementById('incomePatientName').value = '';
@@ -1112,7 +1006,7 @@
                 .insert([{ category, amount, description }]);
 
             if (error) {
-                await showAlert(`খৰচ সংৰক্ষণ কৰিব পৰা নগ'ল: ${error.message}`, 'ভুল', '❌');
+                await showAlert('খৰচ সংৰক্ষণ কৰিব পৰা নগ’ল: ' + error.message, 'ভুল', '❌');
             } else {
                 await showAlert('দৈনিক খৰচ সফলতাৰে সংৰক্ষণ কৰা হৈছে।', 'সফল ✅', '✅');
                 if (amountEl) amountEl.value = '';
@@ -1274,7 +1168,7 @@
                 .eq('id', expenseId);
             
             if (error) {
-                await showAlert(`খৰচ মচিব পৰা নগ'ল: ${error.message}`, 'ভুল', '❌');
+                await showAlert('খৰচ মচিব পৰা নগ’ল: ' + error.message, 'ভুল', '❌');
             } else {
                 await showAlert('খৰচ সফলতাৰে মচি পেলোৱা হৈছে।', 'সফল ✅', '✅');
                 loadExpenses();
@@ -1309,7 +1203,7 @@
                 .eq('id', paymentId);
             
             if (error) {
-                await showAlert(`আয় ৰেকৰ্ড মচিব পৰা নগ'ল: ${error.message}`, 'ভুল', '❌');
+                await showAlert('আয় ৰেকৰ্ড মচিব পৰা নগ’ল: ' + error.message, 'ভুল', '❌');
             } else {
                 // clinic_visits ত corresponding visit ৰ payment_status 'unpaid' কৰক
                 // visit record থাকিব — কেৱল payment বাতিল হ’ল বুলি mark হ’ব
@@ -1389,7 +1283,7 @@
                     <h1>DR. HARIS CLINIC</h1>
                     <p><b>Dr. Harikanta Das</b></p>
                     <p>BHMS, Diploma in Physiotherapy</p>
-                    <p>Reg. No: D/OL/DMJ/HMP/06</p>
+                    <p>Reg. No: HMC/ASSAM/2014/XXXX</p>
                     <p>Gogamukh, Dhemaji, Assam | Ph: +91 70025 45678</p>
                     <p style="font-size:11px; color:#888;">Website: drhariswellfuture.com</p>
                 </div>
@@ -1430,7 +1324,7 @@
         }
 
         async function sendWhatsAppRx(p) {
-            if(!p.phone) { await showAlert(`মোবাইল নম্বৰ পোৱা নগ'ল।`, 'নম্বৰ নাই', '📵'); return; }
+            if(!p.phone) { await showAlert('মোবাইল নম্বৰ পোৱা নগ’ল।', 'নম্বৰ নাই', '📵'); return; }
             
             const date = new Date(p.created_at).toLocaleDateString('en-IN');
             
@@ -1459,7 +1353,7 @@
         }
 
         async function sendMedicineReminder(p) {
-            if(!p.phone) { await showAlert(`মোবাইল নম্বৰ পোৱা নগ'ল।`, 'নম্বৰ নাই', '📵'); return; }
+            if(!p.phone) { await showAlert('মোবাইল নম্বৰ পোৱা নগ’ল।', 'নম্বৰ নাই', '📵'); return; }
             
             const msg = `🏥 *DR. HARIS CLINIC*\n` +
                         `---------------------------\n` +
@@ -1484,14 +1378,11 @@
                     
                     document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
                     if (targetTab === 'report') loadReport();
-                    // ✅ FIX 4: iframe lazy load — src compare সঠিককৈ কৰা হ'ল
+                    // Lazy load iframes when profile tab activated
                     if (targetTab === 'profile') {
                         document.querySelectorAll('iframe[data-src]').forEach(iframe => {
-                            const currentSrc = iframe.getAttribute('src');
-                            const dataSrc = iframe.getAttribute('data-src');
-                            if (dataSrc && (currentSrc === 'about:blank' || !currentSrc || currentSrc === '')) {
-                                iframe.src = dataSrc;
-                                iframe.removeAttribute('data-src');
+                            if (iframe.src === 'about:blank' && iframe.dataset.src) {
+                                iframe.src = iframe.dataset.src;
                             }
                         });
                     }
