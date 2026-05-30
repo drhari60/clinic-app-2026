@@ -439,7 +439,7 @@
     // SUPABASE SETUP & CONFIGURATION
     // ============================================================
     const SUPABASE_URL = 'https://ntvstfofpbyunvjuzjli.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ibHZnam55ZWN2dm5ubmVzZWdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODMwODcsImV4cCI6MjA5NDI1OTA4N30.x_6poIOY9XfaJIkFj2dxPTnEW93MRAk5670-Ij7tGJI'; // <--- আপোনাৰ আচল Key টো ইয়াত বহুৱাব
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ibHZnam55ZWN2dm5ubmVzZWdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODMwODcsImV4cCI6MjA5NDI1OTA4N30.x_6poIOY9XfaJIkFj2dxPTnEW93MRAk5670-Ij7tGJI';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentSession = null;
@@ -477,6 +477,52 @@
             document.getElementById('customAlertConfirmBtn').onclick = () => { overlay.style.display = 'none'; resolve(true); };
             cancelBtn.onclick = () => { overlay.style.display = 'none'; resolve(false); };
         });
+    }
+
+    // ============================================================
+    // STAFF AUTHENTICATION (LOGIN / LOGOUT LOGIC)
+    // ============================================================
+    async function handleStaffLogin() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value.trim();
+
+        if (!email || !password) {
+            showAlert('অনুগ্ৰহ কৰি ইমেইল আৰু পাছৱৰ্ড দুয়োটা প্ৰৱেশ কৰাওক।', 'ভুল তথ্য', '❌');
+            return;
+        }
+
+        try {
+            const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+
+            currentSession = data.session;
+            showAlert('ক্লিনিক ডেশ্বব’ৰ্ডলৈ স্বাগতম!', 'লগ-ইন সফল', '✅');
+            
+            document.getElementById('mainPatientSection').classList.add('hidden');
+            document.getElementById('appDashboard').classList.remove('hidden');
+            
+            // ডেশ্বব'ৰ্ড খোল খাই যোৱাৰ পিছত ডাটা লোড কৰিবলৈ
+            loadDashboardData();
+        } catch (err) {
+            console.error(err);
+            showAlert('লগ-ইন ব্যৰ্থ হৈছে। অনুগ্ৰহ কৰি ইমেইল আৰু পাছৱৰ্ড পৰীক্ষা কৰক।', 'ত্ৰুটি', '❌');
+        }
+    }
+
+    function handleLogout() {
+        _supabase.auth.signOut();
+        currentSession = null;
+        document.getElementById('appDashboard').classList.add('hidden');
+        document.getElementById('mainPatientSection').classList.remove('hidden');
+        document.getElementById('loginPassword').value = '';
+    }
+
+    // ============================================================
+    // DASHBOARD DATA LOADER (Placeholder for backend fetch)
+    // ============================================================
+    function loadDashboardData() {
+        console.log("Loading clinic data from Supabase...");
+        // ইয়াৰ পিছত আপোনাৰ ৰোগীৰ তালিকা আদি লোড কৰা কাৰ্যসমূহ চলিব
     }
 
     // ============================================================
@@ -534,18 +580,28 @@
     }
 
     // ============================================================
-    // INITIALIZATION ON WINDOW LOAD
+    // INITIALIZATION & EVENT LISTENERS
     // ============================================================
     window.onload = () => {
-        // ৰোটেট হেল্থ টিপছ সক্ৰিয় কৰা হ'ল
         rotateHealthTips();
         
-        // আপোনাৰ বাকী থকা ইনিচিয়েলাইজেচন কোড ইয়াৰ তলত চলিব
-        console.log("Dr. Haris Clinic App Initialized successfully.");
+        // বুটামসমূহৰ ক্লিক ইভেণ্ট সক্ৰিয় কৰা হৈছে
+        const loginBtn = document.getElementById('btnStaffLogin');
+        if(loginBtn) {
+            loginBtn.onclick = handleStaffLogin;
+        }
+
+        const logoutBtn = document.getElementById('btnLogout');
+        if(logoutBtn) {
+            logoutBtn.onclick = handleLogout;
+        }
+
+        console.log("Dr. Haris Clinic App Initialized successfully with login controllers.");
     };
 </script>
 
 </body>
+</html>
 </html>
 </body>
 </html>
