@@ -436,18 +436,20 @@
 
 <script>
     // ============================================================
-    // SUPABASE SETUP & CONFIGURATION
+    // ১. ছুপাবেচ কনেকচন কনফিগিয়েৰেচন (Supabase Integration)
     // ============================================================
     const SUPABASE_URL = 'https://ntvstfofpbyunvjuzjli.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ibHZnam55ZWN2dm5ubmVzZWdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODMwODcsImV4cCI6MjA5NDI1OTA4N30.x_6poIOY9XfaJIkFj2dxPTnEW93MRAk5670-Ij7tGJI';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // ফিক্সড: গোটেই এপ্পটোত ব্যৱহাৰ হ'বলগীয়া ক্লায়েন্ট নাম 'supabase' কৰা হ'ল
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let currentSession = null;
-    let activeTab = 'home';
-    let patientsCache = [];
+    let CURRENT_USER_ROLE = 'staff';
+    let editingPatientId = null;
+    let currentBookingType = 'Regular Appointment';
 
     // ============================================================
-    // CUSTOM MODAL SYSTEM — Replacement for alert/confirm
+    // ২. কাষ্টম মডাল চিষ্টেম (Alert / Confirm Window)
     // ============================================================
     function showAlert(msg, title = 'জাননী', icon = 'ℹ️') {
         return new Promise(resolve => {
@@ -480,60 +482,175 @@
     }
 
     // ============================================================
-    // STAFF AUTHENTICATION (LOGIN / LOGOUT LOGIC)
+    // ৩. এডমিন এণ্ড ষ্টাফ লগ-ইন ব্যৱস্থা (Login / Logout Control)
     // ============================================================
     async function handleStaffLogin() {
         const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value.trim();
+        const password = document.getElementById('loginPassword').value;
 
         if (!email || !password) {
-            showAlert('অনুগ্ৰহ কৰি ইমেইল আৰু পাছৱৰ্ড দুয়োটা প্ৰৱেশ কৰাওক।', 'ভুল তথ্য', '❌');
+            await showAlert('ইমেইল আৰু পাছৱৰ্ড দুয়োটা দিয়া বাধ্যতামূলক।', 'লগ-ইন ত্ৰুটি', '⚠️');
             return;
         }
 
         try {
-            const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+            // ফিক্সড: ক্লায়েন্ট অবজেক্ট শুদ্ধ কৰা হৈছে
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
             if (error) throw error;
 
-            currentSession = data.session;
-            showAlert('ক্লিনিক ডেশ্বব’ৰ্ডলৈ স্বাগতম!', 'লগ-ইন সফল', '✅');
-            
+            // ব্যৱহাৰকাৰীৰ ৰোল স্কেন কৰা
+            const { data: roleData, error: roleError } = await supabase
+                .from('user_roles')
+                .select('role')
+                .eq('user_id', data.user.id)
+                .single();
+
+            if (!roleError && roleData) {
+                CURRENT_USER_ROLE = roleData.role;
+            } else {
+                CURRENT_USER_ROLE = 'staff'; 
+            }
+
+            const badge = document.getElementById('accessBadge');
+            if (CURRENT_USER_ROLE === 'doctor') {
+                badge.textContent = "DOCTOR 👑";
+                badge.className = "text-[9px] sm:text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider";
+            } else {
+                badge.textContent = "STAFF 💼";
+                badge.className = "text-[9px] sm:text-[10px] bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider";
+            }
+
             document.getElementById('mainPatientSection').classList.add('hidden');
             document.getElementById('appDashboard').classList.remove('hidden');
             
-            // ডেশ্বব'ৰ্ড খোল খাই যোৱাৰ পিছত ডাটা লোড কৰিবলৈ
-            loadDashboardData();
+            // ডেশ্বব'ৰ্ডৰ ডাটা ল’ড কৰা
+            loadPatients();
         } catch (err) {
             console.error(err);
-            showAlert('লগ-ইন ব্যৰ্থ হৈছে। অনুগ্ৰহ কৰি ইমেইল আৰু পাছৱৰ্ড পৰীক্ষা কৰক।', 'ত্ৰুটি', '❌');
+            await showAlert('লগ-ইন বিফল হৈছে। ইমেইল, পাছৱৰ্ড বা আপোনাৰ Supabase Auth একাউণ্ট পৰীক্ষা কৰক।', 'প্ৰৱেশ নিষেধ', '❌');
         }
     }
 
     function handleLogout() {
-        _supabase.auth.signOut();
-        currentSession = null;
+        supabase.auth.signOut();
         document.getElementById('appDashboard').classList.add('hidden');
         document.getElementById('mainPatientSection').classList.remove('hidden');
         document.getElementById('loginPassword').value = '';
     }
 
     // ============================================================
-    // DASHBOARD DATA LOADER (Placeholder for backend fetch)
+    // ৪. ডেশ্বব’ৰ্ড নেভিগেশ্যন এণ্ড চাটবট আইফ্ৰেম ল’ড
     // ============================================================
-    function loadDashboardData() {
-        console.log("Loading clinic data from Supabase...");
-        // ইয়াৰ পিছত আপোনাৰ ৰোগীৰ তালিকা আদি লোড কৰা কাৰ্যসমূহ চলিব
-    }
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.onclick = function() {
+            const targetTab = this.getAttribute('data-tab');
+            
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.className = "tab-btn flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition";
+            });
+            this.className = "tab-btn flex flex-col items-center gap-1 text-slate-900 border-b-2 border-slate-900 px-3 py-1 text-xs font-bold transition";
+            
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.add('hidden'));
+            document.getElementById(`tab-${targetTab}`).classList.remove('hidden');
+
+            if (targetTab === 'profile') {
+                document.querySelectorAll('#tab-profile iframe').forEach(iframe => {
+                    if (iframe.src === 'about:blank' || iframe.src === '') {
+                        iframe.src = iframe.getAttribute('data-src');
+                    }
+                });
+            } else if (targetTab === 'booking') {
+                loadBookings();
+            } else if (targetTab === 'expenses') {
+                loadExpensesAndSummary();
+            } else if (targetTab === 'report') {
+                generateReport();
+            }
+        };
+    });
 
     // ============================================================
-    // HEALTH TIPS ROTATION SYSTEM
+    // ৫. ৰোগী ব্যৱস্থাপনা কোড (Patient Ledger Management)
+    // ============================================================
+    function debounce(fn, delay) {
+        let timer;
+        return function(...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => fn.apply(this, args), delay);
+        };
+    }
+
+    function sanitizePhone(raw) {
+        if (!raw) return '';
+        let p = raw.replace(/[\s\-()]/g, '');
+        if (p.startsWith('+91')) p = p.slice(3);
+        else if (p.startsWith('91') && p.length === 12) p = p.slice(2);
+        return p;
+    }
+
+    function escapeHTML(str) {
+        if (!str) return '';
+        return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+    }
+
+    async function loadPatients(query = '') {
+        try {
+            let r = supabase.from('clinic_data').select('*').order('created_at', { ascending: false });
+            if (query) {
+                r = r.or(`patient_name.ilike.%${query}%,patient_phone.ilike.%${query}%`);
+            }
+            const { data, error } = await r;
+            if (error) throw error;
+
+            const container = document.getElementById('listPatients');
+            if (!data || data.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-400 text-xs py-8">কোনো ৰোগীৰ তথ্য পোৱা নগ’ল।</p>`;
+                return;
+            }
+
+            container.innerHTML = data.map(p => `
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 space-y-3 relative overflow-hidden transition hover:shadow-md">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+                                <i class="fas fa-user-circle text-slate-600"></i> ${escapeHTML(p.patient_name)}
+                            </h4>
+                            <p class="text-[11px] text-gray-500 font-medium mt-1">
+                                ${p.age_sex ? `<span>🎂 ${escapeHTML(p.age_sex)}</span> • ` : ''} 📱 ${escapeHTML(p.patient_phone)}
+                            </p>
+                        </div>
+                        <div class="flex gap-1.5">
+                            <button onclick="openHistoryModal('${p.id}', '${p.patient_name}')" class="text-indigo-600 bg-indigo-50 hover:bg-indigo-100 text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition flex items-center gap-1"><i class="fas fa-history"></i> ইতিবৃত্ত</button>
+                            <button onclick="editPatient('${p.id}')" class="text-blue-600 bg-blue-50 hover:bg-blue-100 p-1.5 rounded-xl text-xs w-8 h-8 flex items-center justify-center transition"><i class="fas fa-edit"></i></button>
+                            <button onclick="deletePatient('${p.id}')" class="text-red-600 bg-red-50 hover:bg-red-100 p-1.5 rounded-xl text-xs w-8 h-8 flex items-center justify-center transition"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    ${p.bp ? `<p class="text-xs text-gray-600"><b>🩺 ৰক্তচাপ (BP):</b> ${escapeHTML(p.bp)}</p>` : ''}
+                    ${p.case_history ? `<p class="text-xs text-gray-600"><b>📝 ইতিবৃত্ত:</b> ${escapeHTML(p.case_history)}</p>` : ''}
+                    ${p.medicine_rx ? `<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 mt-1 text-xs text-slate-700"><b>Rx Prescription:</b><p class="mt-1 font-medium whitespace-pre-wrap text-indigo-900">${escapeHTML(p.medicine_rx)}</p></div>` : ''}
+                    <div class="flex justify-between items-center border-t border-gray-50 pt-2.5 mt-1">
+                        <span class="text-[10px] font-bold px-2.5 py-1 rounded-full ${p.fees_paid > 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">₹${p.fees_paid || 0} Paid</span>
+                        <button onclick="printPrescription(${JSON.stringify(p).replace(/"/g, '&quot;')})" class="bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm"><i class="fas fa-print"></i> প্ৰেচক্ৰিপচন</button>
+                    </div>
+                </div>
+            `).join('');
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    document.getElementById('searchBox').oninput = debounce((e) => {
+        loadPatients(e.target.value.trim());
+    }, 400);
+
+    // ============================================================
+    // ৬. হেল্থ টিপছ ৰোটেশ্যন (Health Tips Rotation System)
     // ============================================================
     const HEALTH_TIPS = [
-        { title: "হৃদযন্ত্ৰ সুস্থ ৰাখক", content: "দৈনিক পুৱা ৩০ মিনিট খোজ কাঢ়ক।" },
-        { title: "পানী পৰ্যাপ্ত পৰিমাণে খাওক", content: "সুস্থ শৰীৰৰ বাবে দৈনিক ৩-৪ লিটাৰ পানী খোৱাটো জৰুৰী।" },
-        { title: "মেৰুদণ্ড পোনকৈ বহক", content: "কঁকাল আৰু ডিঙিৰ বিষৰ পৰা বাচিবলৈ বহাৰ অভ্যাস সলনি কৰক।" },
-        { title: "পৰ্যাপ্ত টোপনি প্ৰয়োজন", content: "প্ৰতিদিনে ৭-৮ ঘণ্টা গভীৰ টোপনিয়ে শৰীৰ সতেজ ৰাখে।" },
-        { title: "নিমখ আৰু চেনি কমাব", content: "উচ্চ ৰক্তচাপ আৰু বহুমূত্ৰ ৰোগ প্ৰতিৰোধ কৰিবলৈ নিমখ-চেনি কমকৈ খাওক।" }
+        { title: "হৃদযন্ত্ৰ সুস্থ ৰাখক", content: "দৈনিক পুৱা ৩০ মিনিট খোজ কাঢ়ক আৰু তেল-নিমখ কমাই খাওক।" },
+        { title: "পানীৰ প্ৰয়োজনীয়তা", content: "দিনটোত অন্ততঃ ৩-৪ লিটাৰ পৰিস্কাৰ পানী খোৱাৰ অভ্যাস কৰক।" },
+        { title: "মেদবহুলতাৰ পৰা সাৱধান", content: "ফাষ্ট ফুড আৰু চেনিযুক্ত খাদ্য খোৱাৰ পৰা বিৰত থাকক।" },
+        { title: "হাড় আৰু গাঁঠিৰ যত্ন", content: "কেলচিয়াম আৰু ভিটামিন ডি যুক্ত আহাৰ লওক, দৈনিক ৰ'দত বহক।" }
     ];
 
     function rotateHealthTips() {
@@ -548,60 +665,58 @@
                 tipContentEl.textContent = HEALTH_TIPS[index].content;
             }, 7000);
         } catch (e) {
-            console.error("Health tips error:", e);
+            console.error(e);
         }
     }
 
     // ============================================================
-    // DEBOUNCE & PHONE FILTER FOR SECURITY
+    // ৭. প্ৰিন্ট মডিউল (Prescription Print System)
     // ============================================================
-    function debounce(func, delay = 300) {
-        let timer;
-        return (...args) => {
-            clearTimeout(timer);
-            timer = setTimeout(() => func.apply(this, args), delay);
-        };
-    }
-
-    function cleanPhoneNumber(num) {
-        if (!num) return '';
-        let cleaned = num.toString().replace(/\D/g, '');
-        if (cleaned.length === 12 && cleaned.startsWith('91')) {
-            cleaned = cleaned.substring(2);
-        }
-        return cleaned;
-    }
-
-    function escapeHTML(str) {
-        if (!str) return '';
-        return str.replace(/[&<>'"]/g, 
-            tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-        );
-    }
+    window.printPrescription = (p) => {
+        const printArea = document.getElementById('printArea');
+        const dateStr = p.created_at ? p.created_at.split('T')[0] : new Date().toISOString().split('T')[0];
+        
+        printArea.innerHTML = `
+            <div class="print-header" style="text-align:center; font-family:sans-serif;">
+                <h2>DR. HARIS HOMEOPATHIC & PHYSIOTHERAPY CLINIC</h2>
+                <p>Gogamukh, Dhemaji, Assam | Contact: +91 9954340102</p>
+                <p><b>Dr. Harikanta Das</b> (BHMS, BPT)</p>
+                <hr/>
+            </div>
+            <div class="print-body" style="font-family:sans-serif; margin-top:20px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                    <span><b>Patient Name:</b> ${escapeHTML(p.patient_name)}</span>
+                    <span><b>Age/Sex:</b> ${escapeHTML(p.age_sex || 'N/A')}</span>
+                    <span><b>Date:</b> ${dateStr}</span>
+                </div>
+                <p><b>🩺 BP:</b> ${escapeHTML(p.bp || 'Normal')}</p>
+                <p><b>📝 Case History:</b> ${escapeHTML(p.case_history || 'N/A')}</p>
+                <div style="margin-top:20px; border-top:1px dashed #000; padding-top:10px;">
+                    <h3>Rx (Prescription):</h3>
+                    <p style="font-size:16px; white-space:pre-wrap;">${escapeHTML(p.medicine_rx || 'No medicine specified')}</p>
+                </div>
+            </div>
+        `;
+        window.print();
+    };
 
     // ============================================================
-    // INITIALIZATION & EVENT LISTENERS
+    // ৮. ইনিচিয়েলাইজেচন (Window Initialization)
     // ============================================================
     window.onload = () => {
         rotateHealthTips();
         
-        // বুটামসমূহৰ ক্লিক ইভেণ্ট সক্ৰিয় কৰা হৈছে
         const loginBtn = document.getElementById('btnStaffLogin');
-        if(loginBtn) {
-            loginBtn.onclick = handleStaffLogin;
-        }
+        if(loginBtn) loginBtn.onclick = handleStaffLogin;
 
         const logoutBtn = document.getElementById('btnLogout');
-        if(logoutBtn) {
-            logoutBtn.onclick = handleLogout;
-        }
+        if(logoutBtn) logoutBtn.onclick = handleLogout;
 
-        console.log("Dr. Haris Clinic App Initialized successfully with login controllers.");
+        console.log("Dr. Haris Clinic Dashboard Engine Connected Successfully.");
     };
 </script>
 
 </body>
-</html>
 </html>
 </body>
 </html>
