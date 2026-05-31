@@ -177,7 +177,171 @@
         async function deletePatientRecord(id) { if (!id) { await showAlert("ভুল হৈছে: ৰোগীৰ ID পোৱা নগ'ল!", "ভুল", "❌"); return; } if (!await showConfirm('আপুনি সঁচাকৈয়ে এই ৰেকৰ্ডটো চিৰদিনৰ বাবে মচি পেলাব বিচাৰে নে?', 'নিশ্চিত কৰক', '🗑️')) return; const { error } = await supabaseClient.from('clinic_data').delete().eq('id', id); if (error) { await showAlert('ডাটাবেচে ডিলিট কৰিবলৈ দিয়া নাই: ' + error.message, 'ভুল', '❌'); } else { await Promise.all([supabaseClient.from('clinic_payments').delete().eq('patient_id', id), supabaseClient.from('clinic_visits').delete().eq('patient_id', id)]); await showAlert("ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হ'ল।", 'সফল ✅', '✅'); loadPatients(); loadExpenses(); loadReport(); } }
         function editPatientRecord(p) { currentEditId = p.id; document.getElementById('modalTitle').innerHTML = '✏️ ৰোগীৰ তথ্য আপডেট কৰক'; document.getElementById('pName').value = p.name || ''; document.getElementById('pAgeSex').value = p.age || ''; document.getElementById('pBP').value = p.bp || ''; document.getElementById('pPhone').value = p.phone || ''; document.getElementById('pHistory').value = p.history || ''; document.getElementById('pMedicine').value = p.medicine || ''; document.getElementById('pFees').value = 0; document.getElementById('patientModal').classList.remove('hidden'); }
         
-        async function savePatientRecord() { const name = document.getElementById('pName').value.trim(); const phone = document.getElementById('pPhone').value.trim(); if (!name || !phone) { await showAlert('অনুগ্ৰহ কৰি ৰোগীৰ নাম আৰু মোবাইল নম্বৰ দিয়ক।', 'প্ৰয়োজনীয়', '📋'); return; } const fees = parseFloat(document.getElementById('pFees').value) || 0; const patientData = { name, age: document.getElementById('pAgeSex').value, bp: document.getElementById('pBP').value, phone, history: document.getElementById('pHistory').value, medicine: document.getElementById('pMedicine').value }; if (currentEditId) { const { error } = await supabaseClient.from('clinic_data').update(patientData).eq('id', currentEditId); if (error) { await showAlert('আপডেট ব্যৰ্থ হৈছে: ' + error.message, 'ভুল', '❌'); } else { const { data: existingPay } = await supabaseClient.from('clinic_payments').select('id').eq('patient_id', currentEditId).eq('income_source', 'patient').limit(1).single(); if (existingPay) { await supabaseClient.from('clinic_payments').update({ fees, patient_name: name }).eq('patient_id', currentEditId).eq('income_source', 'patient'); } else if (fees > 0) { await supabaseClient.from('clinic_payments').insert([{ patient_name: name, fees, visit_date: new Date().toISOString().split('T')[0], patient_id: currentEditId, income_source: 'patient' }]); } await supabaseClient.from('clinic_visits').update({ fees_paid: fees, payment_status: fees > 0 ? 'paid' : 'free', patient_name: name, bp: document.getElementById('pBP').value || '', medicine: document.getElementById('pMedicine').value || '', notes: document.getElementById('pHistory').value || '' }).eq('patient_id', currentEditId).eq('visit_type', 'new'); await showAlert('ৰোগীৰ তথ্য সফলতাৰে আপডেট কৰা হৈছে।', 'আপডেট সফল ✅', '🎉'); closePatientModal(); loadPatients(); loadExpenses(); loadReport(); } } else { const { data: insertedData, error } = await supabaseClient.from('clinic_data').insert([patientData]).select().single(); if (error) { await showAlert("সংৰক্ষণ কৰিব পৰা নগ'ল: " + error.message, 'ভুল', '❌'); } else { const visitRecord = { patient_id: insertedData.id, patient_name: name, visit_date: new Date().toISOString().split('T')[0], visit_type: 'new', fees_paid: fees > 0 ? fees : 0, payment_status: fees > 0 ? 'paid' : 'free', bp: document.getElementById('pBP').value || '', medicine: document.getElementById('pMedicine').value || '', notes: document.getElementById('pHistory').value || '' }; await supabaseClient.from('clinic_visits').insert([visitRecord]); if (fees > 0 && insertedData?.id) { await supabaseClient.from('clinic_payments').insert([{ patient_name: name, fees, visit_date: new Date().toISOString().split('T')[0], patient_id: insertedData.id, income_source: 'patient' }]); } await showAlert('নতুন ৰোগীৰ ৰেকৰ্ড সফলতাৰে সংৰক্ষণ কৰা হৈছে।', 'সফল ✅', '🎉'); closePatientModal(); loadPatients(); loadExpenses(); loadReport(); } } }
+       async function savePatientRecord() {
+    const name = document.getElementById('pName').value.trim();
+    const phone = document.getElementById('pPhone').value.trim();
+
+    if (!name || !phone) {
+        await showAlert('অনুগ্ৰহ কৰি ৰোগীৰ নাম আৰু মোবাইল নম্বৰ দিয়ক।', 'প্ৰয়োজনীয়', '📋');
+        return;
+    }
+
+    const fees = parseFloat(document.getElementById('pFees').value) || 0;
+    const todayDate = new Date().toISOString().split('T')[0];
+
+    const patientData = {
+        name,
+        age: document.getElementById('pAgeSex').value,
+        bp: document.getElementById('pBP').value,
+        phone,
+        history: document.getElementById('pHistory').value,
+        medicine: document.getElementById('pMedicine').value
+    };
+
+    // ========== এডিট মোড (currentEditId থাকিলে) ==========
+    if (currentEditId) {
+        const { error } = await supabaseClient
+            .from('clinic_data')
+            .update(patientData)
+            .eq('id', currentEditId);
+
+        if (error) {
+            await showAlert('আপডেট ব্যৰ্থ হৈছে: ' + error.message, 'ভুল', '❌');
+            return;
+        }
+
+        // Payment আপডেট বা ইনছাৰ্ট
+        const { data: existingPay } = await supabaseClient
+            .from('clinic_payments')
+            .select('id')
+            .eq('patient_id', currentEditId)
+            .eq('income_source', 'patient')
+            .maybeSingle();
+
+        if (existingPay) {
+            await supabaseClient
+                .from('clinic_payments')
+                .update({ fees, patient_name: name })
+                .eq('patient_id', currentEditId)
+                .eq('income_source', 'patient');
+            console.log("Payment updated for patient:", name, "fees:", fees);
+        } else if (fees > 0) {
+            const { error: payError } = await supabaseClient
+                .from('clinic_payments')
+                .insert([{
+                    patient_name: name,
+                    fees,
+                    visit_date: todayDate,
+                    patient_id: currentEditId,
+                    income_source: 'patient'
+                }]);
+            if (payError) {
+                console.error("Payment insert error (edit mode):", payError);
+            } else {
+                console.log("Payment inserted for patient:", name, "fees:", fees);
+            }
+        }
+
+        // Visit আপডেট
+        await supabaseClient
+            .from('clinic_visits')
+            .update({
+                fees_paid: fees,
+                payment_status: fees > 0 ? 'paid' : 'free',
+                patient_name: name,
+                bp: document.getElementById('pBP').value || '',
+                medicine: document.getElementById('pMedicine').value || '',
+                notes: document.getElementById('pHistory').value || ''
+            })
+            .eq('patient_id', currentEditId)
+            .eq('visit_type', 'new');
+
+        await showAlert('ৰোগীৰ তথ্য সফলতাৰে আপডেট কৰা হৈছে।', 'আপডেট সফল ✅', '🎉');
+        closePatientModal();
+        
+        // ডাটা ৰিলোড
+        await loadPatients();
+        await loadExpenses();
+        await loadReport();
+    } 
+    // ========== নতুন ৰোগী ==========
+    else {
+        const { data: insertedData, error } = await supabaseClient
+            .from('clinic_data')
+            .insert([patientData])
+            .select()
+            .single();
+
+        if (error) {
+            await showAlert("সংৰক্ষণ কৰিব পৰা নগ'ল: " + error.message, 'ভুল', '❌');
+            return;
+        }
+
+        console.log("Patient inserted successfully, ID:", insertedData.id, "Fees:", fees);
+
+        // Visit Record তৈয়াৰ কৰক
+        const visitRecord = {
+            patient_id: insertedData.id,
+            patient_name: name,
+            visit_date: todayDate,
+            visit_type: 'new',
+            fees_paid: fees > 0 ? fees : 0,
+            payment_status: fees > 0 ? 'paid' : 'free',
+            bp: document.getElementById('pBP').value || '',
+            medicine: document.getElementById('pMedicine').value || '',
+            notes: document.getElementById('pHistory').value || ''
+        };
+
+        const { error: visitError } = await supabaseClient
+            .from('clinic_visits')
+            .insert([visitRecord]);
+
+        if (visitError) {
+            console.error("Visit insert error:", visitError);
+        } else {
+            console.log("Visit inserted successfully for patient:", name);
+        }
+
+        // 🔴 মূল অংশ: fees > 0 হ'লেহে Payment Insert কৰক 🔴
+        if (fees > 0 && insertedData?.id) {
+            const paymentRecord = {
+                patient_name: name,
+                fees: fees,
+                visit_date: todayDate,
+                patient_id: insertedData.id,
+                income_source: 'patient'
+            };
+
+            const { data: paymentData, error: paymentError } = await supabaseClient
+                .from('clinic_payments')
+                .insert([paymentRecord])
+                .select();
+
+            if (paymentError) {
+                console.error("🔴 Payment insert ERROR:", paymentError);
+                await showAlert(
+                    'ৰোগী সংৰক্ষণ হৈছে, কিন্তু Payment যোগ কৰিব পৰা নগল। অনুগ্ৰহ কৰি ডাক্তৰক জানিব দিয়ক।', 
+                    'সতৰ্কবাণী ⚠️', 
+                    '⚠️'
+                );
+            } else {
+                console.log("✅ Payment inserted successfully:", paymentData);
+            }
+        } else {
+            console.log("No payment inserted because fees =", fees, "or no patient ID");
+        }
+
+        await showAlert('নতুন ৰোগীৰ ৰেকৰ্ড সফলতাৰে সংৰক্ষণ কৰা হৈছে।', 'সফল ✅', '🎉');
+        closePatientModal();
+
+        // 🔴 সকলো ডাটা ৰিলোড কৰক — Income টেবুল আপডেট হ'ব 🔴
+        await loadPatients();
+        await loadExpenses();
+        await loadReport();
+        
+        console.log("All data reloaded at:", new Date().toLocaleTimeString());
+    }
+}
         
         // ========== 🔴 IMPORTANT: Manual Income only for Doctor 🔴 ==========
         async function saveIncomeRecord() {
