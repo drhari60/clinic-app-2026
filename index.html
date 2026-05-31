@@ -708,6 +708,18 @@
             if (!problem || problem.length < 5) { await showAlert('স্বাস্থ্য সমস্যাটো সঠিককৈ লিখক।', 'প্ৰয়োজনীয়', '📋'); return; }
             const txnPattern = /^[A-Za-z0-9]{10,30}$/;
             if (!txnPattern.test(txn_id)) { await showAlert('সঠিক Transaction ID দিয়ক।', 'ভুল ID', '🔢'); return; }
+            // আগতেই বুকিং হৈছে নেকি চাওক
+const { data: existing } = await supabaseClient
+    .from('clinic_bookings')
+    .select('id')
+    .eq('phone', phone)
+    .eq('txn_id', txn_id)
+    .maybeSingle();
+
+if (existing) {
+    await showAlert('এই ট্ৰাঞ্জেকচন আইডিৰে আগেয়ে বুকিং হৈছে।', 'ডুপ্লিকেট', '⚠️');
+    return;
+}
             const problemDesc = `[${selectedBookingType}] ${problem}`;
             const { error } = await supabaseClient.from('clinic_bookings').insert([{ name, phone, txn_id, problem: problemDesc }]);
             if (error) {
