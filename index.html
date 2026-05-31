@@ -177,180 +177,41 @@
         async function deletePatientRecord(id) { if (!id) { await showAlert("ভুল হৈছে: ৰোগীৰ ID পোৱা নগ'ল!", "ভুল", "❌"); return; } if (!await showConfirm('আপুনি সঁচাকৈয়ে এই ৰেকৰ্ডটো চিৰদিনৰ বাবে মচি পেলাব বিচাৰে নে?', 'নিশ্চিত কৰক', '🗑️')) return; const { error } = await supabaseClient.from('clinic_data').delete().eq('id', id); if (error) { await showAlert('ডাটাবেচে ডিলিট কৰিবলৈ দিয়া নাই: ' + error.message, 'ভুল', '❌'); } else { await Promise.all([supabaseClient.from('clinic_payments').delete().eq('patient_id', id), supabaseClient.from('clinic_visits').delete().eq('patient_id', id)]); await showAlert("ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হ'ল।", 'সফল ✅', '✅'); loadPatients(); loadExpenses(); loadReport(); } }
         function editPatientRecord(p) { currentEditId = p.id; document.getElementById('modalTitle').innerHTML = '✏️ ৰোগীৰ তথ্য আপডেট কৰক'; document.getElementById('pName').value = p.name || ''; document.getElementById('pAgeSex').value = p.age || ''; document.getElementById('pBP').value = p.bp || ''; document.getElementById('pPhone').value = p.phone || ''; document.getElementById('pHistory').value = p.history || ''; document.getElementById('pMedicine').value = p.medicine || ''; document.getElementById('pFees').value = 0; document.getElementById('patientModal').classList.remove('hidden'); }
         
-       async function savePatientRecord() {
-    const name = document.getElementById('pName').value.trim();
-    const phone = document.getElementById('pPhone').value.trim();
-
-    if (!name || !phone) {
-        await showAlert('অনুগ্ৰহ কৰি ৰোগীৰ নাম আৰু মোবাইল নম্বৰ দিয়ক।', 'প্ৰয়োজনীয়', '📋');
-        return;
-    }
-
-    const fees = parseFloat(document.getElementById('pFees').value) || 0;
-    const todayDate = new Date().toISOString().split('T')[0];
-
-    const patientData = {
-        name,
-        age: document.getElementById('pAgeSex').value,
-        bp: document.getElementById('pBP').value,
-        phone,
-        history: document.getElementById('pHistory').value,
-        medicine: document.getElementById('pMedicine').value
-    };
-
-    // ========== এডিট মোড (currentEditId থাকিলে) ==========
-    if (currentEditId) {
-        const { error } = await supabaseClient
-            .from('clinic_data')
-            .update(patientData)
-            .eq('id', currentEditId);
-
-        if (error) {
-            await showAlert('আপডেট ব্যৰ্থ হৈছে: ' + error.message, 'ভুল', '❌');
-            return;
-        }
-
-        // Payment আপডেট বা ইনছাৰ্ট
-        const { data: existingPay } = await supabaseClient
-            .from('clinic_payments')
-            .select('id')
-            .eq('patient_id', currentEditId)
-            .eq('income_source', 'patient')
-            .maybeSingle();
-
-        if (existingPay) {
-            await supabaseClient
-                .from('clinic_payments')
-                .update({ fees, patient_name: name })
-                .eq('patient_id', currentEditId)
-                .eq('income_source', 'patient');
-            console.log("Payment updated for patient:", name, "fees:", fees);
-        } else if (fees > 0) {
-            const { error: payError } = await supabaseClient
-                .from('clinic_payments')
-                .insert([{
-                    patient_name: name,
-                    fees,
-                    visit_date: todayDate,
-                    patient_id: currentEditId,
-                    income_source: 'patient'
-                }]);
-            if (payError) {
-                console.error("Payment insert error (edit mode):", payError);
+        async function savePatientRecord() {
+            const name = document.getElementById('pName').value.trim();
+            const phone = document.getElementById('pPhone').value.trim();
+            if (!name || !phone) { await showAlert('অনুগ্ৰহ কৰি ৰোগীৰ নাম আৰু মোবাইল নম্বৰ দিয়ক।', 'প্ৰয়োজনীয়', '📋'); return; }
+            const fees = parseFloat(document.getElementById('pFees').value) || 0;
+            const todayDate = new Date().toISOString().split('T')[0];
+            const patientData = { name, age: document.getElementById('pAgeSex').value, bp: document.getElementById('pBP').value, phone, history: document.getElementById('pHistory').value, medicine: document.getElementById('pMedicine').value };
+            if (currentEditId) {
+                const { error } = await supabaseClient.from('clinic_data').update(patientData).eq('id', currentEditId);
+                if (error) { await showAlert('আপডেট ব্যৰ্থ হৈছে: ' + error.message, 'ভুল', '❌'); return; }
+                const { data: existingPay } = await supabaseClient.from('clinic_payments').select('id').eq('patient_id', currentEditId).eq('income_source', 'patient').maybeSingle();
+                if (existingPay) { await supabaseClient.from('clinic_payments').update({ fees, patient_name: name }).eq('patient_id', currentEditId).eq('income_source', 'patient'); console.log("Payment updated:", name, fees); }
+                else if (fees > 0) { const { error: payError } = await supabaseClient.from('clinic_payments').insert([{ patient_name: name, fees, visit_date: todayDate, patient_id: currentEditId, income_source: 'patient' }]); if (payError) console.error("Payment insert error:", payError); else console.log("Payment inserted:", name, fees); }
+                await supabaseClient.from('clinic_visits').update({ fees_paid: fees, payment_status: fees > 0 ? 'paid' : 'free', patient_name: name, bp: document.getElementById('pBP').value || '', medicine: document.getElementById('pMedicine').value || '', notes: document.getElementById('pHistory').value || '' }).eq('patient_id', currentEditId).eq('visit_type', 'new');
+                await showAlert('ৰোগীৰ তথ্য সফলতাৰে আপডেট কৰা হৈছে।', 'আপডেট সফল ✅', '🎉');
+                closePatientModal(); await loadPatients(); await loadExpenses(); await loadReport();
             } else {
-                console.log("Payment inserted for patient:", name, "fees:", fees);
+                const { data: insertedData, error } = await supabaseClient.from('clinic_data').insert([patientData]).select().single();
+                if (error) { await showAlert("সংৰক্ষণ কৰিব পৰা নগ'ল: " + error.message, 'ভুল', '❌'); return; }
+                console.log("Patient inserted, ID:", insertedData.id, "Fees:", fees);
+                const visitRecord = { patient_id: insertedData.id, patient_name: name, visit_date: todayDate, visit_type: 'new', fees_paid: fees > 0 ? fees : 0, payment_status: fees > 0 ? 'paid' : 'free', bp: document.getElementById('pBP').value || '', medicine: document.getElementById('pMedicine').value || '', notes: document.getElementById('pHistory').value || '' };
+                await supabaseClient.from('clinic_visits').insert([visitRecord]);
+                if (fees > 0 && insertedData?.id) {
+                    const { error: paymentError } = await supabaseClient.from('clinic_payments').insert([{ patient_name: name, fees, visit_date: todayDate, patient_id: insertedData.id, income_source: 'patient' }]);
+                    if (paymentError) console.error("Payment insert ERROR:", paymentError);
+                    else console.log("Payment inserted successfully");
+                }
+                await showAlert('নতুন ৰোগীৰ ৰেকৰ্ড সফলতাৰে সংৰক্ষণ কৰা হৈছে।', 'সফল ✅', '🎉');
+                closePatientModal(); await loadPatients(); await loadExpenses(); await loadReport();
             }
         }
-
-        // Visit আপডেট
-        await supabaseClient
-            .from('clinic_visits')
-            .update({
-                fees_paid: fees,
-                payment_status: fees > 0 ? 'paid' : 'free',
-                patient_name: name,
-                bp: document.getElementById('pBP').value || '',
-                medicine: document.getElementById('pMedicine').value || '',
-                notes: document.getElementById('pHistory').value || ''
-            })
-            .eq('patient_id', currentEditId)
-            .eq('visit_type', 'new');
-
-        await showAlert('ৰোগীৰ তথ্য সফলতাৰে আপডেট কৰা হৈছে।', 'আপডেট সফল ✅', '🎉');
-        closePatientModal();
         
-        // ডাটা ৰিলোড
-        await loadPatients();
-        await loadExpenses();
-        await loadReport();
-    } 
-    // ========== নতুন ৰোগী ==========
-    else {
-        const { data: insertedData, error } = await supabaseClient
-            .from('clinic_data')
-            .insert([patientData])
-            .select()
-            .single();
-
-        if (error) {
-            await showAlert("সংৰক্ষণ কৰিব পৰা নগ'ল: " + error.message, 'ভুল', '❌');
-            return;
-        }
-
-        console.log("Patient inserted successfully, ID:", insertedData.id, "Fees:", fees);
-
-        // Visit Record তৈয়াৰ কৰক
-        const visitRecord = {
-            patient_id: insertedData.id,
-            patient_name: name,
-            visit_date: todayDate,
-            visit_type: 'new',
-            fees_paid: fees > 0 ? fees : 0,
-            payment_status: fees > 0 ? 'paid' : 'free',
-            bp: document.getElementById('pBP').value || '',
-            medicine: document.getElementById('pMedicine').value || '',
-            notes: document.getElementById('pHistory').value || ''
-        };
-
-        const { error: visitError } = await supabaseClient
-            .from('clinic_visits')
-            .insert([visitRecord]);
-
-        if (visitError) {
-            console.error("Visit insert error:", visitError);
-        } else {
-            console.log("Visit inserted successfully for patient:", name);
-        }
-
-        // 🔴 মূল অংশ: fees > 0 হ'লেহে Payment Insert কৰক 🔴
-        if (fees > 0 && insertedData?.id) {
-            const paymentRecord = {
-                patient_name: name,
-                fees: fees,
-                visit_date: todayDate,
-                patient_id: insertedData.id,
-                income_source: 'patient'
-            };
-
-            const { data: paymentData, error: paymentError } = await supabaseClient
-                .from('clinic_payments')
-                .insert([paymentRecord])
-                .select();
-
-            if (paymentError) {
-                console.error("🔴 Payment insert ERROR:", paymentError);
-                await showAlert(
-                    'ৰোগী সংৰক্ষণ হৈছে, কিন্তু Payment যোগ কৰিব পৰা নগল। অনুগ্ৰহ কৰি ডাক্তৰক জানিব দিয়ক।', 
-                    'সতৰ্কবাণী ⚠️', 
-                    '⚠️'
-                );
-            } else {
-                console.log("✅ Payment inserted successfully:", paymentData);
-            }
-        } else {
-            console.log("No payment inserted because fees =", fees, "or no patient ID");
-        }
-
-        await showAlert('নতুন ৰোগীৰ ৰেকৰ্ড সফলতাৰে সংৰক্ষণ কৰা হৈছে।', 'সফল ✅', '🎉');
-        closePatientModal();
-
-        // 🔴 সকলো ডাটা ৰিলোড কৰক — Income টেবুল আপডেট হ'ব 🔴
-        await loadPatients();
-        await loadExpenses();
-        await loadReport();
-        
-        console.log("All data reloaded at:", new Date().toLocaleTimeString());
-    }
-}
-        
-        // ========== 🔴 IMPORTANT: Manual Income only for Doctor 🔴 ==========
         async function saveIncomeRecord() {
-            if (!isDoctor) {
-                await showAlert('কেৱল ডাক্তৰেহে manual আয় যোগ কৰিব পাৰে!', 'অনুমতি নাই', '🔒');
-                return;
-            }
-            const patientName = document.getElementById('incomePatientName')?.value.trim();
-            const amount = parseFloat(document.getElementById('incomeAmount')?.value);
+            if (!isDoctor) { await showAlert('কেৱল ডাক্তৰেহে manual আয় যোগ কৰিব পাৰে!', 'অনুমতি নাই', '🔒'); return; }
+            const patientName = document.getElementById('incomePatientName')?.value.trim(); const amount = parseFloat(document.getElementById('incomeAmount')?.value);
             if (!patientName) { await showAlert('অনুগ্ৰহ কৰি ৰোগীৰ নাম লিখক।', 'প্ৰয়োজনীয়', '📋'); return; }
             if (isNaN(amount) || amount <= 0) { await showAlert('অনুগ্ৰহ কৰি সঠিক আয়ৰ পৰিমাণ লিখক।', 'ভুল পৰিমাণ', '💰'); return; }
             const { error } = await supabaseClient.from('clinic_payments').insert([{ patient_name: patientName, fees: amount, visit_date: new Date().toISOString().split('T')[0], income_source: 'manual' }]);
@@ -359,10 +220,10 @@
         
         async function saveExpenseRecord() { const categoryEl = document.getElementById('expCategory'); const amountEl = document.getElementById('expAmount'); const descEl = document.getElementById('expDesc'); if (!amountEl || !amountEl.value) { await showAlert('অনুগ্ৰহ কৰি খৰচৰ পৰিমাণ লিখক।', 'প্ৰয়োজনীয়', '📋'); return; } const category = categoryEl ? categoryEl.value : 'Miscellaneous Expenses'; const amount = parseFloat(amountEl.value); const description = descEl ? descEl.value.trim() : ''; if (isNaN(amount) || amount <= 0) { await showAlert('অনুগ্ৰহ কৰি সঠিক টকাৰ পৰিমাণ লিখক।', 'ভুল পৰিমাণ', '💰'); return; } const { error } = await supabaseClient.from('clinic_expenses').insert([{ category, amount, description }]); if (error) { await showAlert('খৰচ সংৰক্ষণ কৰিব পৰা নগ’ল: ' + error.message, 'ভুল', '❌'); } else { await showAlert('দৈনিক খৰচ সফলতাৰে সংৰক্ষণ কৰা হৈছে।', 'সফল ✅', '✅'); if (amountEl) amountEl.value = ''; if (descEl) descEl.value = ''; loadExpenses(); loadReport(); } }
         
-        async function loadExpenses() { const { data: expenses } = await supabaseClient.from('clinic_expenses').select('*').order('created_at', { ascending: false }); const { data: payments } = await supabaseClient.from('clinic_payments').select('*').order('created_at', { ascending: false }); const today = new Date().toISOString().split('T')[0]; const totalIncome = (payments || []).reduce((sum, p) => sum + (parseFloat(p.fees) || 0), 0); const totalExpense = (expenses || []).reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0); const netProfit = totalIncome - totalExpense; const todayIncome = (payments || []).filter(p => p.visit_date === today).reduce((sum, p) => sum + (parseFloat(p.fees) || 0), 0); const todayExpense = (expenses || []).filter(e => e.created_at.split('T')[0] === today).reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0); const summaryText = document.getElementById('expenseSummaryText'); if (summaryText) { summaryText.innerHTML = `<div class="grid grid-cols-2 gap-2 mb-3"><div class="bg-green-50 p-3 rounded-xl text-center"><p class="text-[10px] text-green-600 font-bold uppercase">আজিৰ আয়</p><p class="text-lg font-extrabold text-green-700">₹${todayIncome}</p></div><div class="bg-red-50 p-3 rounded-xl text-center"><p class="text-[10px] text-red-600 font-bold uppercase">আজিৰ খৰচ</p><p class="text-lg font-extrabold text-red-700">₹${todayExpense}</p></div><div class="bg-blue-50 p-3 rounded-xl text-center"><p class="text-[10px] text-blue-600 font-bold uppercase">মুঠ আয়</p><p class="text-lg font-extrabold text-blue-700">₹${totalIncome}</p></div><div class="bg-purple-50 p-3 rounded-xl text-center"><p class="text-[10px] text-purple-600 font-bold uppercase">নিট লাভ (আনুমানিক)</p><p class="text-lg font-extrabold text-purple-700">₹${netProfit}</p></div></div>`; } const container = document.getElementById('listExpenses'); if (!container) return; const allRows = [...(payments || []).map(p => ({ id: p.id, date: p.visit_date, name: p.patient_name, income: p.fees, expense: 0, desc: p.income_source === 'manual' ? '⚡ Manual Income' : 'Patient Visit', type: 'income', source: p.income_source || 'patient' })), ...(expenses || []).map(e => ({ id: e.id, date: e.created_at.split('T')[0], name: e.category, income: 0, expense: e.amount, desc: e.description || '-', type: 'expense' }))].sort((a, b) => new Date(b.date) - new Date(a.date)); container.innerHTML = `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto"><table class="w-full text-xs"><thead class="bg-slate-900 text-white"><tr><th class="px-3 py-2.5 text-left">তাৰিখ</th><th class="px-3 py-2.5 text-left">নাম / বিভাগ</th><th class="px-3 py-2.5 text-left">বিৱৰণ</th><th class="px-3 py-2.5 text-right text-green-300">আয় ₹</th><th class="px-3 py-2.5 text-right text-red-300">খৰচ ₹</th>${isDoctor ? '<th class="px-3 py-2.5 text-center">এক্সন</th>' : ''}</tr></thead><tbody>${allRows.map(row => `<tr class="${row.type === 'income' ? 'bg-green-50/30' : 'bg-red-50/30'}"><td class="px-3 py-2 text-gray-500">${row.date}</td><td class="px-3 py-2 font-medium text-gray-800">${escapeHTML(row.name)}</td><td class="px-3 py-2 text-gray-500">${escapeHTML(row.desc)}</td><td class="px-3 py-2 text-right font-bold text-green-600">${row.income > 0 ? '₹' + row.income : '-'}</td><td class="px-3 py-2 text-right font-bold text-red-500">${row.expense > 0 ? '₹' + row.expense : '-'}</td>${isDoctor ? `<td class="px-3 py-2 text-center">${row.type === 'expense' ? `<button onclick="editExpenseRecord('${row.id}', '${escapeHTML(row.name)}', ${row.expense}, '${escapeHTML(row.desc)}')" class="bg-blue-500 text-white px-2 py-1 rounded-lg text-[10px] font-bold hover:bg-blue-600 transition mr-1"><i class="fas fa-edit"></i></button><button onclick="deleteExpenseRecord('${row.id}')" class="bg-red-500 text-white px-2 py-1 rounded-lg text-[10px] font-bold hover:bg-red-600 transition"><i class="fas fa-trash"></i> মচক</button>` : row.type === 'income' ? `<button onclick="deleteIncomeRecord('${row.id}', '${escapeHTML(row.name)}')" class="bg-orange-500 text-white px-2 py-1 rounded-lg text-[10px] font-bold hover:bg-orange-600 transition"><i class="fas fa-trash"></i> মচক</button>` : '-'}</td>` : ''}</tr>`).join('')}<tr class="bg-slate-900 text-white font-bold"><td colspan="3" class="px-3 py-2.5 text-center">মুঠ</td><td class="px-3 py-2.5 text-right text-green-300">₹${totalIncome}</td><td class="px-3 py-2.5 text-right text-red-300">₹${totalExpense}</td>${isDoctor ? '<td class="px-3 py-2.5"></td>' : ''}</tr></tbody></table></div>`; }
+        async function loadExpenses() { const { data: expenses } = await supabaseClient.from('clinic_expenses').select('*').order('created_at', { ascending: false }); const { data: payments } = await supabaseClient.from('clinic_payments').select('*').order('created_at', { ascending: false }); const today = new Date().toISOString().split('T')[0]; const totalIncome = (payments || []).reduce((sum, p) => sum + (parseFloat(p.fees) || 0), 0); const totalExpense = (expenses || []).reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0); const netProfit = totalIncome - totalExpense; const todayIncome = (payments || []).filter(p => p.visit_date === today).reduce((sum, p) => sum + (parseFloat(p.fees) || 0), 0); const todayExpense = (expenses || []).filter(e => e.created_at.split('T')[0] === today).reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0); const summaryText = document.getElementById('expenseSummaryText'); if (summaryText) { summaryText.innerHTML = `<div class="grid grid-cols-2 gap-2 mb-3"><div class="bg-green-50 p-3 rounded-xl text-center"><p class="text-[10px] text-green-600 font-bold uppercase">আজিৰ আয়</p><p class="text-lg font-extrabold text-green-700">₹${todayIncome}</p></div><div class="bg-red-50 p-3 rounded-xl text-center"><p class="text-[10px] text-red-600 font-bold uppercase">আজিৰ খৰচ</p><p class="text-lg font-extrabold text-red-700">₹${todayExpense}</p></div><div class="bg-blue-50 p-3 rounded-xl text-center"><p class="text-[10px] text-blue-600 font-bold uppercase">মুঠ আয়</p><p class="text-lg font-extrabold text-blue-700">₹${totalIncome}</p></div><div class="bg-purple-50 p-3 rounded-xl text-center"><p class="text-[10px] text-purple-600 font-bold uppercase">নিট লাভ (আনুমানিক)</p><p class="text-lg font-extrabold text-purple-700">₹${netProfit}</p></div></div>`; } const container = document.getElementById('listExpenses'); if (!container) return; const allRows = [...(payments || []).map(p => ({ id: p.id, date: p.visit_date, name: p.patient_name, income: p.fees, expense: 0, desc: p.income_source === 'manual' ? '⚡ Manual Income' : 'Patient Visit', type: 'income' })), ...(expenses || []).map(e => ({ id: e.id, date: e.created_at.split('T')[0], name: e.category, income: 0, expense: e.amount, desc: e.description || '-', type: 'expense' }))].sort((a, b) => new Date(b.date) - new Date(a.date)); container.innerHTML = `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto"><table class="w-full text-xs"><thead class="bg-slate-900 text-white"><tr><th class="px-3 py-2.5 text-left">তাৰিখ</th><th class="px-3 py-2.5 text-left">নাম / বিভাগ</th><th class="px-3 py-2.5 text-left">বিৱৰণ</th><th class="px-3 py-2.5 text-right text-green-300">আয় ₹</th><th class="px-3 py-2.5 text-right text-red-300">খৰচ ₹</th>${isDoctor ? '<th class="px-3 py-2.5 text-center">এক্সন</th>' : ''}</tr></thead><tbody>${allRows.map(row => `<tr class="${row.type === 'income' ? 'bg-green-50/30' : 'bg-red-50/30'}"><td class="px-3 py-2 text-gray-500">${row.date}</td><td class="px-3 py-2 font-medium text-gray-800">${escapeHTML(row.name)}</td><td class="px-3 py-2 text-gray-500">${escapeHTML(row.desc)}</td><td class="px-3 py-2 text-right font-bold text-green-600">${row.income > 0 ? '₹' + row.income : '-'}</td><td class="px-3 py-2 text-right font-bold text-red-500">${row.expense > 0 ? '₹' + row.expense : '-'}</td>${isDoctor ? `<td class="px-3 py-2 text-center">${row.type === 'expense' ? `<button onclick="deleteExpenseRecord('${row.id}')" class="bg-red-500 text-white px-2 py-1 rounded-lg text-[10px] font-bold hover:bg-red-600 transition"><i class="fas fa-trash"></i> মচক</button>` : `<button onclick="deleteIncomeRecord('${row.id}', '${escapeHTML(row.name)}')" class="bg-orange-500 text-white px-2 py-1 rounded-lg text-[10px] font-bold hover:bg-orange-600 transition"><i class="fas fa-trash"></i> মচক</button>`}</td>` : ''}</tr>`).join('')}<tr class="bg-slate-900 text-white font-bold"><td colspan="3" class="px-3 py-2.5 text-center">মুঠ</td><td class="px-3 py-2.5 text-right text-green-300">₹${totalIncome}</td><td class="px-3 py-2.5 text-right text-red-300">₹${totalExpense}</td>${isDoctor ? '<td class="px-3 py-2.5"></td>' : ''}</tr></tbody></table></div>`; }
         
-        async function deleteExpenseRecord(expenseId) { if (!isDoctor) { await showAlert('কেবল ডাক্তৰে খৰচ মচিব পাৰে!', 'অনুমতি নাই', '🔒'); return; } if (!expenseId) { await showAlert("ভুল হৈছে: খৰচৰ ID পোৱা নগ'ল!", 'ভুল', '❌'); return; } if (!await showConfirm('আপুনি সঁচাকৈয়ে এই খৰচটো চিৰদিনৰ বাবে মচি পেলাব বিচাৰে নে?', 'নিশ্চিত কৰক', '🗑️')) return; const { error } = await supabaseClient.from('clinic_expenses').delete().eq('id', expenseId); if (error) { await showAlert('খৰচ মচিব পৰা নগ’ল: ' + error.message, 'ভুল', '❌'); } else { await showAlert('খৰচ সফলতাৰে মচি পেলোৱা হৈছে।', 'সফল ✅', '✅'); loadExpenses(); loadReport(); } }
-        async function deleteIncomeRecord(paymentId, patientName) { if (!isDoctor) { await showAlert('কেবল ডাক্তৰে আয় মচিব পাৰে!', 'অনুমতি নাই', '🔒'); return; } if (!paymentId) { await showAlert("ভুল হৈছে: Payment ID পোৱা নগ'ল!", 'ভুল', '❌'); return; } if (!await showConfirm(`"${patientName}" ৰ ভিজিট ফীজটো স্থায়ীভাৱে মচিব বিচাৰে নে?`, 'নিশ্চিত কৰক', '⚠️')) return; const { data: paymentRecord } = await supabaseClient.from('clinic_payments').select('patient_id, visit_date, income_source').eq('id', paymentId).single(); const { error } = await supabaseClient.from('clinic_payments').delete().eq('id', paymentId); if (error) { await showAlert('আয় ৰেকৰ্ড মচিব পৰা নগ’ল: ' + error.message, 'ভুল', '❌'); } else { if (paymentRecord?.patient_id && paymentRecord?.visit_date && paymentRecord?.income_source !== 'manual') { await supabaseClient.from('clinic_visits').update({ payment_status: 'unpaid', fees_paid: 0 }).eq('patient_id', paymentRecord.patient_id).eq('visit_date', paymentRecord.visit_date); } await showAlert('আয় ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হৈছে।', 'সফল ✅', '✅'); loadExpenses(); loadReport(); loadPatients(); } }
+        async function deleteExpenseRecord(expenseId) { if (!isDoctor) { await showAlert('কেবল ডাক্তৰে খৰচ মচিব পাৰে!', 'অনুমতি নাই', '🔒'); return; } if (!expenseId) { await showAlert("ভুল হৈছে: খৰচৰ ID পোৱা নগ'ল!", 'ভুল', '❌'); return; } if (!await showConfirm('আপুনি সঁচাকৈয়ে এই খৰচটো মচিব বিচাৰে নে?', 'নিশ্চিত কৰক', '🗑️')) return; const { error } = await supabaseClient.from('clinic_expenses').delete().eq('id', expenseId); if (error) { await showAlert('খৰচ মচিব পৰা নগ’ল: ' + error.message, 'ভুল', '❌'); } else { await showAlert('খৰচ সফলতাৰে মচি পেলোৱা হৈছে।', 'সফল ✅', '✅'); loadExpenses(); loadReport(); } }
+        async function deleteIncomeRecord(paymentId, patientName) { if (!isDoctor) { await showAlert('কেবল ডাক্তৰে আয় মচিব পাৰে!', 'অনুমতি নাই', '🔒'); return; } if (!paymentId) { await showAlert("ভুল হৈছে: Payment ID পোৱা নগ'ল!", 'ভুল', '❌'); return; } if (!await showConfirm(`"${patientName}" ৰ ভিজিট ফীজটো মচিব বিচাৰে নে?`, 'নিশ্চিত কৰক', '⚠️')) return; const { data: paymentRecord } = await supabaseClient.from('clinic_payments').select('patient_id, visit_date, income_source').eq('id', paymentId).single(); const { error } = await supabaseClient.from('clinic_payments').delete().eq('id', paymentId); if (error) { await showAlert('আয় ৰেকৰ্ড মচিব পৰা নগ’ল: ' + error.message, 'ভুল', '❌'); } else { if (paymentRecord?.patient_id && paymentRecord?.visit_date && paymentRecord?.income_source !== 'manual') { await supabaseClient.from('clinic_visits').update({ payment_status: 'unpaid', fees_paid: 0 }).eq('patient_id', paymentRecord.patient_id).eq('visit_date', paymentRecord.visit_date); } await showAlert('আয় ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হৈছে।', 'সফল ✅', '✅'); loadExpenses(); loadReport(); loadPatients(); } }
         async function editExpenseRecord(expenseId, category, amount, description) { if (!isDoctor) { await showAlert('কেবল ডাক্তৰে খৰচ সম্পাদনা কৰিব পাৰে!', 'অনুমতি নাই', '🔒'); return; } const modal = document.getElementById('expenseEditModal'); if (!modal) return; document.getElementById('editExpId').value = expenseId; document.getElementById('editExpAmount').value = amount; document.getElementById('editExpDesc').value = description === '-' ? '' : description; document.getElementById('editExpCategory').value = category; modal.classList.remove('hidden'); }
         async function saveEditedExpense() { const expenseId = document.getElementById('editExpId').value; const amount = parseFloat(document.getElementById('editExpAmount').value); const description = document.getElementById('editExpDesc').value.trim(); const category = document.getElementById('editExpCategory').value; if (!amount || amount <= 0) { await showAlert('সঠিক পৰিমাণ দিয়ক।', 'ভুল', '⚠️'); return; } const { error } = await supabaseClient.from('clinic_expenses').update({ amount, description, category }).eq('id', expenseId); if (error) { await showAlert('আপডেট ব্যৰ্থ: ' + error.message, 'ভুল', '❌'); } else { await showAlert('খৰচ সফলতাৰে আপডেট কৰা হৈছে।', 'সফল ✅', '✅'); document.getElementById('expenseEditModal').classList.add('hidden'); loadExpenses(); loadReport(); } }
         
