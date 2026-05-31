@@ -344,14 +344,18 @@
             }
         }
         
-        async function saveIncomeRecord() {
-            if (!isDoctor) { await showAlert('কেৱল ডাক্তৰেহে manual আয় যোগ কৰিব পাৰে!', 'অনুমতি নাই', '🔒'); return; }
-            const patientName = document.getElementById('incomePatientName')?.value.trim(); const amount = parseFloat(document.getElementById('incomeAmount')?.value);
-            if (!patientName) { await showAlert('অনুগ্ৰহ কৰি ৰোগীৰ নাম লিখক।', 'প্ৰয়োজনীয়', '📋'); return; }
-            if (isNaN(amount) || amount <= 0) { await showAlert('অনুগ্ৰহ কৰি সঠিক আয়ৰ পৰিমাণ লিখক।', 'ভুল পৰিমাণ', '💰'); return; }
-            const { error } = await supabaseClient.from('clinic_payments').insert([{ patient_name: patientName, fees: amount, visit_date: new Date().toISOString().split('T')[0], income_source: 'manual' }]);
-            if (error) { await showAlert('আয় সংৰক্ষণ কৰিব পৰা নগ’ল: ' + error.message, 'ভুল', '❌'); } else { await showAlert('আয় সফলতাৰে সংৰক্ষণ কৰা হৈছে।', 'সফল ✅', '✅'); document.getElementById('incomePatientName').value = ''; document.getElementById('incomeAmount').value = ''; loadExpenses(); loadReport(); }
-        }
+async function saveIncomeRecord() {
+    if (!isDoctor) {
+        await showAlert('কেৱল ডাক্তৰেহে manual আয় যোগ কৰিব পাৰে!', 'অনুমতি নাই', '🔒');
+        return;
+    }
+    const patientName = document.getElementById('incomePatientName')?.value.trim();
+    const amount = parseFloat(document.getElementById('incomeAmount')?.value);
+    if (!patientName) { await showAlert('অনুগ্ৰহ কৰি ৰোগীৰ নাম লিখক।', 'প্ৰয়োজনীয়', '📋'); return; }
+    if (isNaN(amount) || amount <= 0) { await showAlert('অনুগ্ৰহ কৰি সঠিক আয়ৰ পৰিমাণ লিখক।', 'ভুল পৰিমাণ', '💰'); return; }
+    const { error } = await supabaseClient.from('clinic_payments').insert([{ patient_name: patientName, fees: amount, visit_date: new Date().toISOString().split('T')[0], income_source: 'manual' }]);
+    if (error) { await showAlert('আয় সংৰক্ষণ কৰিব পৰা নগ’ল: ' + error.message, 'ভুল', '❌'); } else { await showAlert('আয় সফলতাৰে সংৰক্ষণ কৰা হৈছে।', 'সফল ✅', '✅'); document.getElementById('incomePatientName').value = ''; document.getElementById('incomeAmount').value = ''; loadExpenses(); loadReport(); }
+}
         
         async function saveExpenseRecord() { const categoryEl = document.getElementById('expCategory'); const amountEl = document.getElementById('expAmount'); const descEl = document.getElementById('expDesc'); if (!amountEl || !amountEl.value) { await showAlert('অনুগ্ৰহ কৰি খৰচৰ পৰিমাণ লিখক।', 'প্ৰয়োজনীয়', '📋'); return; } const category = categoryEl ? categoryEl.value : 'Miscellaneous Expenses'; const amount = parseFloat(amountEl.value); const description = descEl ? descEl.value.trim() : ''; if (isNaN(amount) || amount <= 0) { await showAlert('অনুগ্ৰহ কৰি সঠিক টকাৰ পৰিমাণ লিখক।', 'ভুল পৰিমাণ', '💰'); return; } const { error } = await supabaseClient.from('clinic_expenses').insert([{ category, amount, description }]); if (error) { await showAlert('খৰচ সংৰক্ষণ কৰিব পৰা নগ’ল: ' + error.message, 'ভুল', '❌'); } else { await showAlert('দৈনিক খৰচ সফলতাৰে সংৰক্ষণ কৰা হৈছে।', 'সফল ✅', '✅'); if (amountEl) amountEl.value = ''; if (descEl) descEl.value = ''; loadExpenses(); loadReport(); } }
         
