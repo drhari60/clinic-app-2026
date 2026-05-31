@@ -864,7 +864,7 @@ if (existing) {
             const { data, error } = await supabaseClient
                 .from('clinic_data').select('*')
                 .order('created_at', { ascending: false })
-                .limit(200);
+                .limit(500);
             if (error || !data) return;
             const container = document.getElementById('listPatients');
             if (!container) return;
