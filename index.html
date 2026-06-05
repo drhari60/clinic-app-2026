@@ -343,13 +343,13 @@ async function loadExpenses() {
         const monthStartDate = startOfMonth.toISOString().split('T')[0];
         const monthEndDate = endOfMonth.toISOString().split('T')[0];
 
-        const { data: pData, error: pErr } = await _supabase
+        const { data: pData, error: pErr } = await supabase
             .from('patients')
             .select('fees')
             .gte('created_at', monthStartDate)
             .lte('created_at', monthEndDate);
 
-        const { data: expData, error: expErr } = await _supabase
+        const { data: expData, error: expErr } = await supabase
             .from('expenses')
             .select('amount, type')
             .gte('date', monthStartDate)
