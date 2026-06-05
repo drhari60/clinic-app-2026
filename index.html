@@ -88,7 +88,11 @@
             <div class="space-y-1.5"><label class="text-[11px] font-bold text-red-600 block flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> ট্ৰেনজেকচন আইডি দিয়াটো বাধ্যতামূলক:*</label><input type="text" id="bTxnId" placeholder="12-Digit UPI Transaction ID দিয়ক" class="w-full p-3.5 border-2 border-slate-950 rounded-xl font-mono text-sm font-bold text-center tracking-widest bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 shadow-inner"></div>
             <button id="btnSubmitBooking" class="w-full bg-emerald-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-emerald-700 text-xs uppercase transition tracking-wider">বুকিং নিশ্চিত কৰক (Confirm)</button>
         </div>
-        <div class="w-full space-y-3 my-5 border-t border-b border-gray-200/60 py-4">
+        <div id="debugPanel" class="w-full my-3 p-3 bg-yellow-50 border border-yellow-300 rounded-xl text-xs hidden">
+    <p class="font-bold text-yellow-800 mb-1">🔍 Debug Info:</p>
+    <p id="debugMsg" class="text-yellow-700 break-all"></p>
+</div>
+<div class="w-full space-y-3 my-5 border-t border-b border-gray-200/60 py-4">
             <p class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">ক্লিনিক মেনেজমেণ্ট কণ্ট্ৰ’ল</p>
             <div class="grid grid-cols-1 gap-2"><input type="email" id="loginEmail" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-slate-800 bg-slate-50 text-xs shadow-inner" placeholder="ইমেইল ঠিকনা"><div class="flex gap-2"><input type="password" id="loginPassword" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-slate-800 bg-slate-50 text-xs shadow-inner" placeholder="পাছৱৰ্ড"><button id="btnStaffLogin" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-5 rounded-xl transition text-[10px] tracking-wider uppercase shadow-md">LOGIN</button></div></div>
         </div>
@@ -159,7 +163,29 @@
         const reportMonthEl = document.getElementById('reportMonth'); if (reportMonthEl) reportMonthEl.value = new Date().getMonth();
         const reportYearEl = document.getElementById('reportYear'); if (reportYearEl) { const currentYear = new Date().getFullYear(); for (let y = 2024; y <= currentYear + 1; y++) { const opt = document.createElement('option'); opt.value = y; opt.textContent = y; reportYearEl.appendChild(opt); } reportYearEl.value = currentYear; }
         
-        async function handleLogin() { const email = safeGet('loginEmail').value.trim(); const password = safeGet('loginPassword').value.trim(); if (!email || !password) { await showAlert('অনুগ্ৰহ কৰি ইমেইল আৰু পাছৱৰ্ড লিখক।', 'প্ৰয়োজনীয় তথ্য', '📋'); return; } const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password }); if (error) { await showAlert('ভুল ইমেইল বা পাছৱৰ্ড। পুনৰ চেষ্টা কৰক।', 'Login ব্যৰ্থ', '❌'); return; } await checkRole(email); showDashboard(); }
+        async function handleLogin() { 
+    const email = safeGet('loginEmail').value.trim(); 
+    const password = safeGet('loginPassword').value.trim(); 
+    if (!email || !password) { await showAlert('অনুগ্ৰহ কৰি ইমেইল আৰু পাছৱৰ্ড লিখক।', 'প্ৰয়োজনীয় তথ্য', '📋'); return; }
+    const debugPanel = document.getElementById('debugPanel');
+    const debugMsg = document.getElementById('debugMsg');
+    if(debugPanel) debugPanel.classList.remove('hidden');
+    if(debugMsg) debugMsg.textContent = 'Connecting to Supabase...';
+    try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) { 
+            if(debugMsg) debugMsg.textContent = 'Auth Error: ' + error.message + ' (status: ' + error.status + ')';
+            await showAlert('Error: ' + error.message, 'Login ব্যৰ্থ', '❌'); 
+            return; 
+        }
+        if(debugMsg) debugMsg.textContent = 'Login OK! User: ' + data.user.email;
+        await checkRole(email); 
+        showDashboard(); 
+    } catch(e) {
+        if(debugMsg) debugMsg.textContent = 'Exception: ' + e.message;
+        await showAlert('Exception: ' + e.message, 'Error', '❌');
+    }
+}
         async function showDashboard() { const main = document.getElementById('mainPatientSection'); const dash = document.getElementById('appDashboard'); if (main) main.classList.add('hidden'); if (dash) dash.classList.remove('hidden'); await loadPatients(); }
         async function handleLogout() { await supabaseClient.auth.signOut(); const main = document.getElementById('mainPatientSection'); const dash = document.getElementById('appDashboard'); if (dash) dash.classList.add('hidden'); if (main) main.classList.remove('hidden'); safeGet('loginEmail').value = ''; safeGet('loginPassword').value = ''; isDoctor = false; const lp = document.getElementById('listPatients'); const lb = document.getElementById('listBookings'); if (lp) lp.innerHTML = ''; if (lb) lb.innerHTML = ''; }
         
