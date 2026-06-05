@@ -277,8 +277,8 @@ async function loadExpenses() {
     const today = new Date().toISOString().split('T')[0]; 
     const now = new Date(); 
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]; 
-    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0] + 'T23:59:59+00:00'; 
-    const todayEnd = today + 'T23:59:59+00:00'; 
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0] + 'T23:59:59+00:00';
+    const todayEnd = today + 'T23:59:59+00:00'; // Fix: আজিৰ শেষলৈকে সকলো entry
 
     // ডাটাবেচ ক্ৰেশ্ব নহ'বলৈ কেৱল চলিত মাহৰ আয়-ব্যয় আৰু সামগ্ৰিক হিচাপৰ বাবে সুকীয়া লজিক
     const [{ data: expenses }, { data: payments }, { data: allPayments }, { data: allExpenses }] = await Promise.all([ 
