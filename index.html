@@ -400,14 +400,50 @@ async function loadExpenses() {
             loadMedicines();
         }
 
-        async function useStock(id, name, currentQty) {
-            const amt = parseInt(prompt('কিমান ' + name + ' ব্যৱহাৰ কৰিলে?') || '0');
-            if (!amt || amt <= 0) return;
+        function useStock(id, name, currentQty, sellPrice) {
+            document.getElementById('stockActionMedId').value = id;
+            document.getElementById('stockActionMedName').value = name;
+            document.getElementById('stockActionMedQty').value = currentQty;
+            document.getElementById('stockActionMedSellPrice').value = sellPrice || 0;
+            document.getElementById('stockActionTitle').innerText = '💊 ' + name;
+            document.getElementById('stockActionQty').value = '';
+            document.getElementById('stockActionSellRow').classList.add('hidden');
+            document.getElementById('stockActionModal').classList.remove('hidden');
+        }
+
+        function stockActionTypeChange() {
+            const type = document.getElementById('stockActionType').value;
+            document.getElementById('stockActionSellRow').classList.toggle('hidden', type !== 'sell');
+        }
+
+        async function confirmStockAction() {
+            const id = document.getElementById('stockActionMedId').value;
+            const name = document.getElementById('stockActionMedName').value;
+            const currentQty = parseInt(document.getElementById('stockActionMedQty').value);
+            const defaultSellPrice = parseFloat(document.getElementById('stockActionMedSellPrice').value) || 0;
+            const type = document.getElementById('stockActionType').value;
+            const amt = parseInt(document.getElementById('stockActionQty').value) || 0;
+            if (amt <= 0) { await showAlert('সঠিক পৰিমাণ দিয়ক।', 'প্ৰয়োজনীয়', '⚠️'); return; }
             if (amt > currentQty) { await showAlert('Stock এ নোফুৰে! বৰ্তমান আছে: ' + currentQty, 'অপৰ্যাপ্ত', '⚠️'); return; }
-            const newQty = currentQty - amt;
+            const newQty = type === 'expired' ? 0 : currentQty - amt;
+            const expiredAmt = type === 'expired' ? currentQty : amt;
             const { error } = await supabaseClient.from('clinic_medicines').update({ quantity: newQty }).eq('id', id);
             if (error) { await showAlert('আপডেট ব্যৰ্থ।', 'ভুল', '❌'); return; }
-            await supabaseClient.from('clinic_medicine_logs').insert([{ medicine_id: id, medicine_name: name, type: 'out', quantity: amt, note: 'ব্যৱহাৰ' }]);
+            const noteMap = { sell: 'বিক্ৰী', use: 'Clinic ব্যৱহাৰ', expired: 'Expired — মচা হ&#39;ল' };
+            await supabaseClient.from('clinic_medicine_logs').insert([{ medicine_id: id, medicine_name: name, type: 'out', quantity: type === 'expired' ? expiredAmt : amt, note: noteMap[type] }]);
+            if (type === 'sell') {
+                const sellAmt = parseFloat(document.getElementById('stockActionSellAmt').value) || (defaultSellPrice * amt);
+                if (sellAmt > 0) {
+                    await supabaseClient.from('clinic_payments').insert([{ patient_name: 'Medicine Sale — ' + name, fees: sellAmt, visit_date: new Date().toISOString().split('T')[0], income_source: 'manual' }]);
+                    await showAlert(name + ' বিক্ৰী হ&#39;ল। ₹' + sellAmt + ' আয়ত যোগ হ&#39;ল।', 'সফল ✅', '💰');
+                    loadExpenses(); loadReport();
+                }
+            } else if (type === 'expired') {
+                await showAlert(name + ' — Expired হোৱাকৈ সম্পূৰ্ণ stock মচা হ&#39;ল।', 'সফল ✅', '🗑️');
+            } else {
+                await showAlert(name + ' — ' + amt + ' টা ব্যৱহাৰ হ&#39;ল।', 'সফল ✅', '✅');
+            }
+            document.getElementById('stockActionModal').classList.add('hidden');
             loadMedicines();
         }
 
@@ -446,7 +482,7 @@ async function loadExpenses() {
                             </div>
                         </div>
                         <div class="flex gap-2 ml-2">
-                            <button onclick="useStock('${m.id}','${escapeHTML(m.name)}',${m.quantity})" class="bg-orange-500 text-white text-xs px-3 py-1.5 rounded-lg font-bold">ব্যৱহাৰ</button>
+                            <button onclick="useStock('${m.id}','${escapeHTML(m.name)}',${m.quantity},${m.selling_price||0})" class="bg-orange-500 text-white text-xs px-3 py-1.5 rounded-lg font-bold">Stock কমাওক</button>
                             <button onclick="deleteMedicine('${m.id}','${escapeHTML(m.name)}')" class="bg-red-100 text-red-600 text-xs px-2 py-1.5 rounded-lg font-bold">🗑</button>
                         </div>
                     </div>
@@ -463,6 +499,35 @@ async function loadExpenses() {
             window.open('https://api.whatsapp.com/send?phone=919954340102&text=' + encodeURIComponent(msg), '_blank');
         }
     </script>
+
+    <div id="stockActionModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-5 w-full max-w-sm shadow-2xl">
+            <h3 id="stockActionTitle" class="font-bold text-base text-slate-900 mb-4">💊 Stock কমাওক</h3>
+            <input type="hidden" id="stockActionMedId">
+            <input type="hidden" id="stockActionMedName">
+            <input type="hidden" id="stockActionMedQty">
+            <input type="hidden" id="stockActionMedSellPrice">
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs font-bold text-gray-600 mb-1 block">কাৰণ বাছক</label>
+                    <select id="stockActionType" onchange="stockActionTypeChange()" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none">
+                        <option value="sell">💰 বিক্ৰী হ&#39;ল (Patient ক দিলে)</option>
+                        <option value="use">🏥 Clinic ব্যৱহাৰ (Injection/Dressing)</option>
+                        <option value="expired">⛔ Expired — সম্পূৰ্ণ মচক</option>
+                    </select>
+                </div>
+                <input type="number" id="stockActionQty" placeholder="কিমান টা?" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                <div id="stockActionSellRow" class="hidden">
+                    <label class="text-xs font-bold text-gray-600 mb-1 block">বিক্ৰী মূল্য (₹) — খালী ৰাখিলে default মূল্য ব্যৱহাৰ হ&#39;ব</label>
+                    <input type="number" id="stockActionSellAmt" placeholder="মুঠ বিক্ৰী টকা (₹)" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="confirmStockAction()" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-xl font-bold text-sm transition">নিশ্চিত কৰক</button>
+                    <button onclick="document.getElementById('stockActionModal').classList.add('hidden')" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">বাতিল</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="revisitModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50"><div class="bg-white rounded-2xl p-5 w-full max-w-md shadow-2xl"><h3 id="revisitModalTitle" class="font-bold text-base text-slate-900 mb-4">🔄 নতুন Visit যোগ কৰক</h3><input type="hidden" id="revisitPatientId"><input type="hidden" id="revisitPatientName"><div class="space-y-3"><input type="text" id="revisitBP" placeholder="ৰক্তচাপ (BP) — যদি নতুন" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner"><textarea id="revisitHistory" placeholder="আজিৰ সমস্যা / Chief Complaint" class="w-full p-3 border border-gray-200 rounded-xl text-sm h-20 resize-none focus:outline-none shadow-inner"></textarea><textarea id="revisitMedicine" placeholder="আজিৰ Rx (ঔষধ)" class="w-full p-3 border border-gray-200 rounded-xl text-sm h-24 resize-none focus:outline-none shadow-inner"></textarea><input type="number" id="revisitFees" placeholder="Visit ফীজ (₹) — নাথাকিলে খালী ৰাখক" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner"><div class="flex gap-2"><button onclick="saveRevisit()" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-xl font-bold text-sm transition">সংৰক্ষণ কৰক</button><button onclick="document.getElementById('revisitModal').classList.add('hidden')" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">বাতিল</button></div></div></div></div>
 
