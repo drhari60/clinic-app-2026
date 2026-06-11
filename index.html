@@ -128,7 +128,6 @@
                 </div>
                 <div id="listMedicines" class="space-y-2"></div>
             </div>
-
             <div id="visitHistoryModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50"><div class="bg-white rounded-2xl w-full max-w-md max-h-[85vh] flex flex-col shadow-2xl"><div class="flex justify-between items-center px-5 py-4 border-b border-gray-100"><h3 id="visitHistoryTitle" class="font-bold text-base text-slate-900">📋 Visit History</h3><button onclick="document.getElementById('visitHistoryModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-700 text-xl font-bold">&times;</button></div><div id="visitHistoryList" class="overflow-y-auto px-4 py-3 space-y-3 flex-1 text-sm"><p class="text-gray-400 text-center py-4">লোড হৈ আছে...</p></div></div></div>
             <div id="patientModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"><div class="bg-white rounded-xl p-5 w-full max-w-md"><h3 id="modalTitle" class="font-bold text-lg mb-3">➕ নতুন ৰোগী</h3><input type="text" id="pName" placeholder="ৰোগীৰ নাম *" class="w-full p-2 border rounded-lg mb-2"><input type="text" id="pAgeSex" placeholder="বয়স / লিংগ" class="w-full p-2 border rounded-lg mb-2"><input type="text" id="pBP" placeholder="ৰক্তচাপ (BP)" class="w-full p-2 border rounded-lg mb-2"><input type="text" id="pPhone" placeholder="ম'বাইল নম্বৰ *" class="w-full p-2 border rounded-lg mb-2"><textarea id="pHistory" placeholder="ৰোগৰ ইতিবৃত্ত (Case History)" class="w-full p-2 border rounded-lg mb-2 h-20 resize-none"></textarea><textarea id="pMedicine" placeholder="ঔষধৰ নাম আৰু ব্যৱহাৰৰ নিয়ম (Rx)" class="w-full p-2 border rounded-lg mb-2 h-24 resize-none"></textarea><input type="number" id="pFees" placeholder="ভিজিট ফীজ (₹)" class="w-full p-2 border rounded-lg mb-3"><div class="flex gap-2"><button id="savePatientBtn" class="flex-1 bg-emerald-600 text-white py-2 rounded-lg font-medium">সংৰক্ষণ</button><button id="closeModalBtn" class="flex-1 bg-gray-300 py-2 rounded-lg">বন্ধ</button></div></div></div>
         </div>
@@ -178,7 +177,7 @@
             startHealthTipsRotation(); setupTabs();
         });
 
-        async function checkRole(userEmail) { if (!userEmail) return; isDoctor = (userEmail.toLowerCase() === 'das.harikanta60@gmail.com'); const badge = document.getElementById('accessBadge'); if (badge) { badge.innerText = isDoctor ? 'Doctor (Full Access)' : 'Staff Mode (Restricted)'; badge.className = isDoctor ? 'text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider' : 'text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider'; } const a1 = document.getElementById('agentSection1'); const a2 = document.getElementById('agentSection2'); if (a1) a1.classList.toggle('hidden', !isDoctor); if (a2) a2.classList.toggle('hidden', !isDoctor); document.querySelectorAll('.stock-only').forEach(el => el.classList.toggle('hidden', !isDoctor)); }
+        async function checkRole(userEmail) { if (!userEmail) return; isDoctor = (userEmail.toLowerCase() === 'das.harikanta60@gmail.com'); const badge = document.getElementById('accessBadge'); if (badge) { badge.innerText = isDoctor ? 'Doctor (Full Access)' : 'Staff Mode (Restricted)'; badge.className = isDoctor ? 'text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider' : 'text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider'; } const a1 = document.getElementById('agentSection1'); const a2 = document.getElementById('agentSection2'); if (a1) a1.classList.toggle('hidden', !isDoctor); if (a2) a2.classList.toggle('hidden', !isDoctor); }
         function openAddPatientModal() { currentEditId = null; document.getElementById('modalTitle').innerHTML = '➕ নতুন ৰোগী'; document.getElementById('pName').value = ''; document.getElementById('pAgeSex').value = ''; document.getElementById('pBP').value = ''; document.getElementById('pPhone').value = ''; document.getElementById('pHistory').value = ''; document.getElementById('pMedicine').value = ''; document.getElementById('pFees').value = ''; document.getElementById('patientModal').classList.remove('hidden'); }
         function closePatientModal() { document.getElementById('patientModal').classList.add('hidden'); }
         function generateLiveQR() { const qrBadge = document.getElementById('qrBadge'); if(qrBadge) qrBadge.innerText = `ফীজ: ₹${currentFee} (${selectedBookingType})`; const upiPayload = `upi://pay?pa=9954340102@okbizaxis&pn=Dr%20Harikanta%20Das&am=${currentFee}&cu=INR&tn=${encodeURIComponent(selectedBookingType)}`; const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=${encodeURIComponent(upiPayload)}&ecc=M`; const qrImageContainer = document.getElementById('paymentQRCode'); if(qrImageContainer) { qrImageContainer.src = qrApiUrl; qrImageContainer.onerror = function() { this.style.display = 'none'; const fallback = document.getElementById('qrFallback'); if(fallback) fallback.classList.remove('hidden'); }; qrImageContainer.onload = function() { this.style.display = ''; const fallback = document.getElementById('qrFallback'); if(fallback) fallback.classList.add('hidden'); }; } const upiPayBtn = document.getElementById('upiPayBtn'); if(upiPayBtn) upiPayBtn.href = upiPayload; }
@@ -188,7 +187,7 @@
         const reportYearEl = document.getElementById('reportYear'); if (reportYearEl) reportYearEl.value = new Date().getFullYear();
         
         async function handleLogin() { const email = safeGet('loginEmail').value.trim(); const password = safeGet('loginPassword').value.trim(); if (!email || !password) { await showAlert('অনুগ্ৰহ কৰি ইমেইল আৰু পাছৱৰ্ড লিখক।', 'প্ৰয়োজনীয় তথ্য', '📋'); return; } const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password }); if (error) { await showAlert('ভুল ইমেইল বা পাছৱৰ্ড। পুনৰ চেষ্টা কৰক।', 'Login ব্যৰ্থ', '❌'); return; } await checkRole(email); showDashboard(); }
-        async function showDashboard() { const main = document.getElementById('mainPatientSection'); const dash = document.getElementById('appDashboard'); if (main) main.classList.add('hidden'); if (dash) dash.classList.remove('hidden'); await loadPatients(); }
+        async function showDashboard() { const main = document.getElementById('mainPatientSection'); const dash = document.getElementById('appDashboard'); if (main) main.classList.add('hidden'); if (dash) dash.classList.remove('hidden'); await loadPatients(); setTimeout(checkLowStockOnLogin, 2000); }
         async function handleLogout() { await supabaseClient.auth.signOut(); const main = document.getElementById('mainPatientSection'); const dash = document.getElementById('appDashboard'); if (dash) dash.classList.add('hidden'); if (main) main.classList.remove('hidden'); safeGet('loginEmail').value = ''; safeGet('loginPassword').value = ''; isDoctor = false; const lp = document.getElementById('listPatients'); const lb = document.getElementById('listBookings'); if (lp) lp.innerHTML = ''; if (lb) lb.innerHTML = ''; }
         
         async function submitBooking() { const name = safeGet('bName').value?.trim(); const rawPhone = safeGet('bPhone').value?.trim(); const phone = sanitizePhone(rawPhone); const txn_id = safeGet('bTxnId').value?.trim(); const problem = safeGet('bProblem').value?.trim(); if (!/^[A-Za-zÀ-ÿ\u0980-\u09FF\s.]{3,50}$/.test(name)) { await showAlert('সঠিক ৰোগীৰ নাম দিয়ক।', 'ভুল তথ্য', '⚠️'); return; } if (!/^[6-9]\d{9}$/.test(phone)) { await showAlert('সঠিক 10 ডিজিট নম্বৰ দিয়ক।', 'ভুল নম্বৰ', '📱'); return; } if (!problem || problem.length < 5) { await showAlert('স্বাস্থ্য সমস্যাটো সঠিককৈ লিখক।', 'প্ৰয়োজনীয়', '📋'); return; } if (!/^[A-Za-z0-9]{10,30}$/.test(txn_id)) { await showAlert('সঠিক Transaction ID দিয়ক।', 'ভুল ID', '🔢'); return; } const { data: existing } = await supabaseClient.from('clinic_bookings').select('id').eq('phone', phone).eq('txn_id', txn_id).maybeSingle(); if (existing) { await showAlert('এই ট্ৰাঞ্জেকচন আইডিৰে আগেয়ে বুকিং হৈছে।', 'ডুপ্লিকেট', '⚠️'); return; } const { error } = await supabaseClient.from('clinic_bookings').insert([{ name, phone, txn_id, problem: `[${selectedBookingType}] ${problem}` }]); if (error) { await showAlert('বুকিং ব্যৰ্থ হৈছে। পুনৰ চেষ্টা কৰক।', 'বুকিং ব্যৰ্থ', '❌'); } else { await showAlert('সফল হৈছে! আপোনাৰ বুকিং গ্ৰহণ কৰা হৈছে।', 'বুকিং নিশ্চিত ✅', '🎉'); window.open(`https://api.whatsapp.com/send?phone=91${phone}&text=${encodeURIComponent(`🏥 DR. HARIS CLINIC\n\nনমস্কাৰ ${name},\nআপোনাৰ ${selectedBookingType} ৰ বুকিং পঞ্জীয়ন কৰা হৈছে।\nTxn ID: ${txn_id}`)}`, '_blank'); safeGet('bName').value = ''; safeGet('bPhone').value = ''; safeGet('bProblem').value = ''; safeGet('bTxnId').value = ''; document.getElementById('bookingStep2').classList.add('hidden'); document.getElementById('bookingStep1').classList.remove('hidden'); } }
@@ -371,8 +370,15 @@ async function loadExpenses() {
         async function showVisitHistory(p) { const modal = document.getElementById('visitHistoryModal'); const titleEl = document.getElementById('visitHistoryTitle'); const listEl = document.getElementById('visitHistoryList'); if (!modal || !titleEl || !listEl) return; titleEl.innerHTML = `📋 ${escapeHTML(p.name)} — Visit History`; listEl.innerHTML = '<p class="text-gray-400 text-center py-4">লোড হৈ আছে...</p>'; modal.classList.remove('hidden'); const { data: visits, error } = await supabaseClient.from('clinic_visits').select('*').eq('patient_id', p.id).order('visit_date', { ascending: false }); if (error || !visits || visits.length === 0) { listEl.innerHTML = '<p class="text-gray-400 text-center py-6">কোনো visit পোৱা নগ&#39;ল।</p>'; return; } listEl.innerHTML = visits.map((v) => { const statusColor = v.payment_status === 'paid' ? 'bg-green-100 text-green-700' : v.payment_status === 'free' ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-600'; const visitLabel = v.visit_type === 'new' ? '🆕 নতুন' : v.visit_type === 'follow_up' ? '🔄 Follow-up' : '🔁 Revisit'; return `<div class="border border-gray-100 rounded-xl p-3 bg-gray-50 space-y-1.5"><div class="flex justify-between items-center"><span class="font-bold text-slate-800 text-xs">${v.visit_date} <span class="text-gray-400 font-normal">${visitLabel}</span></span><span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${statusColor}">${v.payment_status === 'paid' ? '₹'+v.fees_paid+' Paid' : v.payment_status === 'free' ? 'Free' : 'Unpaid'}</span></div>${v.bp ? `<p class="text-xs text-gray-600">🩺 BP: <span class="font-medium">${escapeHTML(v.bp)}</span></p>` : ''}${v.notes ? `<p class="text-xs text-gray-600">📝 History: <span class="font-medium">${escapeHTML(v.notes)}</span></p>` : ''}${v.medicine ? `<div class="text-xs text-indigo-700 bg-indigo-50 rounded-lg px-2 py-1.5 mt-1"><b>Rx:</b> ${escapeHTML(v.medicine)}</div>` : ''}</div>`; }).join(''); }
         function openRevisitModal(p) { document.getElementById('revisitPatientId').value = p.id; document.getElementById('revisitPatientName').value = p.name; document.getElementById('revisitModalTitle').innerHTML = `🔄 ${escapeHTML(p.name)} — নতুন Visit`; document.getElementById('revisitBP').value = ''; document.getElementById('revisitHistory').value = ''; document.getElementById('revisitMedicine').value = ''; document.getElementById('revisitFees').value = ''; document.getElementById('revisitModal').classList.remove('hidden'); }
         async function saveRevisit() { const patientId = document.getElementById('revisitPatientId').value; const patientName = document.getElementById('revisitPatientName').value; const bp = document.getElementById('revisitBP').value.trim(); const notes = document.getElementById('revisitHistory').value.trim(); const medicine = document.getElementById('revisitMedicine').value.trim(); const fees = parseFloat(document.getElementById('revisitFees').value) || 0; const today = new Date().toISOString().split('T')[0]; if (!notes) { await showAlert('আজিৰ সমস্যা লিখক।', 'প্ৰয়োজনীয়', '📋'); return; } const visitRecord = { patient_id: patientId, patient_name: patientName, visit_date: today, visit_type: 'follow_up', fees_paid: fees, payment_status: fees > 0 ? 'paid' : 'free', bp, medicine, notes }; const { error: visitErr } = await supabaseClient.from('clinic_visits').insert([visitRecord]); if (visitErr) { await showAlert('Visit সংৰক্ষণ ব্যৰ্থ: ' + visitErr.message, 'ভুল', '❌'); return; } if (fees > 0) { await supabaseClient.from('clinic_payments').insert([{ patient_name: patientName, fees, visit_date: today, patient_id: patientId, income_source: 'patient' }]); } const updateData = {}; if (bp) updateData.bp = bp; if (medicine) updateData.medicine = medicine; if (Object.keys(updateData).length > 0) { await supabaseClient.from('clinic_data').update(updateData).eq('id', patientId); } await showAlert('Revisit সফলতাৰে সংৰক্ষণ হৈছে।', 'সফল ✅', '🎉'); document.getElementById('revisitModal').classList.add('hidden'); loadPatients(); loadExpenses(); loadReport(); }
-        function escapeHTML(str) { if (!str) return ''; return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
-
+        async function checkLowStockOnLogin() {
+            const { data: meds } = await supabaseClient.from('clinic_medicines').select('name, quantity, min_quantity').order('name');
+            if (!meds || meds.length === 0) return;
+            const low = meds.filter(m => m.quantity <= m.min_quantity);
+            if (low.length === 0) return;
+            const lines = low.map(m => '  • ' + m.name + ': ' + m.quantity + ' টা বাকী').join('\n');
+            const msg = '⚠️ *DR. HARIS CLINIC — Stock Alert*\n━━━━━━━━━━━━━━━━━━━━\n💊 কম Stock (' + low.length + ' টা):\n' + lines + '\n━━━━━━━━━━━━━━━━━━━━\n📅 ' + new Date().toLocaleDateString('as-IN') + '\n🏥 DR. HARIS CLINIC';
+            window.open('https://api.whatsapp.com/send?phone=919954340102&text=' + encodeURIComponent(msg), '_blank');
+        }
         async function saveMedicine() {
             const name = document.getElementById('medName').value.trim();
             const qty = parseInt(document.getElementById('medQty').value) || 0;
@@ -386,8 +392,7 @@ async function loadExpenses() {
             const { data: existing } = await supabaseClient.from('clinic_medicines').select('id, quantity').eq('name', name).maybeSingle();
             if (existing) {
                 const newQty = existing.quantity + qty;
-                const { error } = await supabaseClient.from('clinic_medicines').update({ quantity: newQty, min_quantity: minQty, purchase_price: buyPrice, selling_price: sellPrice, expiry_date: expiry, supplier_name: supplier }).eq('id', existing.id);
-                if (error) { await showAlert('আপডেট ব্যৰ্থ: ' + error.message, 'ভুল', '❌'); return; }
+                await supabaseClient.from('clinic_medicines').update({ quantity: newQty, min_quantity: minQty, purchase_price: buyPrice, selling_price: sellPrice, expiry_date: expiry, supplier_name: supplier }).eq('id', existing.id);
                 await supabaseClient.from('clinic_medicine_logs').insert([{ medicine_id: existing.id, medicine_name: name, type: 'in', quantity: qty, note: 'Stock আপডেট' }]);
                 await showAlert(name + ' — Stock ' + newQty + ' লৈ আপডেট হ&#39;ল।', 'সফল ✅', '📦');
             } else {
@@ -396,26 +401,51 @@ async function loadExpenses() {
                 await supabaseClient.from('clinic_medicine_logs').insert([{ medicine_id: newMed.id, medicine_name: name, type: 'in', quantity: qty, note: 'নতুন Stock' }]);
                 await showAlert(name + ' — নতুনকৈ যোগ হ&#39;ল।', 'সফল ✅', '🎉');
             }
-            document.getElementById('medName').value = ''; document.getElementById('medQty').value = ''; document.getElementById('medMinQty').value = ''; document.getElementById('medBuyPrice').value = ''; document.getElementById('medSellPrice').value = ''; document.getElementById('medExpiry').value = ''; document.getElementById('medSupplier').value = '';
+            ['medName','medQty','medMinQty','medBuyPrice','medSellPrice','medExpiry','medSupplier'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
             loadMedicines();
         }
-
+        function openEditMedicine(m) {
+            document.getElementById('editMedId').value = m.id;
+            document.getElementById('editMedName').value = m.name;
+            document.getElementById('editMedQty').value = m.quantity;
+            document.getElementById('editMedMinQty').value = m.min_quantity;
+            document.getElementById('editMedBuyPrice').value = m.purchase_price || '';
+            document.getElementById('editMedSellPrice').value = m.selling_price || '';
+            document.getElementById('editMedExpiry').value = m.expiry_date || '';
+            document.getElementById('editMedSupplier').value = m.supplier_name || '';
+            document.getElementById('editMedicineModal').classList.remove('hidden');
+        }
+        async function saveEditMedicine() {
+            const id = document.getElementById('editMedId').value;
+            const name = document.getElementById('editMedName').value.trim();
+            const qty = parseInt(document.getElementById('editMedQty').value) || 0;
+            const minQty = parseInt(document.getElementById('editMedMinQty').value) || 10;
+            const buyPrice = parseFloat(document.getElementById('editMedBuyPrice').value) || null;
+            const sellPrice = parseFloat(document.getElementById('editMedSellPrice').value) || null;
+            const expiry = document.getElementById('editMedExpiry').value || null;
+            const supplier = document.getElementById('editMedSupplier').value.trim() || null;
+            if (!name) { await showAlert('ঔষধৰ নাম লিখক।', 'প্ৰয়োজনীয়', '💊'); return; }
+            const { error } = await supabaseClient.from('clinic_medicines').update({ name, quantity: qty, min_quantity: minQty, purchase_price: buyPrice, selling_price: sellPrice, expiry_date: expiry, supplier_name: supplier }).eq('id', id);
+            if (error) { await showAlert('সংৰক্ষণ ব্যৰ্থ।', 'ভুল', '❌'); return; }
+            await showAlert(name + ' — সম্পাদনা সফল হ&#39;ল।', 'সফল ✅', '👍');
+            document.getElementById('editMedicineModal').classList.add('hidden');
+            loadMedicines();
+        }
         function useStock(id, name, currentQty, sellPrice) {
             document.getElementById('stockActionMedId').value = id;
             document.getElementById('stockActionMedName').value = name;
             document.getElementById('stockActionMedQty').value = currentQty;
             document.getElementById('stockActionMedSellPrice').value = sellPrice || 0;
-            document.getElementById('stockActionTitle').innerText = '💊 ' + name;
+            document.getElementById('stockActionTitle').innerText = name + ' — Stock কমাওক';
             document.getElementById('stockActionQty').value = '';
             document.getElementById('stockActionSellRow').classList.add('hidden');
+            document.getElementById('stockActionType').value = 'sell';
             document.getElementById('stockActionModal').classList.remove('hidden');
         }
-
         function stockActionTypeChange() {
             const type = document.getElementById('stockActionType').value;
             document.getElementById('stockActionSellRow').classList.toggle('hidden', type !== 'sell');
         }
-
         async function confirmStockAction() {
             const id = document.getElementById('stockActionMedId').value;
             const name = document.getElementById('stockActionMedName').value;
@@ -424,102 +454,97 @@ async function loadExpenses() {
             const type = document.getElementById('stockActionType').value;
             const amt = parseInt(document.getElementById('stockActionQty').value) || 0;
             if (amt <= 0) { await showAlert('সঠিক পৰিমাণ দিয়ক।', 'প্ৰয়োজনীয়', '⚠️'); return; }
-            if (amt > currentQty) { await showAlert('Stock এ নোফুৰে! বৰ্তমান আছে: ' + currentQty, 'অপৰ্যাপ্ত', '⚠️'); return; }
+            if (type !== 'expired' && amt > currentQty) { await showAlert('Stock এ নোফুৰে! বৰ্তমান আছে: ' + currentQty, 'অপৰ্যাপ্ত', '⚠️'); return; }
             const newQty = type === 'expired' ? 0 : currentQty - amt;
-            const expiredAmt = type === 'expired' ? currentQty : amt;
-            const { error } = await supabaseClient.from('clinic_medicines').update({ quantity: newQty }).eq('id', id);
-            if (error) { await showAlert('আপডেট ব্যৰ্থ।', 'ভুল', '❌'); return; }
-            const noteMap = { sell: 'বিক্ৰী', use: 'Clinic ব্যৱহাৰ', expired: 'Expired — মচা হ&#39;ল' };
-            await supabaseClient.from('clinic_medicine_logs').insert([{ medicine_id: id, medicine_name: name, type: 'out', quantity: type === 'expired' ? expiredAmt : amt, note: noteMap[type] }]);
+            const deductAmt = type === 'expired' ? currentQty : amt;
+            await supabaseClient.from('clinic_medicines').update({ quantity: newQty }).eq('id', id);
+            const noteMap = { sell: 'বিক্ৰী', use: 'Clinic ব্যৱহাৰ', expired: 'Expired' };
+            await supabaseClient.from('clinic_medicine_logs').insert([{ medicine_id: id, medicine_name: name, type: 'out', quantity: deductAmt, note: noteMap[type] }]);
             if (type === 'sell') {
                 const sellAmt = parseFloat(document.getElementById('stockActionSellAmt').value) || (defaultSellPrice * amt);
                 if (sellAmt > 0) {
-                    await supabaseClient.from('clinic_payments').insert([{ patient_name: 'Medicine Sale — ' + name, fees: sellAmt, visit_date: new Date().toISOString().split('T')[0], income_source: 'manual' }]);
+                    await supabaseClient.from('clinic_payments').insert([{ patient_name: 'ঔষধ বিক্ৰী — ' + name, fees: sellAmt, visit_date: new Date().toISOString().split('T')[0], income_source: 'manual' }]);
                     await showAlert(name + ' বিক্ৰী হ&#39;ল। ₹' + sellAmt + ' আয়ত যোগ হ&#39;ল।', 'সফল ✅', '💰');
                     loadExpenses(); loadReport();
                 }
             } else if (type === 'expired') {
-                await showAlert(name + ' — Expired হোৱাকৈ সম্পূৰ্ণ stock মচা হ&#39;ল।', 'সফল ✅', '🗑️');
+                await showAlert(name + ' — Expired, সম্পূৰ্ণ মচা হ&#39;ল।', 'সফল ✅', '🗑️');
             } else {
                 await showAlert(name + ' — ' + amt + ' টা ব্যৱহাৰ হ&#39;ল।', 'সফল ✅', '✅');
             }
             document.getElementById('stockActionModal').classList.add('hidden');
             loadMedicines();
         }
-
         async function deleteMedicine(id, name) {
             if (!confirm(name + ' মচিব বিচাৰেনে?')) return;
             await supabaseClient.from('clinic_medicines').delete().eq('id', id);
             loadMedicines();
         }
-
         async function loadMedicines() {
             const { data: meds, error } = await supabaseClient.from('clinic_medicines').select('*').order('name');
             if (error) return;
-            const lowStock = (meds || []).filter(m => m.quantity <= m.min_quantity);
+            const low = (meds || []).filter(m => m.quantity <= m.min_quantity);
             const alertBox = document.getElementById('stockAlertBox');
             const alertList = document.getElementById('stockAlertList');
-            if (lowStock.length > 0) {
-                alertBox.classList.remove('hidden');
-                alertList.innerHTML = lowStock.map(m => `<div class="flex justify-between text-xs text-red-700"><span>💊 ${escapeHTML(m.name)}</span><span class="font-bold">${m.quantity} টা বাকী</span></div>`).join('');
-            } else { alertBox.classList.add('hidden'); }
+            if (alertBox) {
+                if (low.length > 0) {
+                    alertBox.classList.remove('hidden');
+                    if (alertList) alertList.innerHTML = low.map(m => '<div class="flex justify-between text-xs text-red-700"><span>💊 ' + escapeHTML(m.name) + '</span><span class="font-bold">' + m.quantity + ' টা বাকী</span></div>').join('');
+                } else { alertBox.classList.add('hidden'); }
+            }
             const listEl = document.getElementById('listMedicines');
+            if (!listEl) return;
             if (!meds || meds.length === 0) { listEl.innerHTML = '<p class="text-xs text-gray-400 text-center py-6">কোনো ঔষধ যোগ কৰা হোৱা নাই।</p>'; return; }
             const today = new Date().toISOString().split('T')[0];
             listEl.innerHTML = meds.map(m => {
                 const isLow = m.quantity <= m.min_quantity;
                 const isExpired = m.expiry_date && m.expiry_date < today;
-                const expiringSoon = m.expiry_date && !isExpired && (new Date(m.expiry_date) - new Date()) < 30 * 24 * 60 * 60 * 1000;
-                return `<div class="bg-white rounded-2xl p-4 shadow-sm border ${isLow ? 'border-red-300' : 'border-gray-100'}">
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1">
-                            <p class="font-bold text-sm text-slate-900">${escapeHTML(m.name)}</p>
-                            <p class="text-xs text-gray-500 mt-0.5">${m.supplier_name ? '🏭 ' + escapeHTML(m.supplier_name) : ''}</p>
-                            <div class="flex flex-wrap gap-2 mt-2">
-                                <span class="text-xs px-2 py-0.5 rounded-full font-bold ${isLow ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}">📦 ${m.quantity} টা</span>
-                                ${m.selling_price ? `<span class="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">₹${m.selling_price}</span>` : ''}
-                                ${m.expiry_date ? `<span class="text-xs px-2 py-0.5 rounded-full ${isExpired ? 'bg-red-200 text-red-800 font-bold' : expiringSoon ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-600'}">⏳ ${m.expiry_date}</span>` : ''}
-                            </div>
-                        </div>
-                        <div class="flex gap-2 ml-2">
-                            <button onclick="useStock('${m.id}','${escapeHTML(m.name)}',${m.quantity},${m.selling_price||0})" class="bg-orange-500 text-white text-xs px-3 py-1.5 rounded-lg font-bold">Stock কমাওক</button>
-                            <button onclick="deleteMedicine('${m.id}','${escapeHTML(m.name)}')" class="bg-red-100 text-red-600 text-xs px-2 py-1.5 rounded-lg font-bold">🗑</button>
-                        </div>
-                    </div>
-                </div>`;
+                const expiringSoon = m.expiry_date && !isExpired && (new Date(m.expiry_date) - new Date()) < 30*24*60*60*1000;
+                const mData = JSON.stringify(m).replace(/"/g, '&quot;');
+                return '<div class="bg-white rounded-2xl p-4 shadow-sm border ' + (isLow ? 'border-red-300' : 'border-gray-100') + '">' +
+                    '<div class="flex justify-between items-start">' +
+                    '<div class="flex-1"><p class="font-bold text-sm text-slate-900">' + escapeHTML(m.name) + '</p>' +
+                    (m.supplier_name ? '<p class="text-xs text-gray-500 mt-0.5">🏭 ' + escapeHTML(m.supplier_name) + '</p>' : '') +
+                    '<div class="flex flex-wrap gap-1.5 mt-2">' +
+                    '<span class="text-xs px-2 py-0.5 rounded-full font-bold ' + (isLow ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700') + '">📦 ' + m.quantity + ' টা</span>' +
+                    (m.selling_price ? '<span class="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">₹' + m.selling_price + '</span>' : '') +
+                    (m.expiry_date ? '<span class="text-xs px-2 py-0.5 rounded-full ' + (isExpired ? 'bg-red-200 text-red-800 font-bold' : expiringSoon ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-600') + '">⏳ ' + m.expiry_date + '</span>' : '') +
+                    '</div></div>' +
+                    '<div class="flex gap-1.5 ml-2 flex-col">' +
+                    '<button onclick="openEditMedicine(JSON.parse(this.dataset.m))" data-m="' + mData + '" class="bg-blue-500 text-white text-xs px-2.5 py-1.5 rounded-lg font-bold">সম্পাদনা</button>' +
+                    '<button onclick="useStock(\'' + m.id + '\',\'' + escapeHTML(m.name).replace(/'/g,'&#39;') + '\',' + m.quantity + ',' + (m.selling_price||0) + ')" class="bg-orange-500 text-white text-xs px-2.5 py-1.5 rounded-lg font-bold">Stock কমাওক</button>' +
+                    '<button onclick="deleteMedicine(\'' + m.id + '\',\'' + escapeHTML(m.name).replace(/'/g,'&#39;') + '\')" class="bg-red-100 text-red-600 text-xs px-2 py-1.5 rounded-lg font-bold">🗑</button>' +
+                    '</div></div></div>';
             }).join('');
         }
-
         async function sendStockAlert() {
             const { data: meds } = await supabaseClient.from('clinic_medicines').select('*').order('name');
-            const lowStock = (meds || []).filter(m => m.quantity <= m.min_quantity);
-            if (lowStock.length === 0) { await showAlert('কোনো ঔষধৰ Stock কম নাই।', 'ঠিক আছে', '✅'); return; }
-            const lines = lowStock.map(m => `  • ${m.name}: ${m.quantity} টা বাকী (min: ${m.min_quantity})`).join('\n');
-            const msg = `⚠️ *DR. HARIS CLINIC — Stock Alert*\n━━━━━━━━━━━━━━━━━━━━\n💊 *কম Stock ৰ ঔষধ:*\n${lines}\n━━━━━━━━━━━━━━━━━━━━\n📅 তাৰিখ: ${new Date().toLocaleDateString('as-IN')}\n🏥 DR. HARIS CLINIC`;
+            const low = (meds || []).filter(m => m.quantity <= m.min_quantity);
+            if (low.length === 0) { await showAlert('কোনো ঔষধৰ Stock কম নাই।', 'ঠিক আছে', '✅'); return; }
+            const lines = low.map(m => '  • ' + m.name + ': ' + m.quantity + ' টা বাকী').join('\n');
+            const msg = '⚠️ *DR. HARIS CLINIC — Stock Alert*\n━━━━━━━━━━━━━━━━━━━━\n💊 কম Stock:\n' + lines + '\n━━━━━━━━━━━━━━━━━━━━\n📅 ' + new Date().toLocaleDateString('as-IN') + '\n🏥 DR. HARIS CLINIC';
             window.open('https://api.whatsapp.com/send?phone=919954340102&text=' + encodeURIComponent(msg), '_blank');
         }
+
+        function escapeHTML(str) { if (!str) return ''; return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
     </script>
 
     <div id="stockActionModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-5 w-full max-w-sm shadow-2xl">
-            <h3 id="stockActionTitle" class="font-bold text-base text-slate-900 mb-4">💊 Stock কমাওক</h3>
+            <h3 id="stockActionTitle" class="font-bold text-base text-slate-900 mb-4">Stock কমাওক</h3>
             <input type="hidden" id="stockActionMedId">
             <input type="hidden" id="stockActionMedName">
             <input type="hidden" id="stockActionMedQty">
             <input type="hidden" id="stockActionMedSellPrice">
             <div class="space-y-3">
-                <div>
-                    <label class="text-xs font-bold text-gray-600 mb-1 block">কাৰণ বাছক</label>
-                    <select id="stockActionType" onchange="stockActionTypeChange()" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none">
-                        <option value="sell">💰 বিক্ৰী হ&#39;ল (Patient ক দিলে)</option>
-                        <option value="use">🏥 Clinic ব্যৱহাৰ (Injection/Dressing)</option>
-                        <option value="expired">⛔ Expired — সম্পূৰ্ণ মচক</option>
-                    </select>
-                </div>
+                <select id="stockActionType" onchange="stockActionTypeChange()" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none">
+                    <option value="sell">💰 বিক্ৰী হ&#39;ল (Patient ক দিলে)</option>
+                    <option value="use">🏥 Clinic ব্যৱহাৰ (Injection/Dressing)</option>
+                    <option value="expired">⛔ Expired — সম্পূৰ্ণ মচক</option>
+                </select>
                 <input type="number" id="stockActionQty" placeholder="কিমান টা?" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
                 <div id="stockActionSellRow" class="hidden">
-                    <label class="text-xs font-bold text-gray-600 mb-1 block">বিক্ৰী মূল্য (₹) — খালী ৰাখিলে default মূল্য ব্যৱহাৰ হ&#39;ব</label>
-                    <input type="number" id="stockActionSellAmt" placeholder="মুঠ বিক্ৰী টকা (₹)" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                    <input type="number" id="stockActionSellAmt" placeholder="মুঠ বিক্ৰী টকা (₹) — খালী ৰাখিলে default মূল্য" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
                 </div>
                 <div class="flex gap-2">
                     <button onclick="confirmStockAction()" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-xl font-bold text-sm transition">নিশ্চিত কৰক</button>
@@ -529,6 +554,29 @@ async function loadExpenses() {
         </div>
     </div>
 
+    <div id="editMedicineModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-5 w-full max-w-sm shadow-2xl">
+            <h3 class="font-bold text-base text-slate-900 mb-4">✏️ ঔষধ সম্পাদনা কৰক</h3>
+            <input type="hidden" id="editMedId">
+            <div class="space-y-2">
+                <input type="text" id="editMedName" placeholder="ঔষধৰ নাম *" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" id="editMedQty" placeholder="Quantity" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                    <input type="number" id="editMedMinQty" placeholder="Low Stock Alert" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" id="editMedBuyPrice" placeholder="কিনা মূল্য (₹)" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                    <input type="number" id="editMedSellPrice" placeholder="বিক্ৰী মূল্য (₹)" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                </div>
+                <input type="date" id="editMedExpiry" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                <input type="text" id="editMedSupplier" placeholder="Supplier ৰ নাম" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+                <div class="flex gap-2">
+                    <button onclick="saveEditMedicine()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm transition">সংৰক্ষণ কৰক</button>
+                    <button onclick="document.getElementById('editMedicineModal').classList.add('hidden')" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">বাতিল</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div id="revisitModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50"><div class="bg-white rounded-2xl p-5 w-full max-w-md shadow-2xl"><h3 id="revisitModalTitle" class="font-bold text-base text-slate-900 mb-4">🔄 নতুন Visit যোগ কৰক</h3><input type="hidden" id="revisitPatientId"><input type="hidden" id="revisitPatientName"><div class="space-y-3"><input type="text" id="revisitBP" placeholder="ৰক্তচাপ (BP) — যদি নতুন" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner"><textarea id="revisitHistory" placeholder="আজিৰ সমস্যা / Chief Complaint" class="w-full p-3 border border-gray-200 rounded-xl text-sm h-20 resize-none focus:outline-none shadow-inner"></textarea><textarea id="revisitMedicine" placeholder="আজিৰ Rx (ঔষধ)" class="w-full p-3 border border-gray-200 rounded-xl text-sm h-24 resize-none focus:outline-none shadow-inner"></textarea><input type="number" id="revisitFees" placeholder="Visit ফীজ (₹) — নাথাকিলে খালী ৰাখক" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner"><div class="flex gap-2"><button onclick="saveRevisit()" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-xl font-bold text-sm transition">সংৰক্ষণ কৰক</button><button onclick="document.getElementById('revisitModal').classList.add('hidden')" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">বাতিল</button></div></div></div></div>
 
 </body>
