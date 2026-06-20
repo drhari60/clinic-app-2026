@@ -451,7 +451,9 @@ async function loadExpenses() {
             loadMedicines();
         }
 
-        function editMedicine(m) {
+        function editMedicine(id) {
+            const m = window.medicineMap && window.medicineMap[id];
+            if (!m) { showAlert('ঔষধৰ তথ্য পোৱা নগ’ল।', 'ভুল', '❌'); return; }
             document.getElementById('medName').value = m.name || '';
             document.getElementById('medQty').value = '';
             document.getElementById('medMinQty').value = m.min_quantity || '';
@@ -459,7 +461,7 @@ async function loadExpenses() {
             document.getElementById('medSellPrice').value = m.selling_price || '';
             document.getElementById('medExpiry').value = m.expiry_date || '';
             document.getElementById('medSupplier').value = m.supplier_name || '';
-            document.getElementById('stockAddForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            document.getElementById('tab-stock').scrollIntoView({ behavior: 'smooth', block: 'start' });
             showAlert(m.name + ' — তথ্য form-ত লোড হৈছে। Quantity-ত যোগ হ\'ব লগা পৰিমাণ দিয়ক।', 'এডিট মোড', '✏️');
         }
 
@@ -475,6 +477,8 @@ async function loadExpenses() {
             } else { alertBox.classList.add('hidden'); }
             const listEl = document.getElementById('listMedicines');
             if (!meds || meds.length === 0) { listEl.innerHTML = '<p class="text-xs text-gray-400 text-center py-6">কোনো ঔষধ যোগ কৰা হোৱা নাই।</p>'; return; }
+            window.medicineMap = {};
+            meds.forEach(m => { window.medicineMap[m.id] = m; });
             const today = new Date().toISOString().split('T')[0];
             listEl.innerHTML = meds.map(m => {
                 const isLow = m.quantity <= m.min_quantity;
@@ -493,7 +497,7 @@ async function loadExpenses() {
                         </div>
                         <div class="flex gap-2 ml-2 flex-wrap justify-end">
                             <button onclick="useStock('${m.id}','${escapeHTML(m.name)}',${m.quantity},${m.selling_price||0})" class="bg-orange-500 text-white text-xs px-3 py-1.5 rounded-lg font-bold">Stock কমাওক</button>
-                            <button onclick="editMedicine(${JSON.stringify(m)})" class="bg-blue-500 text-white text-xs px-2 py-1.5 rounded-lg font-bold">✏️</button>
+                            <button onclick="editMedicine('${m.id}')" class="bg-blue-500 text-white text-xs px-2 py-1.5 rounded-lg font-bold">✏️</button>
                             <button onclick="deleteMedicine('${m.id}','${escapeHTML(m.name)}')" class="bg-red-100 text-red-600 text-xs px-2 py-1.5 rounded-lg font-bold">🗑</button>
                         </div>
                     </div>
