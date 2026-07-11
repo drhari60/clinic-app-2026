@@ -186,7 +186,31 @@
         });
 
         async function checkRole(userEmail) { if (!userEmail) return; isDoctor = (userEmail.toLowerCase() === 'das.harikanta60@gmail.com'); const badge = document.getElementById('accessBadge'); if (badge) { badge.innerText = isDoctor ? 'Doctor (Full Access)' : 'Staff Mode (Restricted)'; badge.className = isDoctor ? 'text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider' : 'text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider'; } const a1 = document.getElementById('agentSection1'); const a2 = document.getElementById('agentSection2'); if (a1) a1.classList.toggle('hidden', !isDoctor); if (a2) a2.classList.toggle('hidden', !isDoctor); document.querySelectorAll('.stock-only').forEach(el => el.classList.toggle('hidden', !isDoctor)); }
-        function openAddPatientModal() { currentEditId = null; document.getElementById('modalTitle').innerHTML = '➕ নতুন ৰোগী'; document.getElementById('pName').value = ''; document.getElementById('pAgeSex').value = ''; document.getElementById('pBP').value = ''; document.getElementById('pPhone').value = ''; document.getElementById('pHistory').value = ''; document.getElementById('pMedicine').value = ''; document.getElementById('pFees').value = ''; document.getElementById('patientModal').classList.remove('hidden'); }
+        async function openAddPatientModal() {
+  currentEditId = null;
+  const today = new Date(new Date().getTime() + (5.5 * 60 * 60 * 1000));
+  const todayStr = today.toISOString().split('T')[0];
+  const dayNames = ['দেওবাৰ','সোমবাৰ','মঙলবাৰ','বুধবাৰ','বৃহস্পতিবাৰ','শুক্ৰবাৰ','শনিবাৰ'];
+  const monthNames = ['জানুৱাৰী','ফেব্ৰুৱাৰী','মাৰ্চ','এপ্ৰিল','মে','জুন','জুলাই','আগষ্ট','ছেপ্টেম্বৰ','অক্টোবৰ','নৱেম্বৰ','ডিচেম্বৰ'];
+  const dayName = dayNames[today.getDay()];
+  const dateLabel = `${dayName}, ${today.getDate()} ${monthNames[today.getMonth()]} ${today.getFullYear()}`;
+  const [{ data: newToday }, { data: revisitToday }] = await Promise.all([
+    supabaseClient.from('clinic_data').select('id').gte('created_at', todayStr + 'T00:00:00+05:30').lte('created_at', todayStr + 'T23:59:59+05:30'),
+    supabaseClient.from('clinic_visits').select('id').eq('visit_date', todayStr)
+  ]);
+  const todayNew = (newToday || []).length;
+  const todayRevisit = (revisitToday || []).length;
+  const todayTotal = todayNew + todayRevisit;
+  document.getElementById('modalTitle').innerHTML = `➕ নতুন ৰোগী<span class="block text-xs font-normal text-gray-400 mt-0.5">📅 ${dateLabel}</span><span class="block text-xs font-normal text-teal-600 mt-0.5">👥 আজি মুঠ ${todayTotal} জন ৰোগী (নতুন ${todayNew} · revisit ${todayRevisit})</span>`;
+  document.getElementById('pName').value = '';
+  document.getElementById('pAgeSex').value = '';
+  document.getElementById('pBP').value = '';
+  document.getElementById('pPhone').value = '';
+  document.getElementById('pHistory').value = '';
+  document.getElementById('pMedicine').value = '';
+  document.getElementById('pFees').value = '';
+  document.getElementById('patientModal').classList.remove('hidden');
+}
         function closePatientModal() { document.getElementById('patientModal').classList.add('hidden'); }
         function generateLiveQR() { const qrBadge = document.getElementById('qrBadge'); if(qrBadge) qrBadge.innerText = `ফীজ: ₹${currentFee} (${selectedBookingType})`; const upiPayload = `upi://pay?pa=9954340102@okbizaxis&pn=Dr%20Harikanta%20Das&am=${currentFee}&cu=INR&tn=${encodeURIComponent(selectedBookingType)}`; const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=${encodeURIComponent(upiPayload)}&ecc=M`; const qrImageContainer = document.getElementById('paymentQRCode'); if(qrImageContainer) { qrImageContainer.src = qrApiUrl; qrImageContainer.onerror = function() { this.style.display = 'none'; const fallback = document.getElementById('qrFallback'); if(fallback) fallback.classList.remove('hidden'); }; qrImageContainer.onload = function() { this.style.display = ''; const fallback = document.getElementById('qrFallback'); if(fallback) fallback.classList.add('hidden'); }; } const upiPayBtn = document.getElementById('upiPayBtn'); if(upiPayBtn) upiPayBtn.href = upiPayload; }
         function startHealthTipsRotation() { let index = 0; setInterval(() => { index = (index + 1) % healthTips.length; const tEl = document.getElementById('tipTitle'); const cEl = document.getElementById('tipContent'); if(tEl && cEl) { tEl.innerText = healthTips[index].title; cEl.innerText = healthTips[index].content; } }, 5000); }
