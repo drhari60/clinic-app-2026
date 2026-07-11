@@ -391,10 +391,11 @@ async function loadExpenses() {
     const income = (pays || []).reduce((s, p) => s + (parseFloat(p.fees) || 0), 0);
     const expense = (exps || []).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
     const profit = income - expense;
-    const patients = (pats || []).length;
-    const visits = (vis || []).length;
+    const newPatients = (pats || []).length;
+    const revisits = (vis || []).length;
+    const totalPatients = newPatients + revisits;
     grandIncome += income; grandExpense += expense;
-    return { month: months[i], income, expense, profit, patients, visits };
+    return { month: months[i], income, expense, profit, newPatients, revisits, totalPatients };
   });
   const grandProfit = grandIncome - grandExpense;
   container.innerHTML = `<div class="p-3 border-b border-gray-100"><p class="text-[10px] text-gray-400 text-center">📅 ${year} চনৰ সকলো মাহৰ হিচাপ</p></div>
@@ -402,7 +403,7 @@ async function loadExpenses() {
   <tr><th class="px-3 py-2.5 text-left">মাহ</th><th class="px-3 py-2.5 text-center text-blue-300">ৰোগী</th><th class="px-3 py-2.5 text-right text-green-300">আয় ₹</th><th class="px-3 py-2.5 text-right text-red-300">খৰচ ₹</th><th class="px-3 py-2.5 text-right text-yellow-300">লাভ ₹</th></tr>
   </thead><tbody>${rows.map((r,i) => `<tr class="${i%2===0?'bg-gray-50/50':'bg-white'} ${r.income===0&&r.expense===0?'opacity-40':''}">
   <td class="px-3 py-2.5 font-bold text-slate-700">${r.month}</td>
-  <td class="px-3 py-2.5 text-center text-blue-600 font-bold">${r.visits > 0 ? r.visits+'জন' : '-'}</td>
+  <td class="px-3 py-2.5 text-center text-blue-600 font-bold">${r.totalPatients > 0 ? r.totalPatients+'জন' : '-'}<span class="block text-[9px] text-gray-400 font-normal">${r.newPatients>0?'নতুন '+r.newPatients:''}${r.newPatients>0&&r.revisits>0?' · ':''}${r.revisits>0?'revisit '+r.revisits:''}</span></td>
   <td class="px-3 py-2.5 text-right font-bold text-green-600">${r.income > 0 ? '₹'+r.income : '-'}</td>
   <td class="px-3 py-2.5 text-right font-bold text-red-500">${r.expense > 0 ? '₹'+r.expense : '-'}</td>
   <td class="px-3 py-2.5 text-right font-bold ${r.profit>=0?'text-purple-600':'text-red-600'}">${r.income>0||r.expense>0?(r.profit>=0?'₹'+r.profit:'- ₹'+Math.abs(r.profit)):'-'}</td>
