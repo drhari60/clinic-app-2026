@@ -188,12 +188,12 @@
         async function checkRole(userEmail) { if (!userEmail) return; isDoctor = (userEmail.toLowerCase() === 'das.harikanta60@gmail.com'); const badge = document.getElementById('accessBadge'); if (badge) { badge.innerText = isDoctor ? 'Doctor (Full Access)' : 'Staff Mode (Restricted)'; badge.className = isDoctor ? 'text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider' : 'text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider'; } const a1 = document.getElementById('agentSection1'); const a2 = document.getElementById('agentSection2'); if (a1) a1.classList.toggle('hidden', !isDoctor); if (a2) a2.classList.toggle('hidden', !isDoctor); document.querySelectorAll('.stock-only').forEach(el => el.classList.toggle('hidden', !isDoctor)); }
         async function openAddPatientModal() {
   currentEditId = null;
-  const today = new Date(new Date().getTime() + (5.5 * 60 * 60 * 1000));
-  const todayStr = today.toISOString().split('T')[0];
+  const todayIST = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+  const todayStr = new Date(new Date().getTime() + (5.5 * 60 * 60 * 1000)).toISOString().split('T')[0];
   const dayNames = ['দেওবাৰ','সোমবাৰ','মঙলবাৰ','বুধবাৰ','বৃহস্পতিবাৰ','শুক্ৰবাৰ','শনিবাৰ'];
   const monthNames = ['জানুৱাৰী','ফেব্ৰুৱাৰী','মাৰ্চ','এপ্ৰিল','মে','জুন','জুলাই','আগষ্ট','ছেপ্টেম্বৰ','অক্টোবৰ','নৱেম্বৰ','ডিচেম্বৰ'];
-  const dayName = dayNames[today.getDay()];
-  const dateLabel = `${dayName}, ${today.getDate()} ${monthNames[today.getMonth()]} ${today.getFullYear()}`;
+  const dayName = dayNames[todayIST.getDay()];
+  const dateLabel = `${dayName}, ${todayIST.getDate()} ${monthNames[todayIST.getMonth()]} ${todayIST.getFullYear()}`;
   const [{ data: newToday }, { data: revisitToday }] = await Promise.all([
     supabaseClient.from('clinic_data').select('id').gte('created_at', todayStr + 'T00:00:00+05:30').lte('created_at', todayStr + 'T23:59:59+05:30'),
     supabaseClient.from('clinic_visits').select('id').eq('visit_date', todayStr)
