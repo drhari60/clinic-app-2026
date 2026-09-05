@@ -103,11 +103,57 @@
             <div class="space-y-1.5"><label class="text-[11px] font-bold text-red-600 block flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> ট্ৰেনজেকচন আইডি দিয়াটো বাধ্যতামূলক:*</label><input type="text" id="bTxnId" placeholder="12-Digit UPI Transaction ID দিয়ক" class="w-full p-3.5 border-2 border-slate-950 rounded-xl font-mono text-sm font-bold text-center tracking-widest bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 shadow-inner"></div>
             <button id="btnSubmitBooking" class="w-full bg-emerald-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-emerald-700 text-xs uppercase transition tracking-wider">বুকিং নিশ্চিত কৰক (Confirm)</button>
         </div>
-        <div class="w-full space-y-3 my-5 border-t border-b border-gray-200/60 py-4">
-            <p class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">ক্লিনিক মেনেজমেণ্ট কণ্ট্ৰ&#39;ল</p>
-            <div class="grid grid-cols-1 gap-2"><input type="email" id="loginEmail" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-slate-800 bg-slate-50 text-xs shadow-inner" placeholder="ইমেইল ঠিকনা"><div class="flex gap-2"><input type="password" id="loginPassword" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-slate-800 bg-slate-50 text-xs shadow-inner" placeholder="পাছৱৰ্ড"><button id="btnStaffLogin" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-5 rounded-xl transition text-[10px] tracking-wider uppercase shadow-md">LOGIN</button></div></div>
+        <!-- Staff Login Card -->
+        <div class="w-full mt-5">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-md overflow-hidden">
+                <!-- Card Header -->
+                <div class="bg-slate-900 px-4 py-3 flex items-center gap-2">
+                    <div class="w-7 h-7 bg-white/10 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-user-shield text-white text-xs"></i>
+                    </div>
+                    <div>
+                        <p class="text-white text-xs font-bold tracking-wide">ক্লিনিক লগইন</p>
+                        <p class="text-slate-400 text-[10px]">Doctor &amp; Staff Access</p>
+                    </div>
+                </div>
+                <!-- Card Body -->
+                <div class="p-4 space-y-3">
+                    <!-- Email -->
+                    <div class="relative">
+                        <i class="fas fa-envelope absolute left-3.5 top-3.5 text-gray-400 text-xs"></i>
+                        <input type="email" id="loginEmail"
+                            class="w-full pl-9 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-slate-800 focus:ring-2 focus:ring-slate-900/10 bg-slate-50 text-xs shadow-inner transition"
+                            placeholder="ইমেইল ঠিকনা">
+                    </div>
+                    <!-- Password with toggle -->
+                    <div class="relative">
+                        <i class="fas fa-lock absolute left-3.5 top-3.5 text-gray-400 text-xs"></i>
+                        <input type="password" id="loginPassword"
+                            class="w-full pl-9 pr-10 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-slate-800 focus:ring-2 focus:ring-slate-900/10 bg-slate-50 text-xs shadow-inner transition"
+                            placeholder="পাছৱৰ্ড"
+                            onkeydown="if(event.key==='Enter') document.getElementById('btnStaffLogin').click()">
+                        <button type="button" onclick="togglePasswordView()" 
+                            class="absolute right-3 top-3 text-gray-400 hover:text-slate-700 transition p-0.5" 
+                            id="pwToggleBtn" title="পাছৱৰ্ড চাওক">
+                            <i class="fas fa-eye text-xs" id="pwToggleIcon"></i>
+                        </button>
+                    </div>
+                    <!-- Login Button -->
+                    <button id="btnStaffLogin"
+                        class="w-full bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold py-3 rounded-xl transition text-xs tracking-wider uppercase shadow-md flex items-center justify-center gap-2">
+                        <i class="fas fa-sign-in-alt"></i> লগইন কৰক
+                    </button>
+                </div>
+            </div>
         </div>
-        <div class="w-full bg-[#1e5a22] text-white p-4 rounded-2xl border border-green-800 mt-1 text-center flex flex-col items-center justify-center min-h-[90px] shadow-lg relative overflow-hidden"><div class="absolute -right-4 -bottom-4 opacity-10 text-5xl text-white"><i class="fas fa-heartbeat"></i></div><h4 class="text-xs font-bold tracking-wide mb-1 text-yellow-300 uppercase flex items-center gap-1" id="tipTitle">হৃদযন্ত্ৰ সুস্থ ৰাখক</h4><p class="text-[11px] text-green-50 font-medium leading-relaxed max-w-[90%]" id="tipContent">দৈনিক পুৱা ৩০ মিনিট খোজ কাঢ়ক।</p></div>
+
+        <!-- Welcome / Health Tip -->
+        <div class="w-full bg-[#1e5a22] text-white p-4 rounded-2xl border border-green-800 mt-4 text-center flex flex-col items-center justify-center min-h-[90px] shadow-lg relative overflow-hidden">
+            <div class="absolute -right-4 -bottom-4 opacity-10 text-5xl text-white"><i class="fas fa-heartbeat"></i></div>
+            <p class="text-[10px] text-yellow-300 font-bold uppercase tracking-widest mb-1">স্বাস্থ্য টিপছ</p>
+            <h4 class="text-xs font-bold tracking-wide mb-1 text-yellow-200 flex items-center gap-1" id="tipTitle">হৃদযন্ত্ৰ সুস্থ ৰাখক</h4>
+            <p class="text-[11px] text-green-50 font-medium leading-relaxed max-w-[90%]" id="tipContent">দৈনিক পুৱা ৩০ মিনিট খোজ কাঢ়ক।</p>
+        </div>
     </div>
 
     <div id="appDashboard" class="hidden min-h-screen pb-24 bg-slate-50">
@@ -220,6 +266,19 @@
         const reportMonthEl = document.getElementById('reportMonth'); if (reportMonthEl) reportMonthEl.value = new Date().getMonth();
         const reportYearEl = document.getElementById('reportYear'); if (reportYearEl) reportYearEl.value = new Date().getFullYear();
         
+        function togglePasswordView() {
+            const pwd = document.getElementById('loginPassword');
+            const icon = document.getElementById('pwToggleIcon');
+            if (!pwd || !icon) return;
+            if (pwd.type === 'password') {
+                pwd.type = 'text';
+                icon.className = 'fas fa-eye-slash text-xs';
+            } else {
+                pwd.type = 'password';
+                icon.className = 'fas fa-eye text-xs';
+            }
+        }
+
         async function handleLogin() { const email = safeGet('loginEmail').value.trim(); const password = safeGet('loginPassword').value.trim(); if (!email || !password) { await showAlert('অনুগ্ৰহ কৰি ইমেইল আৰু পাছৱৰ্ড লিখক।', 'প্ৰয়োজনীয় তথ্য', '📋'); return; } const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password }); if (error) { await showAlert('ভুল ইমেইল বা পাছৱৰ্ড। পুনৰ চেষ্টা কৰক।', 'Login ব্যৰ্থ', '❌'); return; } await checkRole(email); showDashboard(); }
         async function showDashboard() { const main = document.getElementById('mainPatientSection'); const dash = document.getElementById('appDashboard'); if (main) main.classList.add('hidden'); if (dash) dash.classList.remove('hidden'); await loadPatients(); loadBirthdayReminders(); }
         async function handleLogout() { await supabaseClient.auth.signOut(); const main = document.getElementById('mainPatientSection'); const dash = document.getElementById('appDashboard'); if (dash) dash.classList.add('hidden'); if (main) main.classList.remove('hidden'); safeGet('loginEmail').value = ''; safeGet('loginPassword').value = ''; isDoctor = false; const lp = document.getElementById('listPatients'); const lb = document.getElementById('listBookings'); if (lp) lp.innerHTML = ''; if (lb) lb.innerHTML = ''; }
@@ -271,17 +330,7 @@ async function loadBirthdayReminders() {
 
 function sendBirthdayWish(name, phone) {
     if (!phone) { showAlert('এই ৰোগীৰ মোবাইল নম্বৰ নাই।', 'নম্বৰ নাই', '⚠️'); return; }
-    const msg = `🎂 জন্মদিনৰ শুভেচ্ছা ${name}!\n\n
-
-আপোনাৰ জন্মদিনৰ এই বিশেষ দিনটোত DR. HARIS CLINIC-ৰ তৰফৰ পৰা জনালোঁ আন্তৰিক শুভেচ্ছা আৰু শুভকামনা।
-
-আপোনাৰ জীৱন সুখ, শান্তি, সুস্বাস্থ্য আৰু সফলতাৰে পৰিপূৰ্ণ হওক। জীৱনৰ প্ৰতিটো খোজতে নতুন আশা আৰু সম্ভাৱনাই আপোনাক আগুৱাই লৈ যাওক।
-
-নিজৰ প্ৰতিভা, সততা আৰু ভাল কামেৰে সমাজত সদায় এটি উজ্জ্বল নক্ষত্ৰৰ দৰে জিলিকি থাকক। আপোনাৰ প্ৰতিটো সৎ প্ৰচেষ্টাই আনৰ জীৱনলৈও সুখ আৰু প্ৰেৰণাৰ পোহৰ কঢ়িয়াই আনক।
-
-ঈশ্বৰে আপোনাক সুস্বাস্থ্য আৰু দীৰ্ঘায়ু প্ৰদান কৰক—এয়াই আমাৰ আন্তৰিক কামনা। 💐
-
-শুভ জন্মদিন! আপোনাৰ আগন্তুক দিনবোৰ হওক আৰু অধিক সুন্দৰ, সফল আৰু মংগলময়। ❤️ 🌿\n\n— Dr. Harikanta Das\nDR. HARIS CLINIC, Gogamukh`;
+    const msg = `🎂 জন্মদিনৰ শুভেচ্ছা ${name}!\n\nআপোনাৰ জন্মদিনত DR. HARIS CLINIC-ৰ পৰা আন্তৰিক শুভেচ্ছা জনালোঁ। আপুনি সুস্বাস্থ্যত দীৰ্ঘজীৱী হওক। 🌿\n\n— Dr. Harikanta Das\nDR. HARIS CLINIC, Gogamukh`;
     const p = phone.replace(/\D/g,'');
     const num = p.startsWith('91') ? p : '91'+p;
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`, '_blank');
