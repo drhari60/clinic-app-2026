@@ -271,7 +271,17 @@ async function loadBirthdayReminders() {
 
 function sendBirthdayWish(name, phone) {
     if (!phone) { showAlert('এই ৰোগীৰ মোবাইল নম্বৰ নাই।', 'নম্বৰ নাই', '⚠️'); return; }
-    const msg = `🎂 জন্মদিনৰ শুভেচ্ছা ${name}!\n\nআপোনাৰ জন্মদিনত DR. HARIS CLINIC-ৰ পৰা আন্তৰিক শুভেচ্ছা জনালোঁ। আপুনি সুস্বাস্থ্যত দীৰ্ঘজীৱী হওক। 🌿\n\n— Dr. Harikanta Das\nDR. HARIS CLINIC, Gogamukh`;
+    const msg = `🎂 জন্মদিনৰ শুভেচ্ছা ${name}!\n\n🌷
+
+আপোনাৰ জন্মদিনৰ এই বিশেষ দিনটোত DR. HARIS CLINIC-ৰ তৰফৰ পৰা জনালোঁ আন্তৰিক শুভেচ্ছা আৰু শুভকামনা।
+
+আপোনাৰ জীৱন সুখ, শান্তি, সুস্বাস্থ্য আৰু সফলতাৰে পৰিপূৰ্ণ হওক। জীৱনৰ প্ৰতিটো খোজতে নতুন আশা আৰু সম্ভাৱনাই আপোনাক আগুৱাই লৈ যাওক।
+
+নিজৰ প্ৰতিভা, সততা আৰু ভাল কামেৰে সমাজত সদায় এটি উজ্জ্বল নক্ষত্ৰৰ দৰে জিলিকি থাকক। আপোনাৰ প্ৰতিটো সৎ প্ৰচেষ্টাই আনৰ জীৱনলৈও সুখ আৰু প্ৰেৰণাৰ পোহৰ কঢ়িয়াই আনক।
+
+ঈশ্বৰে আপোনাক সুস্বাস্থ্য আৰু দীৰ্ঘায়ু প্ৰদান কৰক—এয়াই আমাৰ আন্তৰিক কামনা। 💐
+
+শুভ জন্মদিন! আপোনাৰ আগন্তুক দিনবোৰ হওক আৰু অধিক সুন্দৰ, সফল আৰু মংগলময়। ❤️ 🌿\n\n— Dr. Harikanta Das\nDR. HARIS CLINIC, Gogamukh`;
     const p = phone.replace(/\D/g,'');
     const num = p.startsWith('91') ? p : '91'+p;
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`, '_blank');
