@@ -97,8 +97,13 @@
                     <img id="paymentQRCode" src="" alt="UPI QR Code Scanner" class="w-40 h-40 sm:w-44 sm:h-44 object-contain">
                     <div id="qrFallback" class="hidden w-40 h-40 sm:w-44 sm:h-44 flex flex-col items-center justify-center bg-slate-50 rounded-lg border-2 border-dashed border-slate-300 text-center p-3"><i class="fas fa-qrcode text-3xl text-slate-400 mb-2"></i><p class="text-[10px] text-slate-500 font-medium">QR load হোৱা নাই</p><p class="text-[10px] text-slate-400">তলৰ বুটামেৰে পেমেন্ট কৰক</p></div>
                 </div>
-                <a id="upiPayBtn" href="#" class="inline-flex items-center gap-2 bg-[#E05300] hover:bg-orange-700 text-white px-5 py-3 rounded-xl text-xs font-bold shadow-md transition w-full justify-center"><i class="fas fa-wallet"></i> মোবাইলৰ পৰা পেমেন্ট কৰক</a>
-                <p class="text-[10px] text-gray-400 mt-2.5">UPI ID: <span class="font-mono font-bold text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded">9954340102@okbizaxis</span></p>
+                <a id="upiPayBtn" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-[#2d6be4] hover:bg-blue-700 active:scale-95 text-white px-5 py-3 rounded-xl text-xs font-bold shadow-md transition w-full justify-center">
+                    <i class="fas fa-credit-card"></i> Razorpay-ত পেমেন্ট কৰক
+                </a>
+                <div id="upiIdText" class="flex items-center gap-1.5 mt-2">
+                    <i class="fas fa-shield-alt text-emerald-500 text-[10px]"></i>
+                    <p class="text-[10px] text-gray-400">100% Secure · Card / UPI / Netbanking সকলো সুবিধা</p>
+                </div>
             </div>
             <div class="space-y-1.5"><label class="text-[11px] font-bold text-red-600 block flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> ট্ৰেনজেকচন আইডি দিয়াটো বাধ্যতামূলক:*</label><input type="text" id="bTxnId" placeholder="12-Digit UPI Transaction ID দিয়ক" class="w-full p-3.5 border-2 border-slate-950 rounded-xl font-mono text-sm font-bold text-center tracking-widest bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 shadow-inner"></div>
             <button id="btnSubmitBooking" class="w-full bg-emerald-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-emerald-700 text-xs uppercase transition tracking-wider">বুকিং নিশ্চিত কৰক (Confirm)</button>
@@ -260,7 +265,34 @@
         async function checkRole(userEmail) { if (!userEmail) return; isDoctor = (userEmail.toLowerCase() === 'das.harikanta60@gmail.com'); const badge = document.getElementById('accessBadge'); if (badge) { badge.innerText = isDoctor ? 'Doctor (Full Access)' : 'Staff Mode (Restricted)'; badge.className = isDoctor ? 'text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider' : 'text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider'; } const a1 = document.getElementById('agentSection1'); const a2 = document.getElementById('agentSection2'); if (a1) a1.classList.toggle('hidden', !isDoctor); if (a2) a2.classList.toggle('hidden', !isDoctor); document.querySelectorAll('.stock-only').forEach(el => el.classList.toggle('hidden', !isDoctor)); }
         function openAddPatientModal() { currentEditId = null; document.getElementById('modalTitle').innerHTML = '➕ নতুন ৰোগী'; document.getElementById('pName').value = ''; document.getElementById('pAgeSex').value = ''; document.getElementById('pBP').value = ''; document.getElementById('pPhone').value = ''; document.getElementById('pHistory').value = ''; document.getElementById('pMedicine').value = ''; document.getElementById('pFees').value = ''; document.getElementById('pDob').value = ''; document.getElementById('patientModal').classList.remove('hidden'); }
         function closePatientModal() { document.getElementById('patientModal').classList.add('hidden'); }
-        function generateLiveQR() { const qrBadge = document.getElementById('qrBadge'); if(qrBadge) qrBadge.innerText = `ফীজ: ₹${currentFee} (${selectedBookingType})`; const upiPayload = `upi://pay?pa=9954340102@okbizaxis&pn=Dr%20Harikanta%20Das&am=${currentFee}&cu=INR&tn=${encodeURIComponent(selectedBookingType)}`; const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=${encodeURIComponent(upiPayload)}&ecc=M`; const qrImageContainer = document.getElementById('paymentQRCode'); if(qrImageContainer) { qrImageContainer.src = qrApiUrl; qrImageContainer.onerror = function() { this.style.display = 'none'; const fallback = document.getElementById('qrFallback'); if(fallback) fallback.classList.remove('hidden'); }; qrImageContainer.onload = function() { this.style.display = ''; const fallback = document.getElementById('qrFallback'); if(fallback) fallback.classList.add('hidden'); }; } const upiPayBtn = document.getElementById('upiPayBtn'); if(upiPayBtn) upiPayBtn.href = upiPayload; }
+        const RZP_LINKS = {
+            100: 'https://rzp.io/rzp/uZ0Yt4Z',
+            250: 'https://rzp.io/rzp/QQV2bUvw'
+        };
+
+        function generateLiveQR() {
+            const rzpLink = RZP_LINKS[currentFee] || RZP_LINKS[100];
+            const qrBadge = document.getElementById('qrBadge');
+            if (qrBadge) qrBadge.innerText = `ফীজ: ₹${currentFee} (${selectedBookingType})`;
+            // Razorpay link-ৰ QR generate কৰো
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=${encodeURIComponent(rzpLink)}&ecc=M`;
+            const qrImg = document.getElementById('paymentQRCode');
+            if (qrImg) {
+                qrImg.src = qrApiUrl;
+                qrImg.onerror = function() { this.style.display = 'none'; document.getElementById('qrFallback')?.classList.remove('hidden'); };
+                qrImg.onload  = function() { this.style.display = ''; document.getElementById('qrFallback')?.classList.add('hidden'); };
+            }
+            // Pay button — Razorpay link
+            const payBtn = document.getElementById('upiPayBtn');
+            if (payBtn) {
+                payBtn.href = rzpLink;
+                payBtn.target = '_blank';
+                payBtn.rel = 'noopener noreferrer';
+            }
+            // UPI ID text লুকুৱাওক
+            const upiText = document.getElementById('upiIdText');
+            if (upiText) upiText.classList.add('hidden');
+        }
         function startHealthTipsRotation() { let index = 0; setInterval(() => { index = (index + 1) % healthTips.length; const tEl = document.getElementById('tipTitle'); const cEl = document.getElementById('tipContent'); if(tEl && cEl) { tEl.innerText = healthTips[index].title; cEl.innerText = healthTips[index].content; } }, 5000); }
         document.getElementById('reportMonth')?.addEventListener('change', loadReport); document.getElementById('reportYear')?.addEventListener('change', loadReport);
         const reportMonthEl = document.getElementById('reportMonth'); if (reportMonthEl) reportMonthEl.value = new Date().getMonth();
