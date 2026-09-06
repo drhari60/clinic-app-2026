@@ -170,7 +170,7 @@
         <div class="p-3 sm:p-4 max-w-4xl mx-auto overflow-x-hidden">
             <div id="tab-home" class="tab-content space-y-4"><div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100"><div class="relative"><input type="text" id="searchBox" placeholder="নাম বা মোবাইল নম্বৰেৰে ৰোগী সন্ধান কৰক..." class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm focus:outline-none focus:border-slate-500 shadow-inner"></div><button id="btnScrollToEntry" class="w-full mt-3 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl shadow transition text-center block text-sm"><i class="fas fa-user-plus mr-2"></i> নতুন ৰোগী যোগ কৰক</button></div><div id="birthdaySection" class="hidden bg-gradient-to-r from-pink-50 to-red-50 border border-pink-200 rounded-2xl p-4"><div class="flex items-center gap-2 mb-3"><span class="text-lg">🎂</span><p class="font-bold text-sm text-pink-800">আজিৰ জন্মদিন</p><span id="birthdayCount" class="bg-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full"></span></div><div id="birthdayList" class="space-y-2"></div></div><div id="upcomingBirthdaySection" class="hidden bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4"><div class="flex items-center gap-2 mb-3"><span class="text-lg">📅</span><p class="font-bold text-sm text-amber-800">এই সপ্তাহৰ জন্মদিন</p></div><div id="upcomingBirthdayList" class="space-y-2"></div></div><div id="listPatients" class="space-y-3"></div></div>
             <div id="tab-booking" class="tab-content hidden space-y-4"><h3 class="text-md font-bold text-slate-900 px-1">তাৰিখ ভিত্তিক অনলাইন বুকিং তালিকা</h3><div id="listBookings" class="space-y-3"></div></div>
-            <div id="tab-report" class="tab-content hidden space-y-4"><div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between gap-3"><div class="flex items-center gap-2"><i class="fas fa-chart-bar text-slate-900"></i><h3 class="text-sm font-bold text-slate-900">Monthly Report</h3></div><div class="flex gap-2"><select id="reportYear" class="border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold bg-gray-50 focus:outline-none"></select><select id="reportMonth" class="border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold bg-gray-50 focus:outline-none"><option value="0">জানুৱাৰী</option><option value="1">ফেব্ৰুৱাৰী</option><option value="2">মাৰ্চ</option><option value="3">এপ্ৰিল</option><option value="4">মে</option><option value="5">জুন</option><option value="6">জুলাই</option><option value="7">আগষ্ট</option><option value="8">ছেপ্টেম্বৰ</option><option value="9">অক্টোবৰ</option><option value="10">নৱেম্বৰ</option><option value="11">ডিচেম্বৰ</option></select></div></div><div id="reportSummary" class="grid grid-cols-2 gap-3"></div><div id="reportFinance" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4"></div><div id="reportDaily" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto"></div><div class="grid grid-cols-2 gap-3"><button onclick="printReport()" class="bg-slate-900 text-white py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2"><i class="fas fa-print"></i> Print কৰক</button><button onclick="whatsappReport()" class="bg-green-600 text-white py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2"><i class="fab fa-whatsapp"></i> WhatsApp</button></div></div>
+            <div id="tab-report" class="tab-content hidden space-y-4"><div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between gap-3"><div class="flex items-center gap-2"><i class="fas fa-chart-bar text-slate-900"></i><h3 class="text-sm font-bold text-slate-900">Monthly Report</h3></div><div class="flex gap-2"><select id="reportYear" class="border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold bg-gray-50 focus:outline-none"></select><select id="reportMonth" class="border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold bg-gray-50 focus:outline-none"><option value="0">জানুৱাৰী</option><option value="1">ফেব্ৰুৱাৰী</option><option value="2">মাৰ্চ</option><option value="3">এপ্ৰিল</option><option value="4">মে</option><option value="5">জুন</option><option value="6">জুলাই</option><option value="7">আগষ্ট</option><option value="8">ছেপ্টেম্বৰ</option><option value="9">অক্টোবৰ</option><option value="10">নৱেম্বৰ</option><option value="11">ডিচেম্বৰ</option></select></div></div><div id="reportSummary" class="grid grid-cols-2 gap-3"></div><div id="reportFinance" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4"></div><div id="reportDaily" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto"></div><div class="grid grid-cols-2 gap-3"><button onclick="printReport()" class="bg-slate-900 text-white py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2"><i class="fas fa-print"></i> Print কৰক</button><button onclick="whatsappReport()" class="bg-green-600 text-white py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2"><i class="fab fa-whatsapp"></i> WhatsApp</button></div><button onclick="sendDailySummary()" class="w-full bg-teal-600 text-white py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 mt-1"><i class="fab fa-whatsapp"></i> 📊 আজিৰ দৈনিক সাৰাংশ পঠিয়াওক</button></div></div>
             <div id="tab-profile" class="tab-content hidden space-y-4"><div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center relative overflow-hidden"><div class="absolute top-0 left-0 right-0 h-1.5 premium-gradient"></div><div class="w-20 h-20 premium-gradient text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-3 shadow-md">H</div><h3 class="text-lg font-bold text-gray-900">Dr. Harikanta Das</h3><p class="text-xs text-gray-500 font-medium">Homeopathic Physician & Physiotherapist</p><p class="text-[11px] text-gray-400 mt-1 flex items-center justify-center gap-1"><i class="fas fa-map-marker-alt"></i> Gogamukh, Dhemaji, Assam</p></div><div id="agentSection1" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"><div class="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-500"><div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center"><i class="fas fa-stethoscope text-white text-base"></i></div><div><p class="text-white font-bold text-sm">Dr. Hari's Assistant</p><p class="text-white/70 text-[10px]">স্বাস্থ্য পৰামৰ্শ সহায়ক</p></div></div><div class="relative" style="height:600px;">
   <div id="agentLoader1" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 z-10">
     <div class="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-3"></div>
@@ -225,6 +225,34 @@
     </div>
 
     <div id="printArea" class="hidden p-8 bg-white text-black"></div>
+
+    <!-- Payment History Modal -->
+    <div id="paymentHistoryModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-3">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[85vh] flex flex-col">
+        <div class="flex justify-between items-center px-5 py-3 bg-emerald-700 rounded-t-2xl shrink-0">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-money-bill-wave text-white text-sm"></i>
+            <div>
+              <p class="text-white font-bold text-sm">Payment History</p>
+              <p id="payHistPatientName" class="text-emerald-200 text-[10px]"></p>
+            </div>
+          </div>
+          <button onclick="document.getElementById('paymentHistoryModal').classList.add('hidden')" class="text-white/70 hover:text-white text-lg">✕</button>
+        </div>
+        <!-- Summary -->
+        <div id="payHistSummary" class="grid grid-cols-3 gap-2 p-3 bg-emerald-50 shrink-0"></div>
+        <!-- Due amount input -->
+        <div id="payHistDueSection" class="hidden px-4 py-3 bg-red-50 border-b border-red-100 shrink-0">
+          <p class="text-xs font-bold text-red-700 mb-2">💳 বাকী টকা গ্ৰহণ কৰক</p>
+          <div class="flex gap-2">
+            <input type="number" id="payDueAmount" placeholder="পৰিমাণ (₹)" class="flex-1 p-2 border border-red-200 rounded-lg text-xs focus:outline-none">
+            <button onclick="collectDuePayment()" class="bg-emerald-600 text-white px-3 py-2 rounded-lg text-xs font-bold">✅ গ্ৰহণ কৰক</button>
+          </div>
+        </div>
+        <!-- History list -->
+        <div id="payHistList" class="overflow-y-auto flex-1 p-3 space-y-2"></div>
+      </div>
+    </div>
 
     <!-- Lab Report Modal -->
     <div id="labReportModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-3">
@@ -385,7 +413,112 @@
         let currentPage = 0;
 const PAGE_SIZE = 30;
 
-let _labCurrentPatientId = null;
+// ===== PAYMENT HISTORY =====
+        let _payHistPatient = null;
+
+        async function openPaymentHistory(p) {
+            _payHistPatient = p;
+            document.getElementById('payHistPatientName').textContent = p.name;
+            document.getElementById('payHistList').innerHTML = '<p class="text-xs text-gray-400 text-center py-6">লোড হৈছে...</p>';
+            document.getElementById('paymentHistoryModal').classList.remove('hidden');
+
+            const { data: payments } = await supabaseClient
+                .from('clinic_payments').select('*')
+                .eq('patient_id', p.id)
+                .order('visit_date', { ascending: false });
+
+            const { data: visits } = await supabaseClient
+                .from('clinic_visits').select('*')
+                .eq('patient_id', p.id)
+                .order('visit_date', { ascending: false });
+
+            const totalPaid = (payments || []).reduce((s, r) => s + (parseFloat(r.fees) || 0), 0);
+            const totalVisits = (visits || []).length;
+            const unpaidVisits = (visits || []).filter(v => v.payment_status === 'unpaid').length;
+            const totalDue = (visits || []).filter(v => v.payment_status === 'unpaid').reduce((s, v) => s + (parseFloat(v.fees_paid) || 0), 0);
+
+            // Summary cards
+            document.getElementById('payHistSummary').innerHTML = `
+                <div class="bg-green-100 rounded-xl p-2 text-center">
+                    <p class="text-[10px] text-green-600 font-bold">মুঠ পৰিশোধ</p>
+                    <p class="text-sm font-extrabold text-green-700">₹${totalPaid}</p>
+                </div>
+                <div class="bg-blue-100 rounded-xl p-2 text-center">
+                    <p class="text-[10px] text-blue-600 font-bold">মুঠ Visit</p>
+                    <p class="text-sm font-extrabold text-blue-700">${totalVisits} বাৰ</p>
+                </div>
+                <div class="${totalDue > 0 ? 'bg-red-100' : 'bg-gray-100'} rounded-xl p-2 text-center">
+                    <p class="text-[10px] ${totalDue > 0 ? 'text-red-600' : 'text-gray-500'} font-bold">বাকী আছে</p>
+                    <p class="text-sm font-extrabold ${totalDue > 0 ? 'text-red-700' : 'text-gray-400'}">₹${totalDue}</p>
+                </div>`;
+
+            // Due section
+            const dueSection = document.getElementById('payHistDueSection');
+            if (unpaidVisits > 0) {
+                dueSection.classList.remove('hidden');
+                document.getElementById('payDueAmount').value = '';
+            } else {
+                dueSection.classList.add('hidden');
+            }
+
+            // Payment list
+            if (!payments || payments.length === 0) {
+                document.getElementById('payHistList').innerHTML = '<p class="text-xs text-gray-400 text-center py-6">কোনো payment ৰেকৰ্ড নাই।</p>';
+                return;
+            }
+            document.getElementById('payHistList').innerHTML = payments.map(r => `
+                <div class="bg-gray-50 border border-gray-100 rounded-xl p-3 flex justify-between items-center">
+                    <div>
+                        <p class="font-bold text-xs text-gray-900">₹${parseFloat(r.fees).toFixed(0)}</p>
+                        <p class="text-[10px] text-gray-400">${r.visit_date || 'N/A'} · ${r.income_source === 'manual' ? 'Manual' : 'Visit Fee'}</p>
+                    </div>
+                    <span class="text-[10px] bg-green-100 text-green-700 font-bold px-2 py-1 rounded-lg">✅ Paid</span>
+                </div>`).join('');
+        }
+
+        async function collectDuePayment() {
+            const amount = parseFloat(document.getElementById('payDueAmount').value);
+            if (!amount || amount <= 0) { await showAlert('পৰিমাণ দিয়ক।', 'প্ৰয়োজনীয়', '⚠️'); return; }
+            const today = new Date().toISOString().split('T')[0];
+            const { error } = await supabaseClient.from('clinic_payments').insert([{
+                patient_name: _payHistPatient.name,
+                fees: amount,
+                visit_date: today,
+                patient_id: _payHistPatient.id,
+                income_source: 'patient'
+            }]);
+            if (error) { await showAlert('Save কৰিব পৰা নগ\'ল।', 'ভুল', '❌'); return; }
+            await supabaseClient.from('clinic_visits')
+                .update({ payment_status: 'paid', fees_paid: amount })
+                .eq('patient_id', _payHistPatient.id)
+                .eq('payment_status', 'unpaid');
+            await showAlert(`₹${amount} সফলতাৰে গ্ৰহণ কৰা হৈছে।`, 'সফল ✅', '💰');
+            openPaymentHistory(_payHistPatient);
+            loadExpenses();
+        }
+
+        // ===== DAILY SUMMARY WHATSAPP =====
+        async function sendDailySummary() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayDisplay = new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'});
+
+            const [{ data: payments }, { data: visits }, { data: expenses }] = await Promise.all([
+                supabaseClient.from('clinic_payments').select('fees').eq('visit_date', today),
+                supabaseClient.from('clinic_visits').select('id').eq('visit_date', today),
+                supabaseClient.from('clinic_expenses').select('amount').gte('created_at', today + 'T00:00:00+05:30').lte('created_at', today + 'T23:59:59+05:30')
+            ]);
+
+            const totalIncome = (payments || []).reduce((s, r) => s + (parseFloat(r.fees) || 0), 0);
+            const totalVisits = (visits || []).length;
+            const totalExpense = (expenses || []).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+            const netProfit = totalIncome - totalExpense;
+
+            const msg = `🏥 *DR. HARIS CLINIC*\n📅 দৈনিক প্ৰতিবেদন — ${todayDisplay}\n${'─'.repeat(28)}\n👥 আজিৰ ৰোগী: *${totalVisits} জন*\n💰 মুঠ আয়: *₹${totalIncome}*\n📤 মুঠ খৰচ: *₹${totalExpense}*\n📊 নিট লাভ: *₹${netProfit}*\n${'─'.repeat(28)}\n_DR. HARIS CLINIC Management App_`;
+
+            window.open(`https://wa.me/919954340102?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        let _labCurrentPatientId = null;
         let _labCurrentReports = [];
 
         function openLabReportModal(p) {
@@ -539,7 +672,11 @@ async function loadPatients(reset = true) {
             btnLab.className = 'bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1';
             btnLab.innerHTML = '<i class="fas fa-flask"></i> Lab';
             btnLab.onclick = () => openLabReportModal(p);
-            actions.append(btnPrint, btnWA, btnReminder, btnHistory, btnRevisit, btnLab); if (isDoctor) { const btnEdit = document.createElement('button'); btnEdit.className = 'bg-blue-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold'; btnEdit.innerHTML = '<i class="fas fa-edit"></i> এডিট'; btnEdit.onclick = () => editPatientRecord(p); const btnDelete = document.createElement('button'); btnDelete.className = 'bg-red-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold'; btnDelete.innerHTML = '<i class="fas fa-trash"></i> মচি পেলাওক'; btnDelete.onclick = () => deletePatientRecord(p.id); actions.append(btnEdit, btnDelete); } card.appendChild(actions); return card; }
+            const btnPayHist = document.createElement('button');
+            btnPayHist.className = 'bg-emerald-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1';
+            btnPayHist.innerHTML = '<i class="fas fa-money-bill-wave"></i> Payment';
+            btnPayHist.onclick = () => openPaymentHistory(p);
+            actions.append(btnPrint, btnWA, btnReminder, btnHistory, btnRevisit, btnLab, btnPayHist); if (isDoctor) { const btnEdit = document.createElement('button'); btnEdit.className = 'bg-blue-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold'; btnEdit.innerHTML = '<i class="fas fa-edit"></i> এডিট'; btnEdit.onclick = () => editPatientRecord(p); const btnDelete = document.createElement('button'); btnDelete.className = 'bg-red-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold'; btnDelete.innerHTML = '<i class="fas fa-trash"></i> মচি পেলাওক'; btnDelete.onclick = () => deletePatientRecord(p.id); actions.append(btnEdit, btnDelete); } card.appendChild(actions); return card; }
         
         async function deletePatientRecord(id) { if (!id) { await showAlert("ভুল হৈছে: ৰোগীৰ ID পোৱা নগ'ল!", "ভুল", "❌"); return; } if (!await showConfirm('আপুনি সঁচাকৈয়ে এই ৰেকৰ্ডটো চিৰদিনৰ বাবে মচি পেলাব বিচাৰে নে?', 'নিশ্চিত কৰক', '🗑️')) return; const { error } = await supabaseClient.from('clinic_data').delete().eq('id', id); if (error) { await showAlert('ডাটাবেচে ডিলিট কৰিবলৈ দিয়া নাই: ' + error.message, 'ভুল', '❌'); } else { await Promise.all([supabaseClient.from('clinic_payments').delete().eq('patient_id', id), supabaseClient.from('clinic_visits').delete().eq('patient_id', id)]); await showAlert("ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হ'ল।", 'সফল ✅', '✅'); loadPatients(); loadExpenses(); loadReport(); } }
         function editPatientRecord(p) { currentEditId = p.id; document.getElementById('modalTitle').innerHTML = '✏️ ৰোগীৰ তথ্য আপডেট কৰক'; document.getElementById('pName').value = p.name || ''; document.getElementById('pAgeSex').value = p.age || ''; document.getElementById('pBP').value = p.bp || ''; document.getElementById('pPhone').value = p.phone || ''; document.getElementById('pHistory').value = p.history || ''; document.getElementById('pMedicine').value = p.medicine || ''; document.getElementById('pFees').value = 0; document.getElementById('pDob').value = p.dob || ''; document.getElementById('pWeight').value = p.weight || ''; document.getElementById('pHeight').value = p.height || ''; document.getElementById('patientModal').classList.remove('hidden'); }
