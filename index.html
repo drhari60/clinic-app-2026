@@ -226,6 +226,36 @@
 
     <div id="printArea" class="hidden p-8 bg-white text-black"></div>
 
+    <!-- Lab Report Modal -->
+    <div id="labReportModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-3">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+        <div class="flex justify-between items-center px-5 py-3 bg-indigo-700 rounded-t-2xl">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-flask text-white text-sm"></i>
+            <div>
+              <p class="text-white font-bold text-sm">Lab Reports</p>
+              <p id="labPatientName" class="text-indigo-200 text-[10px]"></p>
+            </div>
+          </div>
+          <button onclick="document.getElementById('labReportModal').classList.add('hidden')" class="text-white/70 hover:text-white text-lg">✕</button>
+        </div>
+        <div class="p-4 space-y-3">
+          <!-- Add new report -->
+          <div class="bg-indigo-50 rounded-xl p-3 space-y-2">
+            <p class="text-xs font-bold text-indigo-700 flex items-center gap-1"><i class="fab fa-google-drive"></i> নতুন Report যোগ কৰক</p>
+            <input type="text" id="labReportName" placeholder="Report-ৰ নাম (যেনে: CBC Report, X-Ray)" class="w-full p-2.5 border border-indigo-200 rounded-lg text-xs focus:outline-none focus:border-indigo-500">
+            <input type="url" id="labReportLink" placeholder="Google Drive share link paste কৰক" class="w-full p-2.5 border border-indigo-200 rounded-lg text-xs focus:outline-none focus:border-indigo-500 font-mono">
+            <input type="date" id="labReportDate" class="w-full p-2.5 border border-indigo-200 rounded-lg text-xs focus:outline-none focus:border-indigo-500">
+            <button onclick="saveLabReport()" class="w-full bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2">
+              <i class="fas fa-plus"></i> Report Save কৰক
+            </button>
+          </div>
+          <!-- Report list -->
+          <div id="labReportList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Prescription Preview Modal -->
     <div id="rxPreviewModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-start justify-center p-3 overflow-y-auto">
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl my-4">
@@ -355,7 +385,75 @@
         let currentPage = 0;
 const PAGE_SIZE = 30;
 
-async function loadBirthdayReminders() {
+let _labCurrentPatientId = null;
+        let _labCurrentReports = [];
+
+        function openLabReportModal(p) {
+            _labCurrentPatientId = p.id;
+            _labCurrentReports = Array.isArray(p.lab_reports) ? p.lab_reports : [];
+            document.getElementById('labPatientName').textContent = p.name;
+            document.getElementById('labReportName').value = '';
+            document.getElementById('labReportLink').value = '';
+            document.getElementById('labReportDate').value = new Date().toISOString().split('T')[0];
+            renderLabReports();
+            document.getElementById('labReportModal').classList.remove('hidden');
+        }
+
+        function renderLabReports() {
+            const list = document.getElementById('labReportList');
+            if (!list) return;
+            if (_labCurrentReports.length === 0) {
+                list.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">এতিয়ালৈকে কোনো report নাই।</p>';
+                return;
+            }
+            list.innerHTML = _labCurrentReports.map((r, i) => `
+                <div class="bg-white border border-gray-200 rounded-xl p-3 flex justify-between items-center gap-2">
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold text-xs text-gray-900 truncate">📋 ${escapeHTML(r.name)}</p>
+                        <p class="text-[10px] text-gray-400 mt-0.5">${escapeHTML(r.date || '')}</p>
+                    </div>
+                    <div class="flex gap-1.5 shrink-0">
+                        <a href="${escapeHTML(r.link)}" target="_blank" rel="noopener noreferrer"
+                           class="bg-indigo-600 text-white px-2.5 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1">
+                           <i class="fas fa-external-link-alt"></i> খোলক
+                        </a>
+                        <button onclick="deleteLabReport(${i})" class="bg-red-100 text-red-600 px-2 py-1.5 rounded-lg text-[10px] font-bold">🗑</button>
+                    </div>
+                </div>`).join('');
+        }
+
+        async function saveLabReport() {
+            const name = document.getElementById('labReportName').value.trim();
+            const link = document.getElementById('labReportLink').value.trim();
+            const date = document.getElementById('labReportDate').value;
+            if (!name) { await showAlert('Report-ৰ নাম দিয়ক।', 'প্ৰয়োজনীয়', '⚠️'); return; }
+            if (!link || !link.startsWith('http')) { await showAlert('সঠিক Google Drive link দিয়ক।', 'ভুল Link', '⚠️'); return; }
+            _labCurrentReports.unshift({ name, link, date });
+            const { error } = await supabaseClient
+                .from('clinic_data')
+                .update({ lab_reports: _labCurrentReports })
+                .eq('id', _labCurrentPatientId);
+            if (error) { await showAlert('Save কৰিব পৰা নগ\'ল।', 'ভুল', '❌'); _labCurrentReports.shift(); return; }
+            document.getElementById('labReportName').value = '';
+            document.getElementById('labReportLink').value = '';
+            renderLabReports();
+            await showAlert(name + ' সংৰক্ষণ হৈছে! ✅', 'সফল', '📋');
+            loadPatients(false);
+        }
+
+        async function deleteLabReport(index) {
+            if (!await showConfirm('এই report মচিব বিচাৰেনে?', 'নিশ্চিত কৰক', '🗑️')) return;
+            _labCurrentReports.splice(index, 1);
+            const { error } = await supabaseClient
+                .from('clinic_data')
+                .update({ lab_reports: _labCurrentReports })
+                .eq('id', _labCurrentPatientId);
+            if (error) { await showAlert('মচিব পৰা নগ\'ল।', 'ভুল', '❌'); return; }
+            renderLabReports();
+            loadPatients(false);
+        }
+
+        async function loadBirthdayReminders() {
     const { data, error } = await supabaseClient.from('clinic_data').select('id,name,phone,dob').not('dob', 'is', null);
     if (error || !data || data.length === 0) return;
     const today = new Date();
@@ -437,7 +535,11 @@ async function loadPatients(reset = true) {
     }
 }
         
-        function createPatientCard(p) { const card = document.createElement('div'); card.className = 'bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-3'; card.innerHTML = `<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2"><div><h4 class="text-base font-bold text-slate-900">${escapeHTML(p.name)} <span class="text-xs font-normal text-gray-500">(${escapeHTML(p.age || 'N/A')})</span></h4><p class="text-xs text-gray-600 mt-0.5">${escapeHTML(p.phone)} | 🩺 BP: ${escapeHTML(p.bp || 'N/A')}</p><p class="text-xs text-gray-500 mt-1"><b>History:</b> ${escapeHTML(p.history || 'None')}</p><p class="text-xs text-gray-600 mt-1"><b>Rx:</b> ${escapeHTML((p.medicine || '').slice(0, 80))}</p></div></div>`; const actions = document.createElement('div'); actions.className = 'flex flex-wrap gap-1.5 border-t pt-2 mt-1 justify-end'; const btnPrint = document.createElement('button'); btnPrint.className = 'bg-gray-800 text-white px-2.5 py-2 rounded-lg text-xs font-bold'; btnPrint.innerHTML = '<i class="fas fa-print"></i>'; btnPrint.onclick = () => printPrescription(p); const btnWA = document.createElement('button'); btnWA.className = 'bg-green-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1'; btnWA.innerHTML = '<i class="fab fa-whatsapp"></i> Rx'; btnWA.onclick = () => sendWhatsAppRx(p); const btnReminder = document.createElement('button'); btnReminder.className = 'bg-orange-500 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1'; btnReminder.innerHTML = '<i class="fas fa-clock"></i> Reminder'; btnReminder.onclick = () => sendMedicineReminder(p); const btnHistory = document.createElement('button'); btnHistory.className = 'bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1'; btnHistory.innerHTML = '<i class="fas fa-history"></i> History'; btnHistory.onclick = () => showVisitHistory(p); const btnRevisit = document.createElement('button'); btnRevisit.className = 'bg-teal-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1'; btnRevisit.innerHTML = '<i class="fas fa-redo"></i> Revisit'; btnRevisit.onclick = () => openRevisitModal(p); actions.append(btnPrint, btnWA, btnReminder, btnHistory, btnRevisit); if (isDoctor) { const btnEdit = document.createElement('button'); btnEdit.className = 'bg-blue-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold'; btnEdit.innerHTML = '<i class="fas fa-edit"></i> এডিট'; btnEdit.onclick = () => editPatientRecord(p); const btnDelete = document.createElement('button'); btnDelete.className = 'bg-red-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold'; btnDelete.innerHTML = '<i class="fas fa-trash"></i> মচি পেলাওক'; btnDelete.onclick = () => deletePatientRecord(p.id); actions.append(btnEdit, btnDelete); } card.appendChild(actions); return card; }
+        function createPatientCard(p) { const card = document.createElement('div'); card.className = 'bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-3'; card.innerHTML = `<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2"><div><h4 class="text-base font-bold text-slate-900">${escapeHTML(p.name)} <span class="text-xs font-normal text-gray-500">(${escapeHTML(p.age || 'N/A')})</span></h4><p class="text-xs text-gray-600 mt-0.5">${escapeHTML(p.phone)} | 🩺 BP: ${escapeHTML(p.bp || 'N/A')}</p><p class="text-xs text-gray-500 mt-1"><b>History:</b> ${escapeHTML(p.history || 'None')}</p><p class="text-xs text-gray-600 mt-1"><b>Rx:</b> ${escapeHTML((p.medicine || '').slice(0, 80))}</p></div></div>`; const actions = document.createElement('div'); actions.className = 'flex flex-wrap gap-1.5 border-t pt-2 mt-1 justify-end'; const btnPrint = document.createElement('button'); btnPrint.className = 'bg-gray-800 text-white px-2.5 py-2 rounded-lg text-xs font-bold'; btnPrint.innerHTML = '<i class="fas fa-print"></i>'; btnPrint.onclick = () => printPrescription(p); const btnWA = document.createElement('button'); btnWA.className = 'bg-green-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1'; btnWA.innerHTML = '<i class="fab fa-whatsapp"></i> Rx'; btnWA.onclick = () => sendWhatsAppRx(p); const btnReminder = document.createElement('button'); btnReminder.className = 'bg-orange-500 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1'; btnReminder.innerHTML = '<i class="fas fa-clock"></i> Reminder'; btnReminder.onclick = () => sendMedicineReminder(p); const btnHistory = document.createElement('button'); btnHistory.className = 'bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1'; btnHistory.innerHTML = '<i class="fas fa-history"></i> History'; btnHistory.onclick = () => showVisitHistory(p); const btnRevisit = document.createElement('button'); btnRevisit.className = 'bg-teal-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1'; btnRevisit.innerHTML = '<i class="fas fa-redo"></i> Revisit'; btnRevisit.onclick = () => openRevisitModal(p); const btnLab = document.createElement('button');
+            btnLab.className = 'bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1';
+            btnLab.innerHTML = '<i class="fas fa-flask"></i> Lab';
+            btnLab.onclick = () => openLabReportModal(p);
+            actions.append(btnPrint, btnWA, btnReminder, btnHistory, btnRevisit, btnLab); if (isDoctor) { const btnEdit = document.createElement('button'); btnEdit.className = 'bg-blue-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold'; btnEdit.innerHTML = '<i class="fas fa-edit"></i> এডিট'; btnEdit.onclick = () => editPatientRecord(p); const btnDelete = document.createElement('button'); btnDelete.className = 'bg-red-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold'; btnDelete.innerHTML = '<i class="fas fa-trash"></i> মচি পেলাওক'; btnDelete.onclick = () => deletePatientRecord(p.id); actions.append(btnEdit, btnDelete); } card.appendChild(actions); return card; }
         
         async function deletePatientRecord(id) { if (!id) { await showAlert("ভুল হৈছে: ৰোগীৰ ID পোৱা নগ'ল!", "ভুল", "❌"); return; } if (!await showConfirm('আপুনি সঁচাকৈয়ে এই ৰেকৰ্ডটো চিৰদিনৰ বাবে মচি পেলাব বিচাৰে নে?', 'নিশ্চিত কৰক', '🗑️')) return; const { error } = await supabaseClient.from('clinic_data').delete().eq('id', id); if (error) { await showAlert('ডাটাবেচে ডিলিট কৰিবলৈ দিয়া নাই: ' + error.message, 'ভুল', '❌'); } else { await Promise.all([supabaseClient.from('clinic_payments').delete().eq('patient_id', id), supabaseClient.from('clinic_visits').delete().eq('patient_id', id)]); await showAlert("ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হ'ল।", 'সফল ✅', '✅'); loadPatients(); loadExpenses(); loadReport(); } }
         function editPatientRecord(p) { currentEditId = p.id; document.getElementById('modalTitle').innerHTML = '✏️ ৰোগীৰ তথ্য আপডেট কৰক'; document.getElementById('pName').value = p.name || ''; document.getElementById('pAgeSex').value = p.age || ''; document.getElementById('pBP').value = p.bp || ''; document.getElementById('pPhone').value = p.phone || ''; document.getElementById('pHistory').value = p.history || ''; document.getElementById('pMedicine').value = p.medicine || ''; document.getElementById('pFees').value = 0; document.getElementById('pDob').value = p.dob || ''; document.getElementById('patientModal').classList.remove('hidden'); }
