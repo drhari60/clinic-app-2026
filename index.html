@@ -241,13 +241,17 @@
         </div>
         <!-- Summary -->
         <div id="payHistSummary" class="grid grid-cols-3 gap-2 p-3 bg-emerald-50 shrink-0"></div>
-        <!-- Due amount input -->
-        <div id="payHistDueSection" class="hidden px-4 py-3 bg-red-50 border-b border-red-100 shrink-0">
-          <p class="text-xs font-bold text-red-700 mb-2">💳 বাকী টকা গ্ৰহণ কৰক</p>
+        <!-- Add payment section - always visible -->
+        <div class="px-4 py-3 bg-emerald-50 border-b border-emerald-100 shrink-0">
+          <p class="text-xs font-bold text-emerald-700 mb-2">💳 Payment যোগ কৰক</p>
           <div class="flex gap-2">
-            <input type="number" id="payDueAmount" placeholder="পৰিমাণ (₹)" class="flex-1 p-2 border border-red-200 rounded-lg text-xs focus:outline-none">
-            <button onclick="collectDuePayment()" class="bg-emerald-600 text-white px-3 py-2 rounded-lg text-xs font-bold">✅ গ্ৰহণ কৰক</button>
+            <input type="number" id="payDueAmount" placeholder="পৰিমাণ (₹)" class="flex-1 p-2 border border-emerald-200 rounded-lg text-xs focus:outline-none">
+            <button onclick="collectDuePayment()" class="bg-emerald-600 text-white px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap">✅ যোগ কৰক</button>
           </div>
+        </div>
+        <!-- Due warning if unpaid visits -->
+        <div id="payHistDueSection" class="hidden px-4 py-2 bg-red-50 border-b border-red-100 shrink-0">
+          <p class="text-xs text-red-600 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> এই ৰোগীৰ বাকী টকা আছে — ওপৰত payment যোগ কৰক।</p>
         </div>
         <!-- History list -->
         <div id="payHistList" class="overflow-y-auto flex-1 p-3 space-y-2"></div>
@@ -452,11 +456,11 @@ const PAGE_SIZE = 30;
                     <p class="text-sm font-extrabold ${totalDue > 0 ? 'text-red-700' : 'text-gray-400'}">₹${totalDue}</p>
                 </div>`;
 
-            // Due section
+            // Due warning section
             const dueSection = document.getElementById('payHistDueSection');
+            document.getElementById('payDueAmount').value = '';
             if (unpaidVisits > 0) {
                 dueSection.classList.remove('hidden');
-                document.getElementById('payDueAmount').value = '';
             } else {
                 dueSection.classList.add('hidden');
             }
@@ -488,32 +492,41 @@ const PAGE_SIZE = 30;
                 income_source: 'patient'
             }]);
             if (error) { await showAlert('Save কৰিব পৰা নগ\'ল।', 'ভুল', '❌'); return; }
+            // unpaid visits থাকিলে update কৰো
             await supabaseClient.from('clinic_visits')
                 .update({ payment_status: 'paid', fees_paid: amount })
                 .eq('patient_id', _payHistPatient.id)
                 .eq('payment_status', 'unpaid');
-            await showAlert(`₹${amount} সফলতাৰে গ্ৰহণ কৰা হৈছে।`, 'সফল ✅', '💰');
+            await showAlert(`₹${amount} সফলতাৰে যোগ কৰা হৈছে।`, 'সফল ✅', '💰');
             openPaymentHistory(_payHistPatient);
             loadExpenses();
+            loadReport();
         }
 
         // ===== DAILY SUMMARY WHATSAPP =====
         async function sendDailySummary() {
             const today = new Date().toISOString().split('T')[0];
             const todayDisplay = new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'});
+            const todayStart = today + 'T00:00:00+05:30';
+            const todayEnd = today + 'T23:59:59+05:30';
 
-            const [{ data: payments }, { data: visits }, { data: expenses }] = await Promise.all([
+            const [{ data: payments }, { data: visits }, { data: newPatients }, { data: expenses }] = await Promise.all([
                 supabaseClient.from('clinic_payments').select('fees').eq('visit_date', today),
                 supabaseClient.from('clinic_visits').select('id').eq('visit_date', today),
-                supabaseClient.from('clinic_expenses').select('amount').gte('created_at', today + 'T00:00:00+05:30').lte('created_at', today + 'T23:59:59+05:30')
+                supabaseClient.from('clinic_data').select('id').gte('created_at', todayStart).lte('created_at', todayEnd),
+                supabaseClient.from('clinic_expenses').select('amount').gte('created_at', todayStart).lte('created_at', todayEnd)
             ]);
 
             const totalIncome = (payments || []).reduce((s, r) => s + (parseFloat(r.fees) || 0), 0);
-            const totalVisits = (visits || []).length;
+            // নতুন ৰোগী + revisit — unique count
+            const totalVisits = new Set([
+                ...(visits || []).map(v => v.id),
+                ...(newPatients || []).map(p => p.id)
+            ]).size;
             const totalExpense = (expenses || []).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
             const netProfit = totalIncome - totalExpense;
 
-            const msg = `🏥 *DR. HARIS CLINIC*\n📅 দৈনিক প্ৰতিবেদন — ${todayDisplay}\n${'─'.repeat(28)}\n👥 আজিৰ ৰোগী: *${totalVisits} জন*\n💰 মুঠ আয়: *₹${totalIncome}*\n📤 মুঠ খৰচ: *₹${totalExpense}*\n📊 নিট লাভ: *₹${netProfit}*\n${'─'.repeat(28)}\n_DR. HARIS CLINIC Management App_`;
+            const msg = `🏥 *DR. HARIS CLINIC*\n📅 দৈনিক প্ৰতিবেদন — ${todayDisplay}\n${'─'.repeat(28)}\n👥 আজিৰ ৰোগী: *${totalVisits} জন*\n   (নতুন: ${(newPatients||[]).length} · Revisit: ${(visits||[]).length})\n💰 মুঠ আয়: *₹${totalIncome}*\n📤 মুঠ খৰচ: *₹${totalExpense}*\n📊 নিট লাভ: *₹${netProfit}*\n${'─'.repeat(28)}\n_DR. HARIS CLINIC Management App_`;
 
             window.open(`https://wa.me/919954340102?text=${encodeURIComponent(msg)}`, '_blank');
         }
