@@ -258,6 +258,61 @@
       </div>
     </div>
 
+    <!-- Physiotherapy Tracker Modal -->
+    <div id="physioModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-3">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col">
+        <!-- Header -->
+        <div class="flex justify-between items-center px-5 py-3 bg-violet-700 rounded-t-2xl shrink-0">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-running text-white text-sm"></i>
+            <div>
+              <p class="text-white font-bold text-sm">Physiotherapy Tracker</p>
+              <p id="physioPatientName" class="text-violet-200 text-[10px]"></p>
+            </div>
+          </div>
+          <button onclick="document.getElementById('physioModal').classList.add('hidden')" class="text-white/70 hover:text-white text-lg">✕</button>
+        </div>
+        <!-- Progress Summary -->
+        <div id="physioSummary" class="grid grid-cols-3 gap-2 p-3 bg-violet-50 shrink-0"></div>
+        <!-- Progress Bar -->
+        <div class="px-4 pb-2 shrink-0">
+          <div class="flex justify-between text-[10px] text-gray-500 mb-1">
+            <span>অগ্ৰগতি</span>
+            <span id="physioPercent">0%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div id="physioProgressBar" class="bg-violet-600 h-2.5 rounded-full transition-all duration-500" style="width:0%"></div>
+          </div>
+        </div>
+        <!-- Add Session Form -->
+        <div class="px-4 pb-3 shrink-0 border-b border-gray-100">
+          <div id="physioSetupSection" class="hidden space-y-2 mb-3 bg-violet-50 rounded-xl p-3">
+            <p class="text-xs font-bold text-violet-700">📋 Physio Plan Setup</p>
+            <input type="number" id="physioTotalSessions" placeholder="মুঠ কিমান Session? (যেনে: 10)" class="w-full p-2 border border-violet-200 rounded-lg text-xs focus:outline-none">
+            <input type="text" id="physioCondition" placeholder="ৰোগৰ ধৰণ (যেনে: Cervical Spondylosis)" class="w-full p-2 border border-violet-200 rounded-lg text-xs focus:outline-none">
+            <button onclick="setupPhysioplan()" class="w-full bg-violet-700 text-white py-2 rounded-xl text-xs font-bold">✅ Plan তৈয়াৰ কৰক</button>
+          </div>
+          <p class="text-xs font-bold text-gray-700 mb-2">➕ নতুন Session যোগ কৰক</p>
+          <div class="space-y-2">
+            <input type="text" id="physioExercise" placeholder="Treatment / Exercise (যেনে: SWD, Traction, Exercise)" class="w-full p-2 border border-gray-200 rounded-lg text-xs focus:outline-none">
+            <div class="flex gap-2">
+              <input type="date" id="physioSessionDate" class="flex-1 p-2 border border-gray-200 rounded-lg text-xs focus:outline-none">
+              <select id="physioStatus" class="p-2 border border-gray-200 rounded-lg text-xs focus:outline-none bg-white">
+                <option value="completed">✅ সম্পূৰ্ণ</option>
+                <option value="missed">❌ Miss</option>
+              </select>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="addPhysioSession()" class="flex-1 bg-violet-700 text-white py-2 rounded-xl text-xs font-bold">➕ Session যোগ</button>
+              <button onclick="sendPhysioUpdate()" class="flex-1 bg-green-600 text-white py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1"><i class="fab fa-whatsapp"></i> Update পঠিয়াওক</button>
+            </div>
+          </div>
+        </div>
+        <!-- Session List -->
+        <div id="physioSessionList" class="overflow-y-auto flex-1 p-3 space-y-2"></div>
+      </div>
+    </div>
+
     <!-- Lab Report Modal -->
     <div id="labReportModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-3">
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
@@ -417,7 +472,127 @@
         let currentPage = 0;
 const PAGE_SIZE = 30;
 
-// ===== PAYMENT HISTORY =====
+// ===== PHYSIOTHERAPY TRACKER =====
+        let _physioPatient = null;
+        let _physioData = null;
+
+        async function openPhysioModal(p) {
+            _physioPatient = p;
+            document.getElementById('physioPatientName').textContent = p.name;
+            document.getElementById('physioSessionDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('physioExercise').value = '';
+            document.getElementById('physioModal').classList.remove('hidden');
+            await loadPhysioData();
+        }
+
+        async function loadPhysioData() {
+            const { data } = await supabaseClient
+                .from('clinic_data').select('physio_data')
+                .eq('id', _physioPatient.id).single();
+            _physioData = (data && data.physio_data) ? data.physio_data : { total: 0, condition: '', sessions: [] };
+            renderPhysioUI();
+        }
+
+        function renderPhysioUI() {
+            const d = _physioData;
+            const completed = (d.sessions || []).filter(s => s.status === 'completed').length;
+            const missed = (d.sessions || []).filter(s => s.status === 'missed').length;
+            const remaining = Math.max(0, (d.total || 0) - completed);
+            const percent = d.total > 0 ? Math.round((completed / d.total) * 100) : 0;
+
+            // Summary
+            document.getElementById('physioSummary').innerHTML = `
+                <div class="bg-violet-100 rounded-xl p-2 text-center">
+                    <p class="text-[10px] text-violet-600 font-bold">সম্পূৰ্ণ</p>
+                    <p class="text-lg font-extrabold text-violet-700">${completed}</p>
+                </div>
+                <div class="bg-orange-100 rounded-xl p-2 text-center">
+                    <p class="text-[10px] text-orange-600 font-bold">বাকী</p>
+                    <p class="text-lg font-extrabold text-orange-700">${remaining}</p>
+                </div>
+                <div class="bg-red-100 rounded-xl p-2 text-center">
+                    <p class="text-[10px] text-red-600 font-bold">Miss</p>
+                    <p class="text-lg font-extrabold text-red-700">${missed}</p>
+                </div>`;
+
+            // Progress bar
+            document.getElementById('physioPercent').textContent = percent + '%';
+            document.getElementById('physioProgressBar').style.width = percent + '%';
+
+            // Setup section
+            const setupSection = document.getElementById('physioSetupSection');
+            if (!d.total || d.total === 0) {
+                setupSection.classList.remove('hidden');
+            } else {
+                setupSection.classList.add('hidden');
+            }
+
+            // Session list
+            const list = document.getElementById('physioSessionList');
+            if (!d.sessions || d.sessions.length === 0) {
+                list.innerHTML = '<p class="text-xs text-gray-400 text-center py-6">এতিয়ালৈকে কোনো session নাই।</p>';
+                return;
+            }
+            list.innerHTML = [...d.sessions].reverse().map((s, i) => `
+                <div class="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-xl p-3">
+                    <span class="text-lg">${s.status === 'completed' ? '✅' : '❌'}</span>
+                    <div class="flex-1">
+                        <p class="font-bold text-xs text-gray-900">${escapeHTML(s.exercise || 'Session')}</p>
+                        <p class="text-[10px] text-gray-400">${s.date || 'N/A'}</p>
+                    </div>
+                    <span class="text-[10px] px-2 py-1 rounded-lg font-bold ${s.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}">#${d.sessions.length - i}</span>
+                </div>`).join('');
+        }
+
+        async function setupPhysioplan() {
+            const total = parseInt(document.getElementById('physioTotalSessions').value);
+            const condition = document.getElementById('physioCondition').value.trim();
+            if (!total || total < 1) { await showAlert('মুঠ session সংখ্যা দিয়ক।', 'প্ৰয়োজনীয়', '⚠️'); return; }
+            _physioData = { total, condition, sessions: [] };
+            await savePhysioData();
+            document.getElementById('physioTotalSessions').value = '';
+            document.getElementById('physioCondition').value = '';
+        }
+
+        async function addPhysioSession() {
+            const exercise = document.getElementById('physioExercise').value.trim();
+            const date = document.getElementById('physioSessionDate').value;
+            const status = document.getElementById('physioStatus').value;
+            if (!exercise) { await showAlert('Treatment/Exercise লিখক।', 'প্ৰয়োজনীয়', '⚠️'); return; }
+            if (!_physioData.sessions) _physioData.sessions = [];
+            _physioData.sessions.push({ exercise, date, status });
+            await savePhysioData();
+            document.getElementById('physioExercise').value = '';
+        }
+
+        async function savePhysioData() {
+            const { error } = await supabaseClient
+                .from('clinic_data').update({ physio_data: _physioData })
+                .eq('id', _physioPatient.id);
+            if (error) { await showAlert('Save কৰিব পৰা নগ'ল।', 'ভুল', '❌'); return; }
+            renderPhysioUI();
+        }
+
+        function sendPhysioUpdate() {
+            if (!_physioPatient.phone) { showAlert('ৰোগীৰ phone নম্বৰ নাই।', 'নম্বৰ নাই', '⚠️'); return; }
+            const d = _physioData;
+            const completed = (d.sessions || []).filter(s => s.status === 'completed').length;
+            const remaining = Math.max(0, (d.total || 0) - completed);
+            const last = d.sessions && d.sessions.length > 0 ? d.sessions[d.sessions.length - 1] : null;
+            const msg = `🏥 *DR. HARIS CLINIC*
+💪 Physiotherapy Update
+${'─'.repeat(25)}
+ৰোগী: *${_physioPatient.name}*
+${d.condition ? 'সমস্যা: ' + d.condition + '\n' : ''}✅ সম্পূৰ্ণ: *${completed} session*
+⏳ বাকী: *${remaining} session*
+${last ? '🔹 শেষ Session: ' + (last.exercise || '') + ' (' + (last.date || '') + ')\n' : ''}${'─'.repeat(25)}
+_DR. HARIS CLINIC, Gogamukh_`;
+            const phone = _physioPatient.phone.replace(/\D/g, '');
+            const num = phone.startsWith('91') ? phone : '91' + phone;
+            window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(msg), '_blank');
+        }
+
+        // ===== PAYMENT HISTORY =====
         let _payHistPatient = null;
 
         async function openPaymentHistory(p) {
@@ -689,7 +864,11 @@ async function loadPatients(reset = true) {
             btnPayHist.className = 'bg-emerald-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1';
             btnPayHist.innerHTML = '<i class="fas fa-money-bill-wave"></i> Payment';
             btnPayHist.onclick = () => openPaymentHistory(p);
-            actions.append(btnPrint, btnWA, btnReminder, btnHistory, btnRevisit, btnLab, btnPayHist); if (isDoctor) { const btnEdit = document.createElement('button'); btnEdit.className = 'bg-blue-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold'; btnEdit.innerHTML = '<i class="fas fa-edit"></i> এডিট'; btnEdit.onclick = () => editPatientRecord(p); const btnDelete = document.createElement('button'); btnDelete.className = 'bg-red-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold'; btnDelete.innerHTML = '<i class="fas fa-trash"></i> মচি পেলাওক'; btnDelete.onclick = () => deletePatientRecord(p.id); actions.append(btnEdit, btnDelete); } card.appendChild(actions); return card; }
+            const btnPhysio = document.createElement('button');
+            btnPhysio.className = 'bg-violet-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1';
+            btnPhysio.innerHTML = '<i class="fas fa-running"></i> Physio';
+            btnPhysio.onclick = () => openPhysioModal(p);
+            actions.append(btnPrint, btnWA, btnReminder, btnHistory, btnRevisit, btnLab, btnPayHist, btnPhysio); if (isDoctor) { const btnEdit = document.createElement('button'); btnEdit.className = 'bg-blue-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold'; btnEdit.innerHTML = '<i class="fas fa-edit"></i> এডিট'; btnEdit.onclick = () => editPatientRecord(p); const btnDelete = document.createElement('button'); btnDelete.className = 'bg-red-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold'; btnDelete.innerHTML = '<i class="fas fa-trash"></i> মচি পেলাওক'; btnDelete.onclick = () => deletePatientRecord(p.id); actions.append(btnEdit, btnDelete); } card.appendChild(actions); return card; }
         
         async function deletePatientRecord(id) { if (!id) { await showAlert("ভুল হৈছে: ৰোগীৰ ID পোৱা নগ'ল!", "ভুল", "❌"); return; } if (!await showConfirm('আপুনি সঁচাকৈয়ে এই ৰেকৰ্ডটো চিৰদিনৰ বাবে মচি পেলাব বিচাৰে নে?', 'নিশ্চিত কৰক', '🗑️')) return; const { error } = await supabaseClient.from('clinic_data').delete().eq('id', id); if (error) { await showAlert('ডাটাবেচে ডিলিট কৰিবলৈ দিয়া নাই: ' + error.message, 'ভুল', '❌'); } else { await Promise.all([supabaseClient.from('clinic_payments').delete().eq('patient_id', id), supabaseClient.from('clinic_visits').delete().eq('patient_id', id)]); await showAlert("ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হ'ল।", 'সফল ✅', '✅'); loadPatients(); loadExpenses(); loadReport(); } }
         function editPatientRecord(p) { currentEditId = p.id; document.getElementById('modalTitle').innerHTML = '✏️ ৰোগীৰ তথ্য আপডেট কৰক'; document.getElementById('pName').value = p.name || ''; document.getElementById('pAgeSex').value = p.age || ''; document.getElementById('pBP').value = p.bp || ''; document.getElementById('pPhone').value = p.phone || ''; document.getElementById('pHistory').value = p.history || ''; document.getElementById('pMedicine').value = p.medicine || ''; document.getElementById('pFees').value = 0; document.getElementById('pDob').value = p.dob || ''; document.getElementById('pWeight').value = p.weight || ''; document.getElementById('pHeight').value = p.height || ''; document.getElementById('patientModal').classList.remove('hidden'); }
