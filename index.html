@@ -377,7 +377,22 @@
         
         window.addEventListener('DOMContentLoaded', async () => {
             const populateYears = () => { const yearSelect = document.getElementById('reportYear'); if (!yearSelect) return; const currentYear = new Date().getFullYear(); yearSelect.innerHTML = ''; for (let year = 2024; year <= currentYear + 2; year++) { const option = document.createElement('option'); option.value = year; option.textContent = year; if (year === currentYear) option.selected = true; yearSelect.appendChild(option); } }; populateYears();
-            try { const { data: { session } } = await supabaseClient.auth.getSession(); if (session && session.user) { await checkRole(session.user.email); showDashboard(); } } catch (err) { console.log('Auth error bypassed'); }
+            try {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                if (error) throw error;
+                if (session && session.user && session.user.email) {
+                    await checkRole(session.user.email);
+                    showDashboard();
+                } else {
+                    // কোনো valid session নাই — login page দেখুৱাওক
+                    document.getElementById('mainPatientSection')?.classList.remove('hidden');
+                    document.getElementById('appDashboard')?.classList.add('hidden');
+                }
+            } catch (err) {
+                console.log('Auth check failed:', err);
+                document.getElementById('mainPatientSection')?.classList.remove('hidden');
+                document.getElementById('appDashboard')?.classList.add('hidden');
+            }
             document.getElementById('btnShareApp')?.addEventListener('click', async () => { if (navigator.share) { try { await navigator.share({ title: 'Dr. Haris Clinic Booking Portal', text: 'ডাঃ হৰিচ হোমিয়োপেথিক এণ্ড ফিজিওথেৰাপী ক্লিনিকৰ পৰা পোনপটীয়া অনলাইন বুকিং কৰিবলৈ লিংকটো ব্যৱহাৰ কৰক।', url: window.location.href }); } catch (err) {} } else { try { await navigator.clipboard.writeText(window.location.href); showAlert('লিংক কপি হৈছে!', 'সফল ✅', '🔗'); } catch (err) { showAlert('Link: ' + window.location.href, 'লিংক', '🔗'); } } });
             const btnRegular = document.getElementById('btnSelectRegular'), btnOnline = document.getElementById('btnSelectOnline');
             if(btnRegular && btnOnline) { btnRegular.addEventListener('click', () => { selectedBookingType = 'Regular Appointment'; currentFee = 100; btnRegular.className = "w-1/2 text-xs font-bold px-4 py-2.5 bg-slate-900 text-white rounded-lg transition-all shadow-sm"; btnOnline.className = "w-1/2 text-xs font-bold px-4 py-2.5 bg-transparent text-gray-500 rounded-lg transition-all"; }); btnOnline.addEventListener('click', () => { selectedBookingType = 'Online Consultation'; currentFee = 250; btnOnline.className = "w-1/2 text-xs font-bold px-4 py-2.5 bg-slate-900 text-white rounded-lg transition-all shadow-sm"; btnRegular.className = "w-1/2 text-xs font-bold px-4 py-2.5 bg-transparent text-gray-500 rounded-lg transition-all"; }); }
@@ -461,7 +476,24 @@
         });
     }, 1500);
 }
-        async function handleLogout() { await supabaseClient.auth.signOut(); const main = document.getElementById('mainPatientSection'); const dash = document.getElementById('appDashboard'); if (dash) dash.classList.add('hidden'); if (main) main.classList.remove('hidden'); safeGet('loginEmail').value = ''; safeGet('loginPassword').value = ''; isDoctor = false; const lp = document.getElementById('listPatients'); const lb = document.getElementById('listBookings'); if (lp) lp.innerHTML = ''; if (lb) lb.innerHTML = ''; }
+        async function handleLogout() {
+            await supabaseClient.auth.signOut();
+            // Local storage-ৰ পৰাও session clear কৰো
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('sb-')) localStorage.removeItem(key);
+            });
+            const main = document.getElementById('mainPatientSection');
+            const dash = document.getElementById('appDashboard');
+            if (dash) dash.classList.add('hidden');
+            if (main) main.classList.remove('hidden');
+            safeGet('loginEmail').value = '';
+            safeGet('loginPassword').value = '';
+            isDoctor = false;
+            const lp = document.getElementById('listPatients');
+            const lb = document.getElementById('listBookings');
+            if (lp) lp.innerHTML = '';
+            if (lb) lb.innerHTML = '';
+        }
         
         async function submitBooking() { const name = safeGet('bName').value?.trim(); const rawPhone = safeGet('bPhone').value?.trim(); const phone = sanitizePhone(rawPhone); const txn_id = safeGet('bTxnId').value?.trim(); const problem = safeGet('bProblem').value?.trim(); if (!/^[A-Za-zÀ-ÿ\u0980-\u09FF\s.]{3,50}$/.test(name)) { await showAlert('সঠিক ৰোগীৰ নাম দিয়ক।', 'ভুল তথ্য', '⚠️'); return; } if (!/^[6-9]\d{9}$/.test(phone)) { await showAlert('সঠিক 10 ডিজিট নম্বৰ দিয়ক।', 'ভুল নম্বৰ', '📱'); return; } if (!problem || problem.length < 5) { await showAlert('স্বাস্থ্য সমস্যাটো সঠিককৈ লিখক।', 'প্ৰয়োজনীয়', '📋'); return; } if (!txn_id || txn_id.length < 8) { await showAlert('সঠিক Payment ID দিয়ক (pay_...)।', 'ভুল ID', '🔢'); return; } const { data: existing } = await supabaseClient.from('clinic_bookings').select('id').eq('phone', phone).eq('txn_id', txn_id).maybeSingle(); if (existing) { await showAlert('এই ট্ৰাঞ্জেকচন আইডিৰে আগেয়ে বুকিং হৈছে।', 'ডুপ্লিকেট', '⚠️'); return; } const { error } = await supabaseClient.from('clinic_bookings').insert([{ name, phone, txn_id, problem: `[${selectedBookingType}] ${problem}` }]); if (error) { await showAlert('বুকিং ব্যৰ্থ হৈছে। পুনৰ চেষ্টা কৰক।', 'বুকিং ব্যৰ্থ', '❌'); } else { await showAlert('সফল হৈছে! আপোনাৰ বুকিং গ্ৰহণ কৰা হৈছে।', 'বুকিং নিশ্চিত ✅', '🎉'); window.open(`https://api.whatsapp.com/send?phone=91${phone}&text=${encodeURIComponent(`🏥 DR. HARIS CLINIC\n\nনমস্কাৰ ${name},\nআপোনাৰ ${selectedBookingType} ৰ বুকিং পঞ্জীয়ন কৰা হৈছে।\nTxn ID: ${txn_id}`)}`, '_blank'); safeGet('bName').value = ''; safeGet('bPhone').value = ''; safeGet('bProblem').value = ''; safeGet('bTxnId').value = ''; document.getElementById('bookingStep2').classList.add('hidden'); document.getElementById('bookingStep1').classList.remove('hidden'); } }
         
