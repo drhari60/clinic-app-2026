@@ -925,7 +925,7 @@ async function loadExpenses() {
         
         function openPhysioModal(record = null) {
   document.getElementById('physioEditId').value = record ? record.id : '';
-  document.getElementById('physioModalTitle').innerHTML = record ? '✏️ চছন আপডেট' : "🏃 নতুন ফিজিঅ'থেৰাপি ৰোগী";
+  document.getElementById('physioModalTitle').innerHTML = record ? '✏️ চেছন আপডেট' : "🏃 নতুন ফিজিঅ'থেৰাপি ৰোগী";
   document.getElementById('physioName').value = record ? record.name : '';
   document.getElementById('physioPhone').value = record ? (record.phone || '') : '';
   document.getElementById('physioCondition').value = record ? (record.condition || '') : '';
@@ -995,12 +995,12 @@ async function loadPhysioList() {
         ${r.condition ? `<p class="text-xs text-teal-600 font-medium mt-0.5">${escapeHTML(r.condition)}</p>` : ''}</div>
         <span class="text-[10px] font-bold px-2 py-1 rounded-full ${statusColor}">${statusText}</span>
       </div>
-      ${r.total_sessions > 0 ? `<div><div class="flex justify-between text-xs text-gray-500 mb-1"><span>চছন: ${r.completed_sessions || 0}/${r.total_sessions}</span><span>${pct}%</span></div>
+      ${r.total_sessions > 0 ? `<div><div class="flex justify-between text-xs text-gray-500 mb-1"><span>চেছন: ${r.completed_sessions || 0}/${r.total_sessions}</span><span>${pct}%</span></div>
       <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-teal-500 h-2 rounded-full transition-all" style="width:${pct}%"></div></div></div>` : ''}
       ${exercises ? `<div class="bg-teal-50 rounded-xl p-3"><p class="text-[10px] font-bold text-teal-700 uppercase mb-1">ব্যায়ামৰ তালিকা</p><ul class="text-xs space-y-0.5 list-disc list-inside">${exercises}</ul></div>` : ''}
       ${r.notes ? `<p class="text-xs text-gray-500 bg-gray-50 rounded-xl px-3 py-2">${escapeHTML(r.notes)}</p>` : ''}
       <div class="flex gap-2 pt-1">
-        ${remaining > 0 ? `<button onclick="updatePhysioSession('${r.id}', ${r.completed_sessions || 0}, ${r.total_sessions || 0})" class="flex-1 bg-teal-600 text-white py-2 rounded-xl text-xs font-bold">✅ চছন সম্পন্ন</button>` : ''}
+        ${remaining > 0 ? `<button onclick="updatePhysioSession('${r.id}', ${r.completed_sessions || 0}, ${r.total_sessions || 0})" class="flex-1 bg-teal-600 text-white py-2 rounded-xl text-xs font-bold">✅ চেছন সম্পন্ন</button>` : ''}
         <button onclick="openPhysioModal(${JSON.stringify(r).replace(/"/g, '&quot;')})" class="flex-1 bg-slate-100 text-slate-700 py-2 rounded-xl text-xs font-bold">✏️ এডিট</button>
         ${isDoctor ? `<button onclick="deletePhysioRecord('${r.id}')" class="bg-red-50 text-red-500 py-2 px-3 rounded-xl text-xs font-bold">🗑️</button>` : ''}
       </div>
