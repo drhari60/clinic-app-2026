@@ -545,7 +545,7 @@ const PAGE_SIZE = 30;
                 patient_id: _payHistPatient.id,
                 income_source: 'patient'
             }]);
-            if (error) { await showAlert('Save কৰিব পৰা নগ\'ল।', 'ভুল', '❌'); return; }
+            if (error) { console.error('collectDuePayment error:', error); await showAlert('Save কৰিব পৰা নগ\'ল: ' + (error.message || JSON.stringify(error)), 'ভুল', '❌'); return; }
             // unpaid visits থাকিলে update কৰো
             await supabaseClient.from('clinic_visits')
                 .update({ payment_status: 'paid', fees_paid: amount })
