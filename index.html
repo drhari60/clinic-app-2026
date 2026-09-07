@@ -979,7 +979,7 @@ async function loadPhysioList() {
   container.innerHTML = '<p class="text-xs text-gray-400 text-center py-6">লোড হৈ আছে...</p>';
   const { data, error } = await supabaseClient.from('physio_sessions').select('*').order('created_at', { ascending: false });
   if (error || !data || data.length === 0) {
-    container.innerHTML = '<p class="text-xs text-gray-400 text-center py-6">কোনো ফিজিঅ'থেৰাপি ৰোগী নাই।</p>';
+    container.innerHTML = "<p class=\"text-xs text-gray-400 text-center py-6\">কোনো ফিজিঅ'থেৰাপি ৰোগী নাই।</p>";
     return;
   }
   container.innerHTML = data.map(r => {
