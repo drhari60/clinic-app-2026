@@ -171,7 +171,42 @@
             <div id="tab-home" class="tab-content space-y-4"><div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100"><div class="relative"><input type="text" id="searchBox" placeholder="নাম বা মোবাইল নম্বৰেৰে ৰোগী সন্ধান কৰক..." class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm focus:outline-none focus:border-slate-500 shadow-inner"></div><button id="btnScrollToEntry" class="w-full mt-3 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl shadow transition text-center block text-sm"><i class="fas fa-user-plus mr-2"></i> নতুন ৰোগী যোগ কৰক</button></div><div id="birthdaySection" class="hidden bg-gradient-to-r from-pink-50 to-red-50 border border-pink-200 rounded-2xl p-4"><div class="flex items-center gap-2 mb-3"><span class="text-lg">🎂</span><p class="font-bold text-sm text-pink-800">আজিৰ জন্মদিন</p><span id="birthdayCount" class="bg-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full"></span></div><div id="birthdayList" class="space-y-2"></div></div><div id="upcomingBirthdaySection" class="hidden bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4"><div class="flex items-center gap-2 mb-3"><span class="text-lg">📅</span><p class="font-bold text-sm text-amber-800">এই সপ্তাহৰ জন্মদিন</p></div><div id="upcomingBirthdayList" class="space-y-2"></div></div><div id="listPatients" class="space-y-3"></div></div>
             <div id="tab-booking" class="tab-content hidden space-y-4"><h3 class="text-md font-bold text-slate-900 px-1">তাৰিখ ভিত্তিক অনলাইন বুকিং তালিকা</h3><div id="listBookings" class="space-y-3"></div></div>
             <div id="tab-report" class="tab-content hidden space-y-4"><div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between gap-3"><div class="flex items-center gap-2"><i class="fas fa-chart-bar text-slate-900"></i><h3 class="text-sm font-bold text-slate-900">Monthly Report</h3></div><div class="flex gap-2"><select id="reportYear" class="border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold bg-gray-50 focus:outline-none"></select><select id="reportMonth" class="border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold bg-gray-50 focus:outline-none"><option value="0">জানুৱাৰী</option><option value="1">ফেব্ৰুৱাৰী</option><option value="2">মাৰ্চ</option><option value="3">এপ্ৰিল</option><option value="4">মে</option><option value="5">জুন</option><option value="6">জুলাই</option><option value="7">আগষ্ট</option><option value="8">ছেপ্টেম্বৰ</option><option value="9">অক্টোবৰ</option><option value="10">নৱেম্বৰ</option><option value="11">ডিচেম্বৰ</option></select></div></div><div id="reportSummary" class="grid grid-cols-2 gap-3"></div><div id="reportFinance" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4"></div><div id="reportDaily" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto"></div><div class="grid grid-cols-2 gap-3"><button onclick="printReport()" class="bg-slate-900 text-white py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2"><i class="fas fa-print"></i> Print কৰক</button><button onclick="whatsappReport()" class="bg-green-600 text-white py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2"><i class="fab fa-whatsapp"></i> WhatsApp</button></div><button onclick="sendDailySummary()" class="w-full bg-teal-600 text-white py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 mt-1"><i class="fab fa-whatsapp"></i> 📊 আজিৰ দৈনিক সাৰাংশ পঠিয়াওক</button></div></div>
-            <div id="tab-profile" class="tab-content hidden space-y-4"><div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center relative overflow-hidden"><div class="absolute top-0 left-0 right-0 h-1.5 premium-gradient"></div><div class="w-20 h-20 premium-gradient text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-3 shadow-md">H</div><h3 class="text-lg font-bold text-gray-900">Dr. Harikanta Das</h3><p class="text-xs text-gray-500 font-medium">Homeopathic Physician & Physiotherapist</p><p class="text-[11px] text-gray-400 mt-1 flex items-center justify-center gap-1"><i class="fas fa-map-marker-alt"></i> Gogamukh, Dhemaji, Assam</p></div><div id="agentSection1" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"><div class="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-500"><div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center"><i class="fas fa-stethoscope text-white text-base"></i></div><div><p class="text-white font-bold text-sm">Dr. Hari's Assistant</p><p class="text-white/70 text-[10px]">স্বাস্থ্য পৰামৰ্শ সহায়ক</p></div></div><div class="relative" style="height:600px;">
+            <div id="tab-physio" class="tab-content hidden space-y-4">
+  <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
+    <div class="flex items-center gap-2"><i class="fas fa-running text-teal-600"></i><h3 class="text-sm font-bold text-slate-900">ফিজিঅ'থেৰাপি চছন ট্ৰেকাৰ</h3></div>
+    <button onclick="openPhysioModal()" class="bg-teal-600 text-white px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1"><i class="fas fa-plus"></i> নতুন ৰোগী</button>
+  </div>
+  <div id="physioList" class="space-y-3"></div>
+</div>
+
+<!-- Physio Modal -->
+<div id="physioModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+  <div class="bg-white rounded-2xl p-5 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
+    <h3 id="physioModalTitle" class="font-bold text-base text-slate-900 mb-4">🏃 ফিজিঅ'থেৰাপি ৰোগী</h3>
+    <input type="hidden" id="physioEditId">
+    <div class="space-y-3">
+      <input type="text" id="physioName" placeholder="ৰোগীৰ নাম *" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+      <input type="text" id="physioPhone" placeholder="ম'বাইল নম্বৰ" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+      <input type="text" id="physioCondition" placeholder="সমস্যা / Diagnosis" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+      <div class="flex gap-2">
+        <input type="number" id="physioTotalSessions" placeholder="মুঠ চছন সংখ্যা" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+        <input type="number" id="physioCompletedSessions" placeholder="সম্পূৰ্ণ হোৱা" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner">
+      </div>
+      <textarea id="physioExercises" placeholder="দিয়া ব্যায়াম / Exercises (প্ৰতিটো নতুন লাইনত লিখক)" class="w-full p-3 border border-gray-200 rounded-xl text-sm h-24 resize-none focus:outline-none shadow-inner"></textarea>
+      <textarea id="physioNotes" placeholder="অতিৰিক্ত টোকা" class="w-full p-3 border border-gray-200 rounded-xl text-sm h-16 resize-none focus:outline-none shadow-inner"></textarea>
+      <div class="flex gap-2">
+        <button onclick="savePhysioRecord()" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-xl font-bold text-sm transition">সংৰক্ষণ</button>
+        <button onclick="document.getElementById('physioModal').classList.add('hidden')" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">বাতিল</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="tab-profile" class="tab-content hidden space-y-4"><div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center relative overflow-hidden"><div class="absolute top-0 left-0 right-0 h-1.5 premium-gradient"></div><div class="w-20 h-20 premium-gradient text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-3 shadow-md">H</div><h3 class="text-lg font-bold text-gray-900">Dr. Harikanta Das</h3><p class="text-xs text-gray-500 font-medium">Homeopathic Physician & Physiotherapist</p><p class="text-[11px] text-gray-400 mt-1 flex items-center justify-center gap-1"><i class="fas fa-map-marker-alt"></i> Gogamukh, Dhemaji, Assam</p>
+<div class="mt-3 rounded-2xl overflow-hidden border border-gray-100 shadow-sm" style="height:200px;">
+  <iframe src="https://maps.google.com/maps?q=Gogamukh,Dhemaji,Assam&z=14&output=embed" width="100%" height="200" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+</div>
+<a href="https://maps.google.com/?q=Gogamukh,Dhemaji,Assam" target="_blank" class="mt-2 inline-flex items-center gap-1 text-xs text-teal-600 font-bold"><i class="fas fa-directions"></i> Google Maps-ত খোলক</a></div><div id="agentSection1" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"><div class="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-500"><div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center"><i class="fas fa-stethoscope text-white text-base"></i></div><div><p class="text-white font-bold text-sm">Dr. Hari's Assistant</p><p class="text-white/70 text-[10px]">স্বাস্থ্য পৰামৰ্শ সহায়ক</p></div></div><div class="relative" style="height:600px;">
   <div id="agentLoader1" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 z-10">
     <div class="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-3"></div>
     <p class="text-xs text-gray-400 font-medium">Assistant load হৈছে...</p>
@@ -220,6 +255,7 @@
             <button data-tab="expenses" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition"><i class="fas fa-wallet text-base"></i>খৰচ</button>
             <button data-tab="report" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition"><i class="fas fa-chart-bar text-base"></i>ৰিপোৰ্ট</button>
             <button data-tab="stock" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition"><i class="fas fa-pills text-base"></i>ষ্টক</button>
+            <button data-tab="physio" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition"><i class="fas fa-running text-base"></i>ফিজিঅ'</button>
             <button data-tab="profile" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition"><i class="fas fa-user text-base"></i>প্ৰফাইল</button>
         </div>
     </div>
@@ -887,7 +923,92 @@ async function loadExpenses() {
         async function sendWhatsAppRx(p) { if(!p.phone) { await showAlert('মোবাইল নম্বৰ পোৱা নগ&#39;ল।', 'নম্বৰ নাই', '📵'); return; } const date = new Date(p.created_at).toLocaleDateString('en-IN'); const msg = `🏥 *DR. HARIS CLINIC*\n🌿 Homeopathic & Physiotherapy Center\n📍 Gogamukh, Dhemaji, Assam\n━━━━━━━━━━━━━━━━━━━━\n👤 *ৰোগী:* ${p.name}\n🎂 *বয়স/লিংগ:* ${p.age || 'N/A'}\n🩺 *BP:* ${p.bp || 'N/A'}\n📅 *তাৰিখ:* ${date}\n━━━━━━━━━━━━━━━━━━━━\n💊 *Rx (ঔষধৰ তালিকা):*\n\n${p.medicine || 'None'}\n\n━━━━━━━━━━━━━━━━━━━━\n📘 *Facebook:* https://www.facebook.com/drhari365\n🔴 *YouTube:* https://www.youtube.com/@drhari\n📸 *Instagram:* https://www.instagram.com/drharikanta\n🌐 *Website:* https://drhariswellfuture.com\n━━━━━━━━━━━━━━━━━━━━\nনিৰোগী আৰু সুস্বাস্থ্যৰ কামনাৰে,\n*ডাঃ হৰিকান্ত দাস*\n🏥 DR. HARIS CLINIC`; window.open(`https://api.whatsapp.com/send?phone=91${p.phone.replace(/\D/g, '')}&text=${encodeURIComponent(msg)}`, '_blank'); }
         async function sendMedicineReminder(p) { if(!p.phone) { await showAlert('মোবাইল নম্বৰ পোৱা নগ&#39;ল।', 'নম্বৰ নাই', '📵'); return; } const msg = `🏥 *DR. HARIS CLINIC*\n---------------------------\nনমস্কাৰ ${p.name},\nঅনুগ্ৰহ কৰি আপোনাৰ ঔষধখিনি সময়মতে সেৱন কৰিবলৈ মনত পেলাই দিয়া হ&#39;ল।\n\n---------------------------\n💡 *দৈনিক স্বাস্থ্য সম্পৰ্কীয় গুৰুত্বপূৰ্ণ প্ৰবন্ধ পঢ়িবলৈ ক্লিক কৰক:* \n\n📘 *Facebook:* https://www.facebook.com/drhari365\n🔴 *YouTube:* https://www.youtube.com/@drhari\n📸 *Instagram:* https://www.instagram.com/drharikanta\n🌐 *Website:* https://drhariswellfuture.com\nকুশলে থাকক, \n*DR. HARIS CLINIC*`; window.open(`https://api.whatsapp.com/send?phone=91${p.phone.replace(/\D/g, '')}&text=${encodeURIComponent(msg)}`, '_blank'); }
         
-        function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); buttons.forEach(btn => { btn.addEventListener('click', () => { const targetTab = btn.getAttribute('data-tab'); document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden')); if (targetTab === 'booking') loadBookings(); if (targetTab === 'expenses') loadExpenses(); if (targetTab === 'report') loadReport(); if (targetTab === 'home') loadPatients(); if (targetTab === 'stock') loadMedicines(); if (targetTab === 'profile') { document.querySelectorAll('iframe[data-src]').forEach(iframe => { if (iframe.src === 'about:blank' && iframe.dataset.src) { iframe.src = iframe.dataset.src; } }); } document.getElementById(`tab-${targetTab}`)?.classList.remove('hidden'); buttons.forEach(b => { b.classList.remove('text-slate-900', 'border-b-2', 'border-slate-900'); b.classList.add('text-gray-400'); }); btn.classList.add('text-slate-900', 'border-b-2', 'border-slate-900'); btn.classList.remove('text-gray-400'); }); }); }
+        function openPhysioModal(record = null) {
+  document.getElementById('physioEditId').value = record ? record.id : '';
+  document.getElementById('physioModalTitle').innerHTML = record ? '✏️ চছন আপডেট' : '🏃 নতুন ফিজিঅ'থেৰাপি ৰোগী';
+  document.getElementById('physioName').value = record ? record.name : '';
+  document.getElementById('physioPhone').value = record ? (record.phone || '') : '';
+  document.getElementById('physioCondition').value = record ? (record.condition || '') : '';
+  document.getElementById('physioTotalSessions').value = record ? (record.total_sessions || '') : '';
+  document.getElementById('physioCompletedSessions').value = record ? (record.completed_sessions || 0) : '';
+  document.getElementById('physioExercises').value = record ? (record.exercises || '') : '';
+  document.getElementById('physioNotes').value = record ? (record.notes || '') : '';
+  document.getElementById('physioModal').classList.remove('hidden');
+}
+
+async function savePhysioRecord() {
+  const id = document.getElementById('physioEditId').value;
+  const name = document.getElementById('physioName').value.trim();
+  const phone = document.getElementById('physioPhone').value.trim();
+  const condition = document.getElementById('physioCondition').value.trim();
+  const total_sessions = parseInt(document.getElementById('physioTotalSessions').value) || 0;
+  const completed_sessions = parseInt(document.getElementById('physioCompletedSessions').value) || 0;
+  const exercises = document.getElementById('physioExercises').value.trim();
+  const notes = document.getElementById('physioNotes').value.trim();
+  if (!name) { await showAlert('ৰোগীৰ নাম লিখক।', 'প্ৰয়োজনীয়', '⚠️'); return; }
+  const payload = { name, phone, condition, total_sessions, completed_sessions, exercises, notes, updated_at: new Date(new Date().getTime() + (5.5*60*60*1000)).toISOString() };
+  let error;
+  if (id) {
+    ({ error } = await supabaseClient.from('physio_sessions').update(payload).eq('id', id));
+  } else {
+    payload.created_at = new Date(new Date().getTime() + (5.5*60*60*1000)).toISOString();
+    ({ error } = await supabaseClient.from('physio_sessions').insert([payload]));
+  }
+  if (error) { await showAlert('সংৰক্ষণ ব্যৰ্থ: ' + error.message, 'ভুল', '❌'); return; }
+  await showAlert(id ? 'আপডেট হৈছে!' : 'নতুন ৰোগী যোগ হৈছে!', 'সফল ✅', '✅');
+  document.getElementById('physioModal').classList.add('hidden');
+  loadPhysioList();
+}
+
+async function updatePhysioSession(id, completed, total) {
+  const newCompleted = Math.min(completed + 1, total);
+  const { error } = await supabaseClient.from('physio_sessions').update({ completed_sessions: newCompleted, updated_at: new Date(new Date().getTime() + (5.5*60*60*1000)).toISOString() }).eq('id', id);
+  if (!error) loadPhysioList();
+}
+
+async function deletePhysioRecord(id) {
+  const ok = await showConfirm('এই ৰোগীৰ তথ্য মচিব নেকি?', 'নিশ্চিত কৰক', '🗑️');
+  if (!ok) return;
+  await supabaseClient.from('physio_sessions').delete().eq('id', id);
+  loadPhysioList();
+}
+
+async function loadPhysioList() {
+  const container = document.getElementById('physioList');
+  if (!container) return;
+  container.innerHTML = '<p class="text-xs text-gray-400 text-center py-6">লোড হৈ আছে...</p>';
+  const { data, error } = await supabaseClient.from('physio_sessions').select('*').order('created_at', { ascending: false });
+  if (error || !data || data.length === 0) {
+    container.innerHTML = '<p class="text-xs text-gray-400 text-center py-6">কোনো ফিজিঅ'থেৰাপি ৰোগী নাই।</p>';
+    return;
+  }
+  container.innerHTML = data.map(r => {
+    const remaining = (r.total_sessions || 0) - (r.completed_sessions || 0);
+    const pct = r.total_sessions > 0 ? Math.round((r.completed_sessions / r.total_sessions) * 100) : 0;
+    const statusColor = remaining <= 0 ? 'bg-green-100 text-green-700' : remaining <= 3 ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700';
+    const statusText = remaining <= 0 ? '✅ সম্পূৰ্ণ' : `${remaining} টা বাকী`;
+    const exercises = r.exercises ? r.exercises.split('\n').filter(e => e.trim()).map(e => `<li class="text-gray-600">${escapeHTML(e.trim())}</li>`).join('') : '';
+    return `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 space-y-3">
+      <div class="flex items-start justify-between">
+        <div><p class="font-bold text-slate-900 text-sm">${escapeHTML(r.name)}</p>
+        ${r.phone ? `<p class="text-xs text-gray-400">${escapeHTML(r.phone)}</p>` : ''}
+        ${r.condition ? `<p class="text-xs text-teal-600 font-medium mt-0.5">${escapeHTML(r.condition)}</p>` : ''}</div>
+        <span class="text-[10px] font-bold px-2 py-1 rounded-full ${statusColor}">${statusText}</span>
+      </div>
+      ${r.total_sessions > 0 ? `<div><div class="flex justify-between text-xs text-gray-500 mb-1"><span>চছন: ${r.completed_sessions || 0}/${r.total_sessions}</span><span>${pct}%</span></div>
+      <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-teal-500 h-2 rounded-full transition-all" style="width:${pct}%"></div></div></div>` : ''}
+      ${exercises ? `<div class="bg-teal-50 rounded-xl p-3"><p class="text-[10px] font-bold text-teal-700 uppercase mb-1">ব্যায়ামৰ তালিকা</p><ul class="text-xs space-y-0.5 list-disc list-inside">${exercises}</ul></div>` : ''}
+      ${r.notes ? `<p class="text-xs text-gray-500 bg-gray-50 rounded-xl px-3 py-2">${escapeHTML(r.notes)}</p>` : ''}
+      <div class="flex gap-2 pt-1">
+        ${remaining > 0 ? `<button onclick="updatePhysioSession('${r.id}', ${r.completed_sessions || 0}, ${r.total_sessions || 0})" class="flex-1 bg-teal-600 text-white py-2 rounded-xl text-xs font-bold">✅ চছন সম্পন্ন</button>` : ''}
+        <button onclick="openPhysioModal(${JSON.stringify(r).replace(/"/g, '&quot;')})" class="flex-1 bg-slate-100 text-slate-700 py-2 rounded-xl text-xs font-bold">✏️ এডিট</button>
+        ${isDoctor ? `<button onclick="deletePhysioRecord('${r.id}')" class="bg-red-50 text-red-500 py-2 px-3 rounded-xl text-xs font-bold">🗑️</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); buttons.forEach(btn => { btn.addEventListener('click', () => { const targetTab = btn.getAttribute('data-tab'); document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden')); if (targetTab === 'booking') loadBookings(); if (targetTab === 'expenses') loadExpenses(); if (targetTab === 'report') loadReport(); if (targetTab === 'home') loadPatients(); if (targetTab === 'stock') loadMedicines(); if (targetTab === 'physio') loadPhysioList(); if (targetTab === 'profile') { document.querySelectorAll('iframe[data-src]').forEach(iframe => { if (iframe.src === 'about:blank' && iframe.dataset.src) { iframe.src = iframe.dataset.src; } }); } document.getElementById(`tab-${targetTab}`)?.classList.remove('hidden'); buttons.forEach(b => { b.classList.remove('text-slate-900', 'border-b-2', 'border-slate-900'); b.classList.add('text-gray-400'); }); btn.classList.add('text-slate-900', 'border-b-2', 'border-slate-900'); btn.classList.remove('text-gray-400'); }); }); }
         
         async function loadReport() { const monthSelect = document.getElementById('reportMonth'); const yearSelect = document.getElementById('reportYear'); const selectedMonth = parseInt(monthSelect.value); const year = yearSelect ? parseInt(yearSelect.value) : new Date().getFullYear(); const monthStartDate = new Date(year, selectedMonth, 1).toISOString().split('T')[0]; const monthEndDate = new Date(year, selectedMonth + 1, 0).toISOString().split('T')[0]; const monthEndFull = monthEndDate + 'T23:59:59+00:00'; const [{ data: payments }, { data: expenses }, { data: patients }, { data: visits }] = await Promise.all([supabaseClient.from('clinic_payments').select('*').gte('visit_date', monthStartDate).lte('visit_date', monthEndDate), supabaseClient.from('clinic_expenses').select('*').gte('created_at', monthStartDate).lte('created_at', monthEndFull), supabaseClient.from('clinic_data').select('*').gte('created_at', monthStartDate).lte('created_at', monthEndFull), supabaseClient.from('clinic_visits').select('*').gte('visit_date', monthStartDate).lte('visit_date', monthEndDate)]); const totalIncome = (payments || []).reduce((s, p) => s + (parseFloat(p.fees) || 0), 0); const totalExpense = (expenses || []).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0); const netProfit = totalIncome - totalExpense; const totalNewPatients = (patients || []).length; const uniquePatientIds = new Set((visits || []).filter(v => v.patient_id).map(v => v.patient_id)); const totalUniqueVisitors = uniquePatientIds.size; const totalVisits = (visits || []).length; const summaryEl = document.getElementById('reportSummary'); if (summaryEl) { summaryEl.innerHTML = `<div class="bg-blue-50 p-3 rounded-xl text-center"><p class="text-[10px] text-blue-600 font-bold uppercase">নতুন ৰোগী</p><p class="text-2xl font-extrabold text-blue-700">${totalNewPatients}</p><p class="text-[10px] text-blue-400">জন (নতুন Registration)</p></div><div class="bg-indigo-50 p-3 rounded-xl text-center"><p class="text-[10px] text-indigo-600 font-bold uppercase">Unique ৰোগী</p><p class="text-2xl font-extrabold text-indigo-700">${totalUniqueVisitors}</p><p class="text-[10px] text-indigo-400">জন (revisit সহ)</p></div><div class="bg-orange-50 p-3 rounded-xl text-center"><p class="text-[10px] text-orange-600 font-bold uppercase">মুঠ Visit</p><p class="text-2xl font-extrabold text-orange-700">${totalVisits}</p><p class="text-[10px] text-orange-400">টা (সকলো Visit)</p></div><div class="bg-green-50 p-3 rounded-xl text-center"><p class="text-[10px] text-green-600 font-bold uppercase">মুঠ আয়</p><p class="text-2xl font-extrabold text-green-700">₹${totalIncome}</p></div><div class="bg-red-50 p-3 rounded-xl text-center"><p class="text-[10px] text-red-600 font-bold uppercase">মুঠ ব্যয়</p><p class="text-2xl font-extrabold text-red-700">₹${totalExpense}</p></div><div class="${netProfit >= 0 ? 'bg-purple-50' : 'bg-red-50'} p-3 rounded-xl text-center col-span-2"><p class="text-[10px] ${netProfit >= 0 ? 'text-purple-600' : 'text-red-600'} font-bold uppercase">নিট লাভ (আনুমানিক)</p><p class="text-2xl font-extrabold ${netProfit >= 0 ? 'text-purple-700' : 'text-red-700'}">₹${netProfit}</p></div>`; } const categories = {}; (expenses || []).forEach(e => { categories[e.category] = (categories[e.category] || 0) + parseFloat(e.amount || 0); }); const financeEl = document.getElementById('reportFinance'); if (financeEl) { financeEl.innerHTML = `<h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3 flex items-center gap-1"><i class="fas fa-chart-pie text-slate-700"></i> খৰচৰ বিৱৰণ</h4>${Object.keys(categories).length === 0 ? '<p class="text-xs text-gray-400 text-center py-2">এই মাহত কোনো খৰচ নাই</p>' : Object.entries(categories).map(([cat, amt]) => `<div class="flex justify-between items-center py-2 border-b border-gray-50 text-xs"><span class="font-medium text-gray-700">${escapeHTML(cat)}</span><span class="font-bold text-red-600">₹${amt}</span></div>`).join('')}<div class="flex justify-between items-center py-2 text-xs font-bold"><span class="text-slate-900">মুঠ খৰচ</span><span class="text-red-600">₹${totalExpense}</span></div>`; } const dailyIncomeMap = {}; (payments || []).forEach(p => { const date = p.visit_date || p.created_at.split('T')[0]; if (!dailyIncomeMap[date]) dailyIncomeMap[date] = 0; dailyIncomeMap[date] += parseFloat(p.fees || 0); }); const dailyVisitMap = {}; (visits || []).forEach(v => { const date = v.visit_date; if (!dailyVisitMap[date]) dailyVisitMap[date] = 0; dailyVisitMap[date]++; }); const allDates = new Set([...Object.keys(dailyIncomeMap), ...Object.keys(dailyVisitMap)]); const dailyMap = {}; allDates.forEach(date => { dailyMap[date] = { count: dailyVisitMap[date] || 0, income: dailyIncomeMap[date] || 0 }; }); const dailyRows = Object.entries(dailyMap).sort((a, b) => new Date(a[0]) - new Date(b[0])); const dailyEl = document.getElementById('reportDaily'); if (dailyEl) { dailyEl.innerHTML = `<div class="p-4 border-b border-gray-100"><h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1"><i class="fas fa-calendar-alt text-slate-700"></i> দৈনিক আয়ৰ তালিকা</h4></div>${dailyRows.length === 0 ? '<p class="text-xs text-gray-400 text-center py-4">এই মাহত কোনো তথ্য নাই</p>' : `<table class="w-full text-xs"><thead class="bg-slate-900 text-white"><tr><th class="px-4 py-2.5 text-left">তাৰিখ</th><th class="px-4 py-2.5 text-center">ৰোগী</th><th class="px-4 py-2.5 text-right text-green-300">আয় ₹</th></tr></thead><tbody>${dailyRows.map(([date, val]) => `<tr class="hover:bg-gray-50"><td class="px-4 py-2 text-gray-600">${date}</td><td class="px-4 py-2 text-center font-bold text-blue-600">${val.count} জন</td><td class="px-4 py-2 text-right font-bold text-green-600">₹${val.income}</td></tr>`).join('')}<tr class="bg-slate-900 text-white font-bold"><td class="px-4 py-2.5">মুঠ</td><td class="px-4 py-2.5 text-center">${totalVisits} জন</td><td class="px-4 py-2.5 text-right text-green-300">₹${totalIncome}</td></tr></tbody></table>`}`; } }
         function printReport() { const monthNames = ['জানুৱাৰী','ফেব্ৰুৱাৰী','মাৰ্চ','এপ্ৰিল','মে','জুন','জুলাই','আগষ্ট','ছেপ্টেম্বৰ','অক্টোবৰ','নৱেম্বৰ','ডিচেম্বৰ']; const month = monthNames[parseInt(document.getElementById('reportMonth').value)]; const printYear = parseInt(document.getElementById('reportYear')?.value) || new Date().getFullYear(); const printArea = document.getElementById('printArea'); if (!printArea) return; printArea.innerHTML = `<div style="font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto;"><div style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 15px;"><h1 style="font-size: 20px; margin: 0;">DR. HARIS CLINIC</h1><p style="font-size: 12px; color: #555; margin: 3px 0;">Homeopathic & Physiotherapy Center</p><p style="font-size: 14px; font-weight: bold; margin-top: 8px;">📊 ${month} ${printYear} - Monthly Report</p></div>${document.getElementById('reportSummary').innerHTML}${document.getElementById('reportFinance').innerHTML}${document.getElementById('reportDaily').innerHTML}</div>`; window.print(); }
