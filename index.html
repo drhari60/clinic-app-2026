@@ -925,7 +925,7 @@ async function loadExpenses() {
         
         function openPhysioModal(record = null) {
   document.getElementById('physioEditId').value = record ? record.id : '';
-  document.getElementById('physioModalTitle').innerHTML = record ? '✏️ চছন আপডেট' : '🏃 নতুন ফিজিঅ'থেৰাপি ৰোগী';
+  document.getElementById('physioModalTitle').innerHTML = record ? '✏️ চছন আপডেট' : "🏃 নতুন ফিজিঅ'থেৰাপি ৰোগী";
   document.getElementById('physioName').value = record ? record.name : '';
   document.getElementById('physioPhone').value = record ? (record.phone || '') : '';
   document.getElementById('physioCondition').value = record ? (record.condition || '') : '';
