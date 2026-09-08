@@ -863,29 +863,28 @@ async function loadExpenses() {
         async function filterPatients() { const query = safeGet('searchBox').value.toLowerCase().trim(); const container = document.getElementById('listPatients'); if (!container) return; if (!query) { loadPatients(); return; } const { data, error } = await supabaseClient.from('clinic_data').select('*').or(`name.ilike.%${query}%,phone.ilike.%${query}%`).order('created_at', { ascending: false }).limit(50); if (error || !data) return; container.innerHTML = ''; data.forEach(p => container.appendChild(createPatientCard(p))); }
         
         function printPrescription(p) {
-    const today = new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' });
-    const printArea = document.getElementById('printArea');
-    if (!printArea) return;
-    printArea.innerHTML = `<div class="rx-page">
-        <div class="rx-header">
-            <div class="rx-clinic-left">
-                <h1>DR. HARIS CLINIC</h1>
-                <p><i class="fa-solid fa-hospital-user" style="color: #10b981; margin-right: 6px;"></i> Homeopathic &amp; Physiotherapy Center 🌿</p>
-                <p><i class="fa-solid fa-location-dot" style="color: #ef4444; margin-right: 6px;"></i> Gogamukh, Dhemaji, Assam</p>
-                <p><i class="fa-solid fa-file-medical" style="color: #0284c7; margin-right: 6px;"></i> <strong>Licence No.-</strong> D/O/L/DMJ/HMP/OG</p>
-                <p><i class="fa-solid fa-phone" style="color: #10b981; margin-right: 6px;"></i> +91 99543 40102 <span style="margin: 0 6px;">|</span> <i class="fa-solid fa-globe" style="color: #3b82f6; margin-right: 6px;"></i> drhariswellfuture.com</p>
-            </div>
-            <div class="rx-doctor-right">
-                <h2>Dr. Harikanta Das</h2>
-                <p><i class="fa-solid fa-user-doctor" style="color: #0284c7; margin-right: 6px;"></i> MD(CH), BEMS, BNYS (Pursuing), DHPSc</p>  
-                <p><i class="fa-solid fa-briefcase-medical" style="color: #6366f1; margin-right: 6px;"></i> Ex-Physiotherapist, DDRC, NLP</p>
-                <p><i class="fa-solid fa-id-card" style="color: #f59e0b; margin-right: 6px;"></i> Reg. No: CASM20254</p>
-                <p><i class="fa-solid fa-calendar-days" style="color: #10b981; margin-right: 6px;"></i> ${today}</p>
-            </div>
-        </div>
-    </div>`;
+            const today = new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' });
+            const printArea = document.getElementById('printArea');
+            if (!printArea) return;
+            printArea.innerHTML = `<div class="rx-page">
+                <div class="rx-header">
+                    <div class="rx-clinic-left">
+                        <h1>DR. HARIS CLINIC</h1>
+                        <p>Homeopathic &amp; Physiotherapy Center🌿 </p>
+                        <p>Gogamukh, Dhemaji, Assam</p>
+                        <p>Licence No.-D/O/L/DMJ/HMP/OG</p>
+                        <p>📞 +91 99543 40102 | 🌐 drhariswellfuture.com</p>
+                    </div>
+                    <div class="rx-doctor-right">
+                        <h2>Dr. Harikanta Das</h2>
+                        <p>MD(CH),BEMS,BNYS(parsuing),DHPSc</p> 
+                        <p>Ex-Physiotherapist,DDRC, NLP</p>
+                        <p>Reg. No: CASM20254</p>
+                        <p>📅 ${today}</p>
+                    </div>
+                </div>
 
-
+}
                 <div class="rx-patient-grid">
                     <div><strong>ৰোগীৰ নাম:</strong> ${escapeHTML(p.name)}</div>
                     <div><strong>বয়স / লিংগ:</strong> ${escapeHTML(p.age || 'N/A')}</div>
