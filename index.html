@@ -891,11 +891,25 @@ async function loadExpenses() {
                 </div>
 
                 <p class="rx-label">Chief Complaint / ৰোগৰ বিৱৰণ</p>
-                <div class="rx-complaint-box">${escapeHTML(p.history || 'N/A')}</div>
+                <div class="rx-complaint-box">${
+  (p.history || 'N/A')
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line.length > 0)
+    .map(line => '<div>' + escapeHTML(line) + '</div>')
+    .join('')
+}</div>
 
                 <p class="rx-label">Prescription</p>
                 <div class="rx-symbol">℞</div>
-                <div class="rx-med-box">${escapeHTML(p.medicine || 'No prescription written.')}</div>
+                <div class="rx-med-box">${
+  (p.medicine || 'No prescription written.')
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line.length > 0)
+    .map(line => '<div style="margin-bottom:4px;padding-left:8px;">' + escapeHTML(line) + '</div>')
+    .join('')
+}</div>
 
                 <div class="rx-advice-box">
                     ⚠️ <strong>নিৰ্দেশনা:</strong> ঔষধ নিয়মীয়াকৈ খাব। নিজে নিজে ঔষধ সলনি নকৰিব। অসুবিধা হ'লে তৎক্ষণাত যোগাযোগ কৰিব।
