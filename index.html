@@ -922,6 +922,11 @@ async function loadExpenses() {
                         📘 fb.com/drhari365<br>
                         📍 Gogamukh, Dhemaji, Assam
                     </div>
+                    <div style="text-align:center; flex:1;">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent('DR. HARIS CLINIC\n📞 +91 99543 40102\n🌐 drhariswellfuture.com\n📍 Gogamukh, Dhemaji, Assam\n\nৰোগী: ' + p.name + '\nবয়স: ' + (p.age||'N/A') + ' | BP: ' + (p.bp||'N/A') + '\n📅 ' + today)}&ecc=M" 
+                             alt="QR Code" style="width:80px;height:80px;border:1px solid #ddd;border-radius:4px;padding:3px;">
+                        <p style="font-size:8px;color:#999;margin-top:2px;">Scan for details</p>
+                    </div>
                     <div class="rx-footer-right">
                         Dr. Harikanta Das
                         <span>MD(CH),BEMS,BNYS(parsuing),DHPS</span>
