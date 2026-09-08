@@ -41,7 +41,7 @@
             .rx-symbol { font-family: 'Times New Roman', serif; font-size: 34px; color: #1a5c38; line-height: 1; margin: 4px 0 2px; }
             .rx-med-box { font-size: 13px; color: #111; white-space: pre-wrap; line-height: 2; padding: 4px 10px; min-height: 60px; }
             .rx-advice-box { font-size: 10px; color: #555; background: #fffde7; border: 1px solid #ffe082; border-radius: 4px; padding: 6px 10px; margin-top: 10px; }
-            .rx-footer { margin-top: 40px; padding-top: 10px; border-top: 2px solid #1a5c38; display: flex; justify-content: space-between; align-items: flex-end; }
+            .rx-footer { margin-top: 40px; padding-top: 10px; border-top: 2px solid #1a5c38; display: flex; justify-content: space-between; align-items: center; }
             .rx-footer-left { font-size: 10px; color: #888; line-height: 1.6; }
             .rx-footer-right { text-align: right; font-size: 11px; font-weight: bold; color: #1a5c38; }
             .rx-footer-right span { font-weight: normal; font-size: 10px; color: #999; display: block; }
@@ -923,9 +923,9 @@ async function loadExpenses() {
                         📍 Gogamukh, Dhemaji, Assam
                     </div>
                     <div style="text-align:center; flex:1;">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent('DR. HARIS CLINIC\n📞 +91 99543 40102\n🌐 drhariswellfuture.com\n📍 Gogamukh, Dhemaji, Assam\n\nৰোগী: ' + p.name + '\nবয়স: ' + (p.age||'N/A') + ' | BP: ' + (p.bp||'N/A') + '\n📅 ' + today)}&ecc=M" 
-                             alt="QR Code" style="width:80px;height:80px;border:1px solid #ddd;border-radius:4px;padding:3px;">
-                        <p style="font-size:8px;color:#999;margin-top:2px;">Scan for details</p>
+                        <img src="${'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=' + encodeURIComponent('DR. HARIS CLINIC | Tel: +91 99543 40102 | drhariswellfuture.com | Gogamukh, Dhemaji, Assam | Patient: ' + (p.name||'') + ' | Age: ' + (p.age||'NA') + ' | BP: ' + (p.bp||'NA') + ' | Date: ' + today) + '&ecc=M'}" 
+                             alt="QR Code" style="width:90px;height:90px;border:1px solid #ddd;border-radius:4px;padding:3px;" onerror="this.style.display='none'">
+                        <p style="font-size:8px;color:#aaa;margin-top:2px;">Scan for clinic info</p>
                     </div>
                     <div class="rx-footer-right">
                         Dr. Harikanta Das
