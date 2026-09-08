@@ -537,21 +537,24 @@ const PAGE_SIZE = 30;
         async function collectDuePayment() {
             const amount = parseFloat(document.getElementById('payDueAmount').value);
             if (!amount || amount <= 0) { await showAlert('পৰিমাণ দিয়ক।', 'প্ৰয়োজনীয়', '⚠️'); return; }
-            const today = new Date().toISOString().split('T')[0];
-            const { error } = await supabaseClient.from('clinic_payments').insert([{
-                patient_name: _payHistPatient.name,
-                fees: amount,
+            const today = new Date(new Date().getTime() + (5.5 * 60 * 60 * 1000)).toISOString().split('T')[0];
+            const payRecord = {
+                patient_name: String(_payHistPatient.name || ''),
+                fees: Number(amount),
                 visit_date: today,
-                patient_id: _payHistPatient.id,
+                patient_id: String(_payHistPatient.id || ''),
                 income_source: 'patient'
-            }]);
-            if (error) { console.error('collectDuePayment error:', error); await showAlert('Save কৰিব পৰা নগ\'ল: ' + (error.message || JSON.stringify(error)), 'ভুল', '❌'); return; }
-            // unpaid visits থাকিলে update কৰো
-            await supabaseClient.from('clinic_visits')
-                .update({ payment_status: 'paid', fees_paid: amount })
-                .eq('patient_id', _payHistPatient.id)
-                .eq('payment_status', 'unpaid');
-            await showAlert(`₹${amount} সফলতাৰে যোগ কৰা হৈছে।`, 'সফল ✅', '💰');
+            };
+            const { data: inserted, error } = await supabaseClient
+                .from('clinic_payments')
+                .insert(payRecord)
+                .select();
+            if (error) {
+                console.error('Payment error:', JSON.stringify(error));
+                await showAlert('Save কৰিব পৰা নগ\'ল: ' + (error.message || error.code || 'Unknown error'), 'ভুল', '❌');
+                return;
+            }
+            await showAlert('₹' + amount + ' সফলতাৰে যোগ কৰা হৈছে।', 'সফল ✅', '💰');
             openPaymentHistory(_payHistPatient);
             loadExpenses();
             loadReport();
