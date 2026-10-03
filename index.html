@@ -26,7 +26,7 @@
             body > * { display: none !important; }
             #printArea { display: block !important; position: static !important; top: auto !important; left: auto !important; width: 100% !important; height: auto !important; background: white; z-index: 99999; padding: 0; margin: 0; overflow: visible !important; }
             #printArea, #printArea * { visibility: visible !important; }
-            .rx-page { padding: 16px 24px; font-family: Georgia, serif; color: #111; page-break-inside: auto; word-wrap: break-word; overflow-wrap: break-word; }
+            .rx-page { padding: 16px 24px; font-family: Georgia, serif; color: #111; page-break-inside: auto; word-wrap: break-word; overflow-wrap: break-word; min-height: 95vh; display: flex; flex-direction: column; }
             .rx-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px double #1a5c38; padding-bottom: 10px; margin-bottom: 12px; }
             .rx-clinic-left h1 { font-size: 20px; font-weight: bold; color: #1a5c38; margin: 0; letter-spacing: 1px; }
             .rx-clinic-left p { font-size: 10px; color: #555; margin: 2px 0; }
@@ -41,7 +41,8 @@
             .rx-symbol { font-family: 'Times New Roman', serif; font-size: 34px; color: #1a5c38; line-height: 1; margin: 4px 0 2px; }
             .rx-med-box { font-size: 12px; color: #111; white-space: pre-wrap; line-height: 1.8; padding: 4px 10px; min-height: 40px; page-break-inside: auto; word-wrap: break-word; }
             .rx-advice-box { font-size: 10px; color: #555; background: #fffde7; border: 1px solid #ffe082; border-radius: 4px; padding: 6px 10px; margin-top: 10px; }
-            .rx-footer { margin-top: 40px; padding-top: 10px; border-top: 2px solid #1a5c38; display: flex; justify-content: space-between; align-items: center; }
+            .rx-content { flex: 1; }
+            .rx-footer { margin-top: auto; padding-top: 10px; border-top: 2px solid #1a5c38; display: flex; justify-content: space-between; align-items: center; }
             .rx-footer-left { font-size: 10px; color: #888; line-height: 1.6; }
             .rx-footer-right { text-align: right; font-size: 11px; font-weight: bold; color: #1a5c38; }
             .rx-footer-right span { font-weight: normal; font-size: 10px; color: #999; display: block; }
@@ -914,9 +915,9 @@ async function loadExpenses() {
     .join('')
 }</div>
 
-                <div class="rx-advice-box">
+                <div class="rx-content"><div class="rx-advice-box">
                     ⚠️ <strong>নিৰ্দেশনা:</strong> ঔষধ নিয়মীয়াকৈ খাব। নিজে নিজে ঔষধ সলনি নকৰিব। অসুবিধা হ'লে তৎক্ষণাত যোগাযোগ কৰিব।
-                </div>
+                </div></div>
 
                 <div class="rx-footer">
                     <div class="rx-footer-left">
