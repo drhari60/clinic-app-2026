@@ -981,14 +981,8 @@ async function loadExpenses() {
         let _rxPatientData = null;
 
         function doPrintRx() {
-            // Mobile browser print dialog bondho hole page scroll ouplo-loi jai (New Patient button-r thai) -- scroll position save kori punor restore kora hoise.
-            // Preview modal bondho nokora hol: print CSS-te 'body > * { display:none }' diye eitu print-ot nadekhuwai.
-            const savedY = window.pageYOffset || document.documentElement.scrollTop || 0;
-            const restoreScroll = () => { window.scrollTo(0, savedY); };
-            const onAfter = () => { window.removeEventListener('afterprint', onAfter); restoreScroll(); setTimeout(restoreScroll, 150); setTimeout(restoreScroll, 500); };
-            window.addEventListener('afterprint', onAfter);
+            document.getElementById('rxPreviewModal').classList.add('hidden');
             window.print();
-            setTimeout(restoreScroll, 600);
         }
 
         async function doWhatsAppRxFromPreview() {
