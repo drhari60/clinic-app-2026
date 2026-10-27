@@ -1426,48 +1426,23 @@ function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); bu
     { name: 'Gynecology', codes: rng('Gny', 4) }
   ];
   let target = 'pMedicine', activeGroup = 0;
-  let showFormulas = false, formulaCache = null, formulaError = '';
+  let showFormulas = false, formulaCache = null, formulaError = '', formulaLoading = false;
+  // Composition is shown ONLY to the doctor. It is read from the RLS-protected Supabase table, never stored in this file.
   const doctorNow = () => (typeof isDoctor !== 'undefined' && isDoctor === true);
-
-  async function loadFormulas() {
-    if (formulaCache) return;
-    formulaError = '';
-    try {
-      const { data, error } = await supabaseClient.from('rx_code_formulas').select('code,composition').limit(500);
-      if (error) { formulaError = error.message || 'error'; return; }
-      formulaCache = {};
-      (data || []).forEach(r => { formulaCache[String(r.code).toLowerCase()] = r.composition; });
-    } catch (e) { formulaError = String(e && e.message || e); }
-  }
-
-  function renderFormulas() {
-    const panel = document.getElementById('codePickerFormulas');
-    const eye = document.getElementById('codePickerEye');
-    if (!panel || !eye) return;
-    const doc = doctorNow();
-    eye.classList.toggle('hidden', !doc);
-    eye.className = 'text-xs border px-2 py-1 rounded-lg font-bold ' + (doc ? '' : 'hidden ') + (showFormulas ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-slate-50 text-slate-700 border-slate-200');
-    if (!doc || !showFormulas) { panel.classList.add('hidden'); panel.innerHTML = ''; return; }
-    panel.classList.remove('hidden');
-    panel.innerHTML = '';
-    if (formulaError || !formulaCache) {
-      const p = document.createElement('p');
-      p.className = 'text-red-600';
-      p.textContent = formulaError ? ('Composition পঢ়িব নোৱাৰিলোঁ: ' + formulaError) : 'লোড হৈ আছে...';
-      panel.appendChild(p);
-      return;
-    }
-    RX_CODE_GROUPS[activeGroup].codes.forEach(code => {
-      const row = document.createElement('div');
-      row.className = 'flex gap-2 py-0.5';
-      const a = document.createElement('span'); a.className = 'font-bold w-14 shrink-0'; a.textContent = code;
-      const b = document.createElement('span'); b.textContent = formulaCache[code.toLowerCase()] || '—';
-      row.appendChild(a); row.appendChild(b); panel.appendChild(row);
-    });
-  }
   const tokenOf = (line) => { const m = (line || '').trim().match(/^([A-Za-z]+\d+)/); return m ? m[1].toLowerCase() : ''; };
   const linesOf = () => { const el = document.getElementById(target); return el ? el.value.split('\n') : []; };
   const isSelected = (code) => linesOf().some(l => tokenOf(l) === code.toLowerCase());
+
+  async function loadFormulas() {
+    if (formulaCache || formulaLoading) return;
+    formulaLoading = true; formulaError = '';
+    try {
+      const { data, error } = await supabaseClient.from('rx_code_formulas').select('code,composition').limit(500);
+      if (error) { formulaError = error.message || 'error'; }
+      else { formulaCache = {}; (data || []).forEach(r => { formulaCache[String(r.code).toLowerCase()] = r.composition; }); }
+    } catch (e) { formulaError = String((e && e.message) || e); }
+    formulaLoading = false;
+  }
 
   function toggleCode(code) {
     const el = document.getElementById(target);
@@ -1485,7 +1460,12 @@ function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); bu
     const groupsEl = document.getElementById('codePickerGroups');
     const codesEl = document.getElementById('codePickerCodes');
     const selEl = document.getElementById('codePickerSelected');
-    if (!groupsEl || !codesEl || !selEl) return;
+    const eye = document.getElementById('codePickerEye');
+    const panel = document.getElementById('codePickerFormulas');
+    if (!groupsEl || !codesEl || !selEl || !eye || !panel) return;
+    const doc = doctorNow();
+    const listMode = doc && showFormulas && !!formulaCache;
+
     groupsEl.innerHTML = '';
     RX_CODE_GROUPS.forEach((g, gi) => {
       const count = g.codes.filter(isSelected).length;
@@ -1496,38 +1476,62 @@ function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); bu
       b.addEventListener('click', () => { activeGroup = gi; render(); });
       groupsEl.appendChild(b);
     });
+
+    codesEl.className = listMode
+      ? 'flex flex-col gap-1.5 px-4 py-3 overflow-y-auto flex-1'
+      : 'flex flex-wrap gap-2 px-4 py-3 overflow-y-auto flex-1 content-start';
     codesEl.innerHTML = '';
     RX_CODE_GROUPS[activeGroup].codes.forEach(code => {
+      const sel = isSelected(code);
       const b = document.createElement('button');
       b.type = 'button';
-      b.className = 'px-3 py-2 rounded-lg text-sm font-bold border ' + (isSelected(code) ? 'bg-teal-600 text-white border-teal-600' : 'bg-gray-50 text-slate-800 border-gray-200');
-      b.textContent = code;
+      if (listMode) {
+        b.className = 'w-full flex items-baseline gap-3 text-left px-3 py-2 rounded-lg border ' + (sel ? 'bg-teal-600 text-white border-teal-600' : 'bg-gray-50 text-slate-800 border-gray-200');
+        const a = document.createElement('span'); a.className = 'font-bold text-sm w-14 shrink-0'; a.textContent = code;
+        const c = document.createElement('span'); c.className = 'text-sm ' + (sel ? 'text-teal-50' : 'text-slate-600'); c.textContent = formulaCache[code.toLowerCase()] || '—';
+        b.appendChild(a); b.appendChild(c);
+      } else {
+        b.className = 'px-3 py-2 rounded-lg text-sm font-bold border ' + (sel ? 'bg-teal-600 text-white border-teal-600' : 'bg-gray-50 text-slate-800 border-gray-200');
+        b.textContent = code;
+      }
       b.addEventListener('click', () => toggleCode(code));
       codesEl.appendChild(b);
     });
+
     const chosen = [];
     RX_CODE_GROUPS.forEach(g => g.codes.forEach(c => { if (isSelected(c)) chosen.push(c); }));
     selEl.textContent = chosen.length ? 'বাছনি: ' + chosen.join(', ') : 'কোনো code বাছা হোৱা নাই';
-    renderFormulas();
+
+    eye.className = 'text-xs border px-2 py-1 rounded-lg font-bold ' + (doc ? '' : 'hidden ') + (showFormulas ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-slate-50 text-slate-700 border-slate-200');
+    eye.textContent = showFormulas ? '🙈 লুকুৱাওক' : '👁 Composition';
+    panel.innerHTML = '';
+    if (doc && showFormulas && (formulaError || !formulaCache)) {
+      panel.className = 'mx-4 mb-3 p-2 rounded-xl bg-amber-50 border border-amber-200 text-xs ' + (formulaError ? 'text-red-600' : 'text-slate-600');
+      panel.textContent = formulaError ? ('Composition পঢ়িব নোৱাৰিলোঁ: ' + formulaError) : 'Composition লোড হৈ আছে...';
+    } else {
+      panel.className = 'hidden';
+    }
   }
 
-  window.openCodePicker = function (targetId) {
-    target = targetId || 'pMedicine';
-    showFormulas = false;
-    if (!doctorNow()) { formulaCache = null; formulaError = ''; }
-    document.getElementById('codePickerModal').classList.remove('hidden');
-    render();
-  };
   document.addEventListener('click', async function (ev) {
     const eye = ev.target && ev.target.closest ? ev.target.closest('#codePickerEye') : null;
     if (!eye || !doctorNow()) return;
     showFormulas = !showFormulas;
-    if (showFormulas && !formulaCache) { renderFormulas(); await loadFormulas(); }
-    renderFormulas();
+    render();
+    if (showFormulas && !formulaCache) { await loadFormulas(); render(); }
   });
+
+  window.openCodePicker = function (targetId) {
+    target = targetId || 'pMedicine';
+    if (!doctorNow()) { formulaCache = null; formulaError = ''; }
+    showFormulas = doctorNow();
+    document.getElementById('codePickerModal').classList.remove('hidden');
+    render();
+    if (showFormulas && !formulaCache) { loadFormulas().then(render); }
+  };
   window.closeCodePicker = function () {
-    showFormulas = false; renderFormulas();
     document.getElementById('codePickerModal').classList.add('hidden');
+    if (!doctorNow()) { formulaCache = null; formulaError = ''; }
   };
 })();
 </script>
