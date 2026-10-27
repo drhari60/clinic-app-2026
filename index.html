@@ -1404,34 +1404,37 @@ function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); bu
 </div>
 <script>
 (function () {
-  const rng = (p, n) => Array.from({ length: n }, (_, i) => p + (i + 1));
+  // Each code: [code, Sig]. Sig = dose instruction (printed on the prescription). The COMPOSITION is NOT in this file.
+  const GL3 = '5 glb. Three hourly.', GL2 = '5 glb. Two hourly.';
+  const DR = '15 drops thrice daily with half a cup of water before or after a meal, half an hour';
   const RX_CODE_GROUPS = [
-    { name: 'Fever', codes: rng('F', 13) },
-    { name: 'Cough', codes: rng('C', 12) },
-    { name: 'Stomach', codes: rng('S', 12) },
-    { name: 'Sinusitis', codes: rng('Sy', 8) },
-    { name: 'Kidney', codes: rng('K', 8) },
-    { name: 'Gallbladder', codes: rng('G', 5) },
-    { name: 'Piles', codes: rng('P', 6) },
-    { name: 'Tonsillitis', codes: rng('T', 8) },
-    { name: 'Heart', codes: rng('H', 3) },
-    { name: 'Menstrual', codes: rng('M', 7) },
-    { name: 'Vomiting', codes: rng('V', 4) },
-    { name: 'Back Pain', codes: rng('Bp', 9) },
-    { name: 'Premature Ejac.', codes: rng('X', 4) },
-    { name: 'Thyroid', codes: rng('Thy', 7) },
-    { name: 'Teeth', codes: rng('Teeth', 3) },
-    { name: 'Eye', codes: rng('E', 5) },
-    { name: 'Skin', codes: rng('Skin', 8) },
-    { name: 'Gynecology', codes: rng('Gny', 4) }
+    { name: "Fever", codes: [["F1",GL2],["F2",GL2],["F3",GL2],["F4",GL2],["F5",GL3],["F6",GL3],["F7",GL3],["F8",GL3],["F9",GL3],["F10",GL3],["F11","5 tab. Three hourly."],["F12",GL3],["F13",GL3]] },
+    { name: "Cough", codes: [["C1",GL3],["C2",GL3],["C3","5 glb. Two Times."],["C4",GL3],["C5",GL3],["C6",GL3],["C7",GL3],["C8",DR],["C9","5 glb. 8 hourly."],["C10",GL3],["C11",GL3],["C12",GL3]] },
+    { name: "Sinusitis", codes: [["Sy1",GL3],["Sy2",GL3],["Sy3",GL3],["Sy4",GL3],["Sy5",GL3],["Sy6",GL3],["Sy7",GL3],["Sy8",GL3]] },
+    { name: "Stomach", codes: [["S1",GL3],["S2",GL3],["S3",GL3],["S4",DR],["S5",DR],["S6",GL3],["S7",DR],["S8",GL3],["S9",GL3],["S10",GL3],["S11",DR],["S12",DR]] },
+    { name: "Kidney", codes: [["K1",GL3],["K2",DR],["K3",DR],["K4",DR],["K5",GL3],["K6",GL3],["K7",GL3],["K8",GL3]] },
+    { name: "Gallbladder", codes: [["G1","4 tab. 4 times."],["G2",GL3],["G3",DR],["G4",DR]] },
+    { name: "Piles", codes: [["P1",GL3],["P2",GL3],["P3",DR],["P3 (Alt)",GL3],["P4",GL3],["P5","5 glb. Three Times."],["P6",GL3]] },
+    { name: "Vomiting", codes: [["V1",GL3],["V2",GL3],["V3",GL3],["V4",GL3]] },
+    { name: "Tonsillitis", codes: [["T1",GL3],["T2",GL3],["T3",GL3],["T4",GL3],["T5",GL3],["T6",GL3],["T7",GL3],["T8",GL3]] },
+    { name: "Back Pain", codes: [["Bp1",GL3],["Bp2",GL3],["Bp3",GL3],["Bp4",GL3],["Bp5",GL3],["Bp6",GL3],["Bp7",GL3],["Bp8",GL3],["Bp9",GL3]] },
+    { name: "Heart", codes: [["H1",DR],["H2",GL3],["H3",GL3]] },
+    { name: "Menstrual", codes: [["M1",DR],["M2",DR],["M3",GL3],["M4",DR],["M5",GL3],["M6",GL3],["M7",DR]] },
+    { name: "Teeth", codes: [["Teeth1",GL3],["Teeth2",GL3],["Teeth3","Apply over effected area."]] },
+    { name: "Eye", codes: [["E1",GL3],["E2",GL3],["E3","3 drops twice."],["E4",GL3],["E5",GL3]] },
+    { name: "Skin", codes: [["Skin1",GL3],["Skin2",GL3],["Skin3",GL3],["Skin4",GL3],["Skin5",GL3],["Skin6",GL3],["Skin7",GL3],["Skin8","Extranal apply over effected areas."]] },
+    { name: "Premature Ejac.", codes: [["X1",DR],["X2",GL3],["X3",GL3],["X4","6 tab. 4 times."]] },
+    { name: "Thyroid", codes: [["Thy1","2 tab. Three hourly."],["Thy2","5 glb. Three times."],["Thy3","5 glb. Three times."],["Thy4",GL3],["Thy5",GL3],["Thy6",GL3],["Thy7",GL3]] },
+    { name: "Gynecology", codes: [["Gny1",GL3],["Gny2",GL3],["Gny3",GL3],["Gny4",GL3]] }
   ];
   let target = 'pMedicine', activeGroup = 0;
   let showFormulas = false, formulaCache = null, formulaError = '', formulaLoading = false;
   // Composition is shown ONLY to the doctor. It is read from the RLS-protected Supabase table, never stored in this file.
   const doctorNow = () => (typeof isDoctor !== 'undefined' && isDoctor === true);
-  const tokenOf = (line) => { const m = (line || '').trim().match(/^([A-Za-z]+\d+)/); return m ? m[1].toLowerCase() : ''; };
+  // "F1" / "Skin3" / "P3 (Alt)" -> comparable key ("f1", "skin3", "p3(alt)")
+  const tokenOf = (line) => { const m = (line || '').trim().match(/^([A-Za-z]+\d+)(\s*\(\s*alt\s*\))?/i); return m ? (m[1] + (m[2] ? '(alt)' : '')).toLowerCase() : ''; };
   const linesOf = () => { const el = document.getElementById(target); return el ? el.value.split('\n') : []; };
-  const isSelected = (code) => linesOf().some(l => tokenOf(l) === code.toLowerCase());
+  const isSelected = (code) => linesOf().some(l => tokenOf(l) === tokenOf(code));
 
   async function loadFormulas() {
     if (formulaCache || formulaLoading) return;
@@ -1439,18 +1442,19 @@ function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); bu
     try {
       const { data, error } = await supabaseClient.from('rx_code_formulas').select('code,composition').limit(500);
       if (error) { formulaError = error.message || 'error'; }
-      else { formulaCache = {}; (data || []).forEach(r => { formulaCache[String(r.code).toLowerCase()] = r.composition; }); }
+      else { formulaCache = {}; (data || []).forEach(r => { formulaCache[tokenOf(String(r.code))] = r.composition; }); }
     } catch (e) { formulaError = String((e && e.message) || e); }
     formulaLoading = false;
   }
 
-  function toggleCode(code) {
+  // Tap = add "CODE — Sig" to the prescription; tap again = remove that line.
+  function toggleCode(code, sig) {
     const el = document.getElementById(target);
     if (!el) return;
     const lines = el.value.split('\n');
-    const idx = lines.findIndex(l => tokenOf(l) === code.toLowerCase());
+    const idx = lines.findIndex(l => tokenOf(l) === tokenOf(code));
     if (idx >= 0) { lines.splice(idx, 1); }
-    else { while (lines.length && lines[lines.length - 1].trim() === '') lines.pop(); lines.push(code); }
+    else { while (lines.length && lines[lines.length - 1].trim() === '') lines.pop(); lines.push(code + (sig ? ' — ' + sig : '')); }
     el.value = lines.join('\n');
     el.dispatchEvent(new Event('input', { bubbles: true }));
     render();
@@ -1468,7 +1472,7 @@ function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); bu
 
     groupsEl.innerHTML = '';
     RX_CODE_GROUPS.forEach((g, gi) => {
-      const count = g.codes.filter(isSelected).length;
+      const count = g.codes.filter(c => isSelected(c[0])).length;
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold border ' + (gi === activeGroup ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-600 border-gray-200');
@@ -1481,25 +1485,28 @@ function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); bu
       ? 'flex flex-col gap-1.5 px-4 py-3 overflow-y-auto flex-1'
       : 'flex flex-wrap gap-2 px-4 py-3 overflow-y-auto flex-1 content-start';
     codesEl.innerHTML = '';
-    RX_CODE_GROUPS[activeGroup].codes.forEach(code => {
+    RX_CODE_GROUPS[activeGroup].codes.forEach(([code, sig]) => {
       const sel = isSelected(code);
       const b = document.createElement('button');
       b.type = 'button';
       if (listMode) {
-        b.className = 'w-full flex items-baseline gap-3 text-left px-3 py-2 rounded-lg border ' + (sel ? 'bg-teal-600 text-white border-teal-600' : 'bg-gray-50 text-slate-800 border-gray-200');
-        const a = document.createElement('span'); a.className = 'font-bold text-sm w-14 shrink-0'; a.textContent = code;
-        const c = document.createElement('span'); c.className = 'text-sm ' + (sel ? 'text-teal-50' : 'text-slate-600'); c.textContent = formulaCache[code.toLowerCase()] || '—';
-        b.appendChild(a); b.appendChild(c);
+        b.className = 'w-full flex flex-col gap-0.5 text-left px-3 py-2 rounded-lg border ' + (sel ? 'bg-teal-600 text-white border-teal-600' : 'bg-gray-50 text-slate-800 border-gray-200');
+        const top = document.createElement('div'); top.className = 'flex items-baseline gap-3';
+        const a = document.createElement('span'); a.className = 'font-bold text-sm min-w-[4.5rem] shrink-0'; a.textContent = code;
+        const c = document.createElement('span'); c.className = 'text-sm ' + (sel ? 'text-teal-50' : 'text-slate-700'); c.textContent = formulaCache[tokenOf(code)] || '—';
+        top.appendChild(a); top.appendChild(c);
+        const s = document.createElement('div'); s.className = 'text-xs pl-[5.25rem] ' + (sel ? 'text-teal-100' : 'text-slate-500'); s.textContent = 'Sig: ' + sig;
+        b.appendChild(top); b.appendChild(s);
       } else {
         b.className = 'px-3 py-2 rounded-lg text-sm font-bold border ' + (sel ? 'bg-teal-600 text-white border-teal-600' : 'bg-gray-50 text-slate-800 border-gray-200');
         b.textContent = code;
       }
-      b.addEventListener('click', () => toggleCode(code));
+      b.addEventListener('click', () => toggleCode(code, sig));
       codesEl.appendChild(b);
     });
 
     const chosen = [];
-    RX_CODE_GROUPS.forEach(g => g.codes.forEach(c => { if (isSelected(c)) chosen.push(c); }));
+    RX_CODE_GROUPS.forEach(g => g.codes.forEach(c => { if (isSelected(c[0])) chosen.push(c[0]); }));
     selEl.textContent = chosen.length ? 'বাছনি: ' + chosen.join(', ') : 'কোনো code বাছা হোৱা নাই';
 
     eye.className = 'text-xs border px-2 py-1 rounded-lg font-bold ' + (doc ? '' : 'hidden ') + (showFormulas ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-slate-50 text-slate-700 border-slate-200');
