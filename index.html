@@ -1442,7 +1442,13 @@ function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); bu
     try {
       const { data, error } = await supabaseClient.from('rx_code_formulas').select('code,composition').limit(500);
       if (error) { formulaError = error.message || 'error'; }
-      else { formulaCache = {}; (data || []).forEach(r => { formulaCache[tokenOf(String(r.code))] = r.composition; }); }
+      else if (!data || data.length === 0) {
+        // Table reachable but nothing readable: either the SQL was not run, or the database does not recognise this login as the doctor
+        let who = '';
+        try { const s = await supabaseClient.auth.getSession(); who = (s && s.data && s.data.session && s.data.session.user && s.data.session.user.email) || ''; } catch (e) {}
+        formulaError = 'কোনো composition পোৱা নগ\'ল। (১) SQL চলোৱা হৈছে নে? (২) ডাটাবেছে এই লগ-ইন ইমেইলক ডাক্তৰ বুলি চিনিছে নে? আপোনাৰ লগ-ইন ইমেইল: ' + (who || 'অজ্ঞাত') + ' — SQLৰ policy-ত হুবহু এই ইমেইল থাকিব লাগে।';
+      }
+      else { formulaCache = {}; data.forEach(r => { formulaCache[tokenOf(String(r.code))] = r.composition; }); }
     } catch (e) { formulaError = String((e && e.message) || e); }
     formulaLoading = false;
   }
@@ -1514,7 +1520,7 @@ function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); bu
     panel.innerHTML = '';
     if (doc && showFormulas && (formulaError || !formulaCache)) {
       panel.className = 'mx-4 mb-3 p-2 rounded-xl bg-amber-50 border border-amber-200 text-xs ' + (formulaError ? 'text-red-600' : 'text-slate-600');
-      panel.textContent = formulaError ? ('Composition পঢ়িব নোৱাৰিলোঁ: ' + formulaError) : 'Composition লোড হৈ আছে...';
+      panel.textContent = formulaError ? ((/^কোনো composition/.test(formulaError) ? '' : 'Composition পঢ়িব নোৱাৰিলোঁ: ') + formulaError) : 'Composition লোড হৈ আছে...';
     } else {
       panel.className = 'hidden';
     }
