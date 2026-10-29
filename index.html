@@ -1393,6 +1393,7 @@ function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); bu
         <button type="button" onclick="closeCodePicker()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
       </div>
     </div>
+    <div id="codePickerModes" class="flex gap-2 px-4 pt-3"></div>
     <div id="codePickerGroups" class="flex flex-wrap gap-1.5 px-4 pt-3"></div>
     <div id="codePickerCodes" class="flex flex-wrap gap-2 px-4 py-3 overflow-y-auto flex-1 content-start"></div>
     <div id="codePickerFormulas" class="hidden mx-4 mb-3 p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-slate-700 max-h-40 overflow-y-auto"></div>
@@ -1404,7 +1405,7 @@ function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); bu
 </div>
 <script>
 (function () {
-  // Each code: [code, Sig]. Sig = dose instruction (printed on the prescription). The COMPOSITION is NOT in this file.
+  // Each homeopathy code: [code, Sig]. The COMPOSITION is NOT in this file (it lives in the doctor-only Supabase table).
   const GL3 = '5 glb. Three hourly.', GL2 = '5 glb. Two hourly.';
   const DR = '15 drops thrice daily with half a cup of water before or after a meal, half an hour';
   const RX_CODE_GROUPS = [
@@ -1427,14 +1428,31 @@ function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); bu
     { name: "Thyroid", codes: [["Thy1","2 tab. Three hourly."],["Thy2","5 glb. Three times."],["Thy3","5 glb. Three times."],["Thy4",GL3],["Thy5",GL3],["Thy6",GL3],["Thy7",GL3]] },
     { name: "Gynecology", codes: [["Gny1",GL3],["Gny2",GL3],["Gny3",GL3],["Gny4",GL3]] }
   ];
-  let target = 'pMedicine', activeGroup = 0;
+  // Electrohomoeopathy: [code, medicine name]. These names are not secret, so everyone can see them.
+  const RX_ELECTRO_GROUPS = [
+    { name: "Scrofoloso (S)", codes: [["S1","Cochlearia"],["S2","Lycopodium"],["S3","Scrophularia"],["S4","Sarsaparilla"],["S5","Berberis"],["S6","Solidago"],["S7","Malva"],["S8","Veronica"],["S9","Nasturtium"],["S10","Centaurium"],["S11","Lobelia"],["S12","Euphrasia"]] },
+    { name: "Angioticos (A)", codes: [["A1","Avena"],["A2","Hamamelis"],["A3","Hydrastis"]] },
+    { name: "Linfatico (L)", codes: [["L1","Echinacea"],["L2","Abrotanum"]] },
+    { name: "Canceroso (C)", codes: [["C1","Caulophyllum"],["C2","Equisetum"],["C3","Mezereum"],["C4","Symphytum"],["C5","Conium"],["C6","Vincetoxicum"],["C7","Millefolium"],["C8","Chelidonium"],["C9","Pulsatilla"],["C10","Podophyllum"],["C11","Rhus toxicodendron"],["C12","Sanguinaria"],["C13","Ailanthus"],["C14","Belladonna"],["C15","Condurango"],["C16","Nux vomica"],["C17","Rhus aromatica"]] },
+    { name: "Febrifugo (F)", codes: [["F1","Aconitum"],["F2","Cinchona"]] },
+    { name: "Pettorale (P)", codes: [["P1","Adiantum"],["P2","Phellandrium"],["P3","Drosera"],["P4","Ipecacuanha"],["P5","Teucrium"],["P6","Eucalyptus"],["P7","Galeopsis"],["P8","Glechoma"],["P9","Polygala"]] },
+    { name: "Vermifugo (Ver)", codes: [["Ver1","Allium"],["Ver2","Tanacetum"]] },
+    { name: "Venerio (Ven)", codes: [["Ven1","Thuja"],["Ven2","Steffensia"],["Ven3","Phytolacca"],["Ven4","Clematis"],["Ven5","Vinca minor"]] },
+    { name: "Other", codes: [["SL","Slass"],["SY","Synthesis"],["APP","Aqua Perla Perli"],["BE","Blue Electral"],["GE","Green Electral"],["RE","Red Electral"],["YE","Yellow Electral"],["WE","White Electral"]] }
+  ];
+  let target = 'pMedicine', mode = 'homeo', activeGroup = 0, activeElectro = 0;
   let showFormulas = false, formulaCache = null, formulaError = '', formulaLoading = false;
   // Composition is shown ONLY to the doctor. It is read from the RLS-protected Supabase table, never stored in this file.
   const doctorNow = () => (typeof isDoctor !== 'undefined' && isDoctor === true);
-  // "F1" / "Skin3" / "P3 (Alt)" -> comparable key ("f1", "skin3", "p3(alt)")
+  // Homeopathy line "F1" / "Skin3" / "P3 (Alt)" -> key "f1", "skin3", "p3(alt)"
   const tokenOf = (line) => { const m = (line || '').trim().match(/^([A-Za-z]+\d+)(\s*\(\s*alt\s*\))?/i); return m ? (m[1] + (m[2] ? '(alt)' : '')).toLowerCase() : ''; };
+  // Electro line "Electro S1 — Cochlearia" -> key "electro:s1" (never equal to a homeopathy key, so S1 / C5 / F1 / P3 do not clash)
+  const electroKey = (line) => { const m = (line || '').trim().match(/^Electro\s+([A-Za-z]+\d*)(?![A-Za-z0-9])/i); return m ? 'electro:' + m[1].toLowerCase() : ''; };
+  const keyOfLine = (line) => electroKey(line) || tokenOf(line);
+  const homeoKey = (code) => tokenOf(code);
+  const electroItemKey = (code) => 'electro:' + String(code).toLowerCase();
   const linesOf = () => { const el = document.getElementById(target); return el ? el.value.split('\n') : []; };
-  const isSelected = (code) => linesOf().some(l => tokenOf(l) === tokenOf(code));
+  const isSelected = (key) => linesOf().some(l => keyOfLine(l) === key);
 
   async function loadFormulas() {
     if (formulaCache || formulaLoading) return;
@@ -1453,20 +1471,18 @@ function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); bu
     formulaLoading = false;
   }
 
-  // Tap = add "CODE — Sig" to the prescription; tap again = remove that line.
-  function toggleCode(code, sig) {
+  // Tap = add the line(s) to the prescription; tap again = remove them (and the "Sig:" line right below, if any).
+  function toggleItem(key, newLines) {
     const el = document.getElementById(target);
     if (!el) return;
     const lines = el.value.split('\n');
-    const idx = lines.findIndex(l => tokenOf(l) === tokenOf(code));
+    const idx = lines.findIndex(l => keyOfLine(l) === key);
     if (idx >= 0) {
-      // remove the code line, and also its "Sig: ..." line right below it (if any)
       const hasSigBelow = idx + 1 < lines.length && /^\s*Sig\s*:/i.test(lines[idx + 1]);
       lines.splice(idx, hasSigBelow ? 2 : 1);
     } else {
       while (lines.length && lines[lines.length - 1].trim() === '') lines.pop();
-      lines.push(code);
-      if (sig) lines.push('Sig: ' + sig);
+      newLines.forEach(l => lines.push(l));
     }
     el.value = lines.join('\n');
     el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -1474,23 +1490,38 @@ function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); bu
   }
 
   function render() {
+    const modesEl = document.getElementById('codePickerModes');
     const groupsEl = document.getElementById('codePickerGroups');
     const codesEl = document.getElementById('codePickerCodes');
     const selEl = document.getElementById('codePickerSelected');
     const eye = document.getElementById('codePickerEye');
     const panel = document.getElementById('codePickerFormulas');
-    if (!groupsEl || !codesEl || !selEl || !eye || !panel) return;
+    if (!modesEl || !groupsEl || !codesEl || !selEl || !eye || !panel) return;
+    const electro = mode === 'electro';
     const doc = doctorNow();
-    const listMode = doc && showFormulas && !!formulaCache;
+    const listMode = electro || (doc && showFormulas && !!formulaCache);
+    const groups = electro ? RX_ELECTRO_GROUPS : RX_CODE_GROUPS;
+    const gi0 = electro ? activeElectro : activeGroup;
+    const keyOf = (code) => electro ? electroItemKey(code) : homeoKey(code);
 
-    groupsEl.innerHTML = '';
-    RX_CODE_GROUPS.forEach((g, gi) => {
-      const count = g.codes.filter(c => isSelected(c[0])).length;
+    modesEl.innerHTML = '';
+    [['homeo', 'Homeopathy'], ['electro', '⚡ Electrohomoeopathy']].forEach(([m, label]) => {
       const b = document.createElement('button');
       b.type = 'button';
-      b.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold border ' + (gi === activeGroup ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-600 border-gray-200');
+      b.className = 'flex-1 py-2 rounded-xl text-xs font-bold border ' + (mode === m ? 'bg-teal-600 text-white border-teal-600' : 'bg-white text-slate-600 border-gray-200');
+      b.textContent = label;
+      b.addEventListener('click', () => { mode = m; render(); });
+      modesEl.appendChild(b);
+    });
+
+    groupsEl.innerHTML = '';
+    groups.forEach((g, gi) => {
+      const count = g.codes.filter(c => isSelected(keyOf(c[0]))).length;
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold border ' + (gi === gi0 ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-600 border-gray-200');
       b.textContent = g.name + (count ? ' (' + count + ')' : '');
-      b.addEventListener('click', () => { activeGroup = gi; render(); });
+      b.addEventListener('click', () => { if (electro) activeElectro = gi; else activeGroup = gi; render(); });
       groupsEl.appendChild(b);
     });
 
@@ -1498,34 +1529,45 @@ function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); bu
       ? 'flex flex-col gap-1.5 px-4 py-3 overflow-y-auto flex-1'
       : 'flex flex-wrap gap-2 px-4 py-3 overflow-y-auto flex-1 content-start';
     codesEl.innerHTML = '';
-    RX_CODE_GROUPS[activeGroup].codes.forEach(([code, sig]) => {
-      const sel = isSelected(code);
+    groups[gi0].codes.forEach(([code, extra]) => {
+      const sel = isSelected(keyOf(code));
       const b = document.createElement('button');
       b.type = 'button';
-      if (listMode) {
+      if (electro) {
+        // code + medicine name (names are public)
+        b.className = 'w-full flex items-baseline gap-3 text-left px-3 py-2 rounded-lg border ' + (sel ? 'bg-teal-600 text-white border-teal-600' : 'bg-gray-50 text-slate-800 border-gray-200');
+        const a = document.createElement('span'); a.className = 'font-bold text-sm min-w-[4.5rem] shrink-0'; a.textContent = code;
+        const c = document.createElement('span'); c.className = 'text-sm ' + (sel ? 'text-teal-50' : 'text-slate-700'); c.textContent = extra;
+        b.appendChild(a); b.appendChild(c);
+        b.addEventListener('click', () => toggleItem(electroItemKey(code), ['Electro ' + code + ' — ' + extra]));
+      } else if (listMode) {
         b.className = 'w-full flex flex-col gap-0.5 text-left px-3 py-2 rounded-lg border ' + (sel ? 'bg-teal-600 text-white border-teal-600' : 'bg-gray-50 text-slate-800 border-gray-200');
         const top = document.createElement('div'); top.className = 'flex items-baseline gap-3';
         const a = document.createElement('span'); a.className = 'font-bold text-sm min-w-[4.5rem] shrink-0'; a.textContent = code;
         const c = document.createElement('span'); c.className = 'text-sm ' + (sel ? 'text-teal-50' : 'text-slate-700'); c.textContent = formulaCache[tokenOf(code)] || '—';
         top.appendChild(a); top.appendChild(c);
-        const s = document.createElement('div'); s.className = 'text-xs pl-[5.25rem] ' + (sel ? 'text-teal-100' : 'text-slate-500'); s.textContent = 'Sig: ' + sig;
+        const s = document.createElement('div'); s.className = 'text-xs pl-[5.25rem] ' + (sel ? 'text-teal-100' : 'text-slate-500'); s.textContent = 'Sig: ' + extra;
         b.appendChild(top); b.appendChild(s);
+        b.addEventListener('click', () => toggleItem(homeoKey(code), extra ? [code, 'Sig: ' + extra] : [code]));
       } else {
         b.className = 'px-3 py-2 rounded-lg text-sm font-bold border ' + (sel ? 'bg-teal-600 text-white border-teal-600' : 'bg-gray-50 text-slate-800 border-gray-200');
         b.textContent = code;
+        b.addEventListener('click', () => toggleItem(homeoKey(code), extra ? [code, 'Sig: ' + extra] : [code]));
       }
-      b.addEventListener('click', () => toggleCode(code, sig));
       codesEl.appendChild(b);
     });
 
     const chosen = [];
-    RX_CODE_GROUPS.forEach(g => g.codes.forEach(c => { if (isSelected(c[0])) chosen.push(c[0]); }));
+    RX_CODE_GROUPS.forEach(g => g.codes.forEach(c => { if (isSelected(homeoKey(c[0]))) chosen.push(c[0]); }));
+    RX_ELECTRO_GROUPS.forEach(g => g.codes.forEach(c => { if (isSelected(electroItemKey(c[0]))) chosen.push('Electro ' + c[0]); }));
     selEl.textContent = chosen.length ? 'বাছনি: ' + chosen.join(', ') : 'কোনো code বাছা হোৱা নাই';
 
-    eye.className = 'text-xs border px-2 py-1 rounded-lg font-bold ' + (doc ? '' : 'hidden ') + (showFormulas ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-slate-50 text-slate-700 border-slate-200');
+    // composition button + status panel exist only in Homeopathy mode, for the doctor
+    const showEye = doc && !electro;
+    eye.className = 'text-xs border px-2 py-1 rounded-lg font-bold ' + (showEye ? '' : 'hidden ') + (showFormulas ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-slate-50 text-slate-700 border-slate-200');
     eye.textContent = showFormulas ? '🙈 লুকুৱাওক' : '👁 Composition';
     panel.innerHTML = '';
-    if (doc && showFormulas && (formulaError || !formulaCache)) {
+    if (showEye && showFormulas && (formulaError || !formulaCache)) {
       panel.className = 'mx-4 mb-3 p-2 rounded-xl bg-amber-50 border border-amber-200 text-xs ' + (formulaError ? 'text-red-600' : 'text-slate-600');
       panel.textContent = formulaError ? ((/^কোনো composition/.test(formulaError) ? '' : 'Composition পঢ়িব নোৱাৰিলোঁ: ') + formulaError) : 'Composition লোড হৈ আছে...';
     } else {
@@ -1535,7 +1577,7 @@ function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); bu
 
   document.addEventListener('click', async function (ev) {
     const eye = ev.target && ev.target.closest ? ev.target.closest('#codePickerEye') : null;
-    if (!eye || !doctorNow()) return;
+    if (!eye || !doctorNow() || mode !== 'homeo') return;
     showFormulas = !showFormulas;
     render();
     if (showFormulas && !formulaCache) { await loadFormulas(); render(); }
@@ -1543,6 +1585,7 @@ function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); bu
 
   window.openCodePicker = function (targetId) {
     target = targetId || 'pMedicine';
+    mode = 'homeo';
     if (!doctorNow()) { formulaCache = null; formulaError = ''; }
     showFormulas = doctorNow();
     document.getElementById('codePickerModal').classList.remove('hidden');
