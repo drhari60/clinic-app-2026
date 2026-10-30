@@ -232,7 +232,7 @@
   </div>
 </div>
 
-<div id="tab-profile" class="tab-content hidden space-y-4"><div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center relative overflow-hidden"><div class="absolute top-0 left-0 right-0 h-1.5 premium-gradient"></div><div class="w-20 h-20 premium-gradient text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-3 shadow-md">H</div><h3 class="text-lg font-bold text-gray-900">Dr. Harikanta Das</h3><p class="text-xs text-gray-500 font-medium">Homoeopathic Physician & Physiotherapist</p><p class="text-[11px] text-gray-400 mt-1 flex items-center justify-center gap-1"><i class="fas fa-map-marker-alt"></i> Gogamukh, Dhemaji, Assam</p></div><div id="agentSection1" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"><div class="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-500"><div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center"><i class="fas fa-stethoscope text-white text-base"></i></div><div><p class="text-white font-bold text-sm">Dr. Hari's Assistant</p><p class="text-white/70 text-[10px]">স্বাস্থ্য পৰামৰ্শ সহায়ক</p></div></div><div class="relative" style="height:600px;">
+<div id="tab-profile" class="tab-content hidden space-y-4"><div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center relative overflow-hidden"><div class="absolute top-0 left-0 right-0 h-1.5 premium-gradient"></div><div class="w-20 h-20 premium-gradient text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-3 shadow-md">H</div><h3 class="text-lg font-bold text-gray-900">Dr. Harikanta Das</h3><p class="text-xs text-gray-500 font-medium">Homoeopathic Physician & Physiotherapist</p><p class="text-[11px] text-gray-400 mt-1 flex items-center justify-center gap-1"><i class="fas fa-map-marker-alt"></i> Gogamukh, Dhemaji, Assam</p></div><div id="exportCard" class="stock-only hidden bg-white p-4 rounded-2xl shadow-sm border border-gray-100"><p class="font-bold text-sm text-gray-800 mb-1">📊 ডাটা Excel লৈ নিয়ক</p><p class="text-[11px] text-gray-500 mb-3">সকলো ৰোগীৰ তথ্য Excel (CSV) ফাইলত, প্ৰতিটো শিতান সুকীয়া column ত। ইয়াত কোনো তথ্য সলনি বা মচা নহয়।</p><div class="grid grid-cols-2 gap-2"><button type="button" onclick="exportPatientsCSV(false)" class="export-btn bg-emerald-600 text-white text-xs font-bold py-2.5 rounded-xl">সম্পূৰ্ণ তথ্য</button><button type="button" onclick="exportPatientsCSV(true)" class="export-btn bg-slate-800 text-white text-xs font-bold py-2.5 rounded-xl">নাম নথকা (গৱেষণা)</button></div></div><div id="agentSection1" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"><div class="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-500"><div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center"><i class="fas fa-stethoscope text-white text-base"></i></div><div><p class="text-white font-bold text-sm">Dr. Hari's Assistant</p><p class="text-white/70 text-[10px]">স্বাস্থ্য পৰামৰ্শ সহায়ক</p></div></div><div class="relative" style="height:600px;">
   <div id="agentLoader1" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 z-10">
     <div class="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-3"></div>
     <p class="text-xs text-gray-400 font-medium">Assistant load হৈছে...</p>
@@ -286,7 +286,7 @@
 <option value="Tea Garden"><option value="Nepali"><option value="Bengali Hindu">
 <option value="Bengali Muslim"><option value="Bihari"><option value="Marwari">
 <option value="Others">
-</datalist></div><input type="text" id="pBP" placeholder="ৰক্তচাপ (BP)" class="w-full p-2 border rounded-lg mb-2"><input type="text" id="pPhone" placeholder="ম'বাইল নম্বৰ *" class="w-full p-2 border rounded-lg mb-2"><input type="text" id="pAddress" placeholder="ঠিকনা (গাঁও/চহৰ)" class="w-full p-2 border rounded-lg mb-2"><div class="mb-2"><label class="text-xs text-gray-500 font-semibold mb-1 block">🎂 জন্ম তাৰিখ (Birthday)</label><input type="text" id="pDob" inputmode="numeric" maxlength="10" placeholder="দিন/মাহ/বছৰ (DD/MM/YYYY)" oninput="formatDobInput(this)" autocomplete="off" class="w-full p-2 border rounded-lg text-sm"></div><div class="grid grid-cols-2 gap-2 mb-2"><input type="number" id="pWeight" placeholder="ওজন (kg)" class="w-full p-2 border rounded-lg text-sm"><input type="number" id="pHeight" placeholder="উচ্চতা (cm)" class="w-full p-2 border rounded-lg text-sm"></div><textarea id="pChiefComplaint" placeholder="Chief Complaint (প্ৰধান সমস্যা) — Prescription-ত print হ'ব" class="w-full p-2 border rounded-lg mb-2 h-16 resize-none text-sm"></textarea><textarea id="pHistory" placeholder="ৰোগৰ ইতিবৃত্ত / Case History — Print নহ'ব, record-ত থাকিব" class="w-full p-2 border rounded-lg mb-2 h-16 resize-none text-sm bg-blue-50"></textarea><div class="flex items-center justify-between mb-1"><label class="text-xs text-gray-500 font-semibold">💊 Rx (ঔষধ)</label><button type="button" onclick="openTemplateSelector()" class="text-xs bg-teal-50 text-teal-700 border border-teal-200 px-2 py-1 rounded-lg font-bold">🗂️ Template বাছক</button><button type="button" onclick="openCodePicker('pMedicine')" class="text-xs bg-slate-50 text-slate-700 border border-slate-200 px-2 py-1 rounded-lg font-bold ml-1">🔢 Code</button></div><textarea id="pMedicine" placeholder="ঔষধৰ নাম আৰু ব্যৱহাৰৰ নিয়ম (Rx)" class="w-full p-2 border rounded-lg mb-2 h-24 resize-none"></textarea><input type="number" id="pFees" placeholder="ভিজিট ফীজ (₹)" class="w-full p-2 border rounded-lg mb-3"><div class="flex gap-2"><button id="savePatientBtn" class="flex-1 bg-emerald-600 text-white py-2 rounded-lg font-medium">সংৰক্ষণ</button><button id="closeModalBtn" class="flex-1 bg-gray-300 py-2 rounded-lg">বন্ধ</button></div></div></div>
+</datalist></div><input type="text" id="pBP" placeholder="ৰক্তচাপ (BP)" class="w-full p-2 border rounded-lg mb-2"><input type="text" id="pPhone" placeholder="ম'বাইল নম্বৰ *" class="w-full p-2 border rounded-lg mb-2"><input type="text" id="pAddress" placeholder="ঠিকনা (গাঁও/চহৰ)" class="w-full p-2 border rounded-lg mb-2"><div class="mb-2"><label class="text-xs text-gray-500 font-semibold mb-1 block">🎂 জন্ম তাৰিখ (Birthday)</label><input type="text" id="pDob" inputmode="numeric" maxlength="10" placeholder="দিন/মাহ/বছৰ (DD/MM/YYYY)" oninput="formatDobInput(this)" autocomplete="off" class="w-full p-2 border rounded-lg text-sm"></div><div class="grid grid-cols-2 gap-2 mb-2"><input type="number" id="pWeight" placeholder="ওজন (kg)" class="w-full p-2 border rounded-lg text-sm"><input type="number" id="pHeight" placeholder="উচ্চতা (cm)" class="w-full p-2 border rounded-lg text-sm"></div><textarea id="pChiefComplaint" placeholder="Chief Complaint (প্ৰধান সমস্যা) — Prescription-ত print হ'ব" class="w-full p-2 border rounded-lg mb-2 h-16 resize-none text-sm"></textarea><textarea id="pHistory" placeholder="ৰোগৰ ইতিবৃত্ত / Case History — Print নহ'ব, record-ত থাকিব" class="w-full p-2 border rounded-lg mb-2 h-16 resize-none text-sm bg-blue-50"></textarea><div id="caseDetailsBox" class="mb-2"></div><div class="flex items-center justify-between mb-1"><label class="text-xs text-gray-500 font-semibold">💊 Rx (ঔষধ)</label><button type="button" onclick="openTemplateSelector()" class="text-xs bg-teal-50 text-teal-700 border border-teal-200 px-2 py-1 rounded-lg font-bold">🗂️ Template বাছক</button><button type="button" onclick="openCodePicker('pMedicine')" class="text-xs bg-slate-50 text-slate-700 border border-slate-200 px-2 py-1 rounded-lg font-bold ml-1">🔢 Code</button></div><textarea id="pMedicine" placeholder="ঔষধৰ নাম আৰু ব্যৱহাৰৰ নিয়ম (Rx)" class="w-full p-2 border rounded-lg mb-2 h-24 resize-none"></textarea><input type="number" id="pFees" placeholder="ভিজিট ফীজ (₹)" class="w-full p-2 border rounded-lg mb-3"><div class="flex gap-2"><button id="savePatientBtn" class="flex-1 bg-emerald-600 text-white py-2 rounded-lg font-medium">সংৰক্ষণ</button><button id="closeModalBtn" class="flex-1 bg-gray-300 py-2 rounded-lg">বন্ধ</button></div></div></div>
         </div>
         <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-gray-200 shadow-xl px-4 py-2 flex justify-between items-center z-50 max-w-4xl mx-auto rounded-t-2xl">
             <button data-tab="home" class="tab-btn flex flex-col items-center gap-1 text-slate-900 border-b-2 border-slate-900 px-3 py-1 text-xs font-bold transition"><i class="fas fa-home text-base"></i>হোম</button>
@@ -393,6 +393,238 @@
         function formatDobInput(el) { let d = el.value.replace(/\D/g, '').slice(0, 8); let out = d; if (d.length > 4) out = d.slice(0,2) + '/' + d.slice(2,4) + '/' + d.slice(4); else if (d.length > 2) out = d.slice(0,2) + '/' + d.slice(2); el.value = out; }
         function dobToISO(v) { const m = String(v || '').trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); if (!m) return null; const dd = +m[1], mm = +m[2], yy = +m[3]; const dt = new Date(yy, mm - 1, dd); if (dt.getFullYear() !== yy || dt.getMonth() !== mm - 1 || dt.getDate() !== dd || yy < 1900 || dt > new Date()) return null; return yy + '-' + String(mm).padStart(2,'0') + '-' + String(dd).padStart(2,'0'); }
         function dobFromISO(iso) { const m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? m[3] + '/' + m[2] + '/' + m[1] : ''; }
+        // ===== Case History (structured details) — saved inside the existing `history` text column =====
+        const CASE_DELIM = '\n\n[CASE DETAILS]\n';
+        const CASE_GROUPS = [
+            { id: 'basic', title: '📋 Basic Case History', fields: [
+                { l: 'Occupation', t: 't', ph: 'পেছা' },
+                { l: 'Marital Status', t: 's', o: ['Single', 'Married', 'Widowed', 'Divorced'] },
+                { l: 'Emergency Contact', t: 't', ph: 'নাম / ফোন' },
+                { l: 'Duration of Complaint', t: 't', ph: 'কিমান দিনৰ পৰা' },
+                { l: 'Onset', t: 's', o: ['Sudden', 'Gradual'] },
+                { l: 'Progress', t: 's', o: ['Improving', 'Worsening', 'Unchanged'] },
+                { l: 'Severity', t: 's', o: ['Mild', 'Moderate', 'Severe'] },
+                { l: 'Location of Complaint', t: 't' },
+                { l: 'Time of Occurrence', t: 't', ph: 'ৰাতি / ৰাতিপুৱা...' },
+                { l: 'Previous Treatment Taken', t: 'a' },
+                { l: 'Aggravating Factors', t: 'a' },
+                { l: 'Ameliorating Factors', t: 'a' },
+                { l: 'Associated Symptoms', t: 'a' },
+                { l: 'Previous Episodes', t: 'a' },
+                { l: 'Allergy History', t: 'a', ph: 'ঔষধ / খাদ্য / ধূলি — কি বস্তুৰ পৰা কি প্ৰতিক্ৰিয়া' },
+                { l: 'Family History', t: 'a', ph: 'পৰিয়ালৰ ৰোগৰ ইতিহাস' },
+                { l: 'Past Illness', t: 'a', ph: 'পূৰ্বৰ ৰোগ' },
+                { l: 'Operation / Surgery History', t: 'a', ph: 'পূৰ্বৰ অস্ত্ৰোপচাৰ' },
+                { l: 'Drug History', t: 'a', ph: 'ঔষধৰ নাম, dose, কেতিয়াৰ পৰা, কিয়' },
+                { l: 'Red Flag Symptoms', t: 'c', cls: 'text-red-600', o: ['বুকুৰ বিষ', 'উশাহ লোৱাত কষ্ট', 'অজ্ঞান হোৱা', 'হঠাৎ দুৰ্বলতা', 'অস্বাভাৱিক ৰক্তক্ষৰণ'] }
+            ] },
+            { id: 'detail', title: '🧾 Detailed Medical History', fields: [
+                { l: 'Habit History', t: 'a', ph: 'ধূমপান, মদ্যপান, ধপাত, চূণ, চাধা, তামোল-পান' },
+                { l: 'Addiction History', t: 't' },
+                { l: 'Food Preference', t: 's', o: ['Veg', 'Non-Veg', 'Mixed'] },
+                { l: 'Appetite', t: 's', o: ['Good', 'Poor', 'Increased'] },
+                { l: 'Water Intake', t: 't', ph: 'লিটাৰ/দিন' },
+                { l: 'Stress Level', t: 's', o: ['Low', 'Moderate', 'High'] },
+                { l: 'Sleep History', t: 't', ph: 'সময় আৰু মান' },
+                { l: 'Daily Exercise', t: 't' },
+                { l: 'Bowel History', t: 't' },
+                { l: 'Bladder History', t: 't' },
+                { l: 'Dietary History', t: 'a' },
+                { l: 'Occupation-related Exposure', t: 'a' },
+                { l: 'Immunization History', t: 'a', ph: 'টিকাকৰণ (শিশুৰ বাবে)' },
+                { l: 'Functional Status', t: 'a', ph: 'দৈনন্দিন কাম, খোজকঢ়া, উঠা-বহা' },
+                { l: 'Previous Medical Records', t: 'a', ph: 'আগৰ Prescription / Report' }
+            ] },
+            { id: 'women', women: true, title: '👩 Menstrual & Obstetric History', fields: [
+                { l: 'Age at Menarche', t: 't' },
+                { l: 'LMP', t: 't', ph: 'Last Menstrual Period' },
+                { l: 'Menstrual Cycle', t: 't', ph: 'যেনে 28 দিন' },
+                { l: 'Duration of Period', t: 't' },
+                { l: 'Cycle Regularity', t: 's', o: ['Regular', 'Irregular'] },
+                { l: 'Amount of Bleeding', t: 's', o: ['Scanty', 'Normal', 'Heavy'] },
+                { l: 'Menstrual Pain', t: 't' },
+                { l: 'Menopause Status', t: 's', o: ['No', 'Yes', 'Perimenopausal'] },
+                { l: 'Gravida (G)', t: 't' },
+                { l: 'Para (P)', t: 't' },
+                { l: 'Abortion (A)', t: 't' },
+                { l: 'Living Children (L)', t: 't' },
+                { l: 'Pregnancy / Lactation Status', t: 's', o: ['Not pregnant', 'Pregnant', 'Lactating'] },
+                { l: 'Pregnancy Complications', t: 'a' }
+            ] },
+            { id: 'exam', title: '🩺 Examination, Reports & Doctor Notes', bmi: true, fields: [
+                { l: 'Pulse Rate', t: 't', ph: '/min' },
+                { l: 'Respiratory Rate', t: 't', ph: '/min' },
+                { l: 'Body Temperature', t: 't', ph: '°F / °C' },
+                { l: 'SpO2', t: 't', ph: '%' },
+                { l: 'Blood Sugar', t: 't', ph: 'FBS / PPBS / RBS' },
+                { l: 'Pallor', t: 's', o: ['Absent', 'Present'] },
+                { l: 'Edema', t: 's', o: ['Absent', 'Present'] },
+                { l: 'Jaundice', t: 's', o: ['Absent', 'Present'] },
+                { l: 'Cyanosis', t: 's', o: ['Absent', 'Present'] },
+                { l: 'CVS', t: 't' },
+                { l: 'RS', t: 't' },
+                { l: 'CNS', t: 't' },
+                { l: 'GIT', t: 't' },
+                { l: 'Musculoskeletal System', t: 't' },
+                { l: 'Genitourinary System', t: 't' },
+                { l: 'Investigations / Reports', t: 'a', ph: 'Blood, X-Ray, USG, ECG, CT, MRI...' },
+                { l: 'Clinical Findings', t: 'a' },
+                { l: 'Provisional Diagnosis', t: 'a' },
+                { l: 'Differential Diagnosis', t: 'a' },
+                { l: 'Treatment Plan', t: 'a' },
+                { l: 'Advice', t: 'a' },
+                { l: 'Follow-up Date', t: 't', ph: 'DD/MM/YYYY' },
+                { l: 'Referral', t: 't' }
+            ] },
+            { id: 'physio', title: '🏃 Physiotherapy Assessment', fields: [
+                { l: 'Pain Location', t: 't' },
+                { l: 'Pain Intensity (VAS 0-10)', t: 's', o: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'] },
+                { l: 'Range of Motion (ROM)', t: 'a' },
+                { l: 'Muscle Strength (MMT)', t: 'a' },
+                { l: 'Muscle Tone', t: 't' },
+                { l: 'Posture Assessment', t: 'a' },
+                { l: 'Gait Assessment', t: 'a' },
+                { l: 'Joint Mobility', t: 'a' },
+                { l: 'Functional Limitation', t: 'a' },
+                { l: 'Neurological Assessment', t: 'a' },
+                { l: 'Special Tests', t: 'a' },
+                { l: 'Physiotherapy Goals', t: 'a' }
+            ] }
+        ];
+        const CASE_FIELDS = []; CASE_GROUPS.forEach(g => g.fields.forEach(f => { f.g = g.id; CASE_FIELDS.push(f); }));
+        let caseExtra = [];
+        function caseBuild() {
+            const box = document.getElementById('caseDetailsBox');
+            if (!box || box.dataset.built) return !!box;
+            let html = '<p class="text-[11px] text-gray-400 mb-1">📂 বিস্তৃত Case History (প্ৰয়োজন অনুসৰি পূৰণ কৰক — Print নহ’ব)</p>';
+            let n = 0;
+            CASE_GROUPS.forEach(g => {
+                html += `<details id="caseGrp_${g.id}" class="mb-2 border rounded-lg bg-gray-50 ${g.women ? 'hidden' : ''}"><summary class="px-3 py-2 text-xs font-bold text-gray-700 cursor-pointer select-none">${g.title}</summary><div class="px-3 pb-3 grid grid-cols-2 gap-2">`;
+                g.fields.forEach(f => {
+                    f.i = n++;
+                    const full = (f.t === 'a' || f.t === 'c') ? 'col-span-2' : '';
+                    html += `<div class="${full}"><label class="text-[11px] font-semibold block mb-0.5 ${f.cls || 'text-gray-500'}">${escapeHTML(f.l)}</label>`;
+                    if (f.t === 't') html += `<input type="text" id="cx_${f.i}" placeholder="${escapeHTML(f.ph || '')}" class="w-full p-2 border rounded-lg text-sm bg-white">`;
+                    else if (f.t === 'a') html += `<textarea id="cx_${f.i}" placeholder="${escapeHTML(f.ph || '')}" class="w-full p-2 border rounded-lg text-sm bg-white h-14 resize-none"></textarea>`;
+                    else if (f.t === 's') html += `<select id="cx_${f.i}" class="w-full p-2 border rounded-lg text-sm bg-white"><option value="">—</option>${f.o.map(o => `<option value="${escapeHTML(o)}">${escapeHTML(o)}</option>`).join('')}</select>`;
+                    else if (f.t === 'c') html += `<div id="cx_${f.i}" class="flex flex-wrap gap-x-3 gap-y-1">${f.o.map(o => `<label class="text-xs flex items-center gap-1"><input type="checkbox" value="${escapeHTML(o)}"> ${escapeHTML(o)}</label>`).join('')}</div>`;
+                    html += '</div>';
+                    if (f.l === 'Pulse Rate' && g.bmi) html = html.replace(/<div class="">(?=<label[^>]*>Pulse Rate)/, '<div id="caseBmi" class="col-span-2 text-[11px] text-gray-500"></div><div class="">');
+                });
+                html += '</div></details>';
+            });
+            box.innerHTML = html; box.dataset.built = '1';
+            ['pWeight', 'pHeight'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', caseBmi); });
+            const gEl = document.getElementById('pGender'); if (gEl) gEl.addEventListener('change', caseSyncGender);
+            return true;
+        }
+        function caseGet(i) {
+            const el = document.getElementById('cx_' + i); if (!el) return '';
+            if (el.tagName === 'DIV') return Array.from(el.querySelectorAll('input:checked')).map(c => c.value).join(', ');
+            return (el.value || '').trim();
+        }
+        function caseSet(i, v) {
+            const el = document.getElementById('cx_' + i); if (!el) return;
+            if (el.tagName === 'DIV') { const vals = String(v || '').split(',').map(x => x.trim()); el.querySelectorAll('input').forEach(c => { c.checked = vals.includes(c.value); }); }
+            else el.value = v || '';
+        }
+        function caseBmi() {
+            const out = document.getElementById('caseBmi'); if (!out) return;
+            const w = parseFloat(document.getElementById('pWeight').value), h = parseFloat(document.getElementById('pHeight').value);
+            out.textContent = (w > 0 && h > 0) ? 'BMI: ' + (w / Math.pow(h / 100, 2)).toFixed(1) + ' kg/m² (ওজন আৰু উচ্চতাৰ পৰা)' : '';
+        }
+        function caseSyncGender() {
+            const grp = document.getElementById('caseGrp_women'); if (!grp) return;
+            const hasData = CASE_FIELDS.some(f => f.g === 'women' && caseGet(f.i));
+            const isF = (document.getElementById('pGender') || {}).value === 'F';
+            grp.classList.toggle('hidden', !(isF || hasData));
+        }
+        function caseSplit(h) {
+            h = h || ''; const i = h.indexOf(CASE_DELIM);
+            return i < 0 ? { free: h, block: '' } : { free: h.slice(0, i), block: h.slice(i + CASE_DELIM.length) };
+        }
+        function caseFree(h) { return caseSplit(h).free; }
+        function caseLoad(h) {
+            const ok = caseBuild(); const sp = caseSplit(h);
+            document.getElementById('pHistory').value = sp.free;
+            if (!ok) return;
+            CASE_FIELDS.forEach(f => caseSet(f.i, ''));
+            caseExtra = [];
+            sp.block.split('\n').forEach(line => {
+                if (!line.trim()) return;
+                const f = CASE_FIELDS.find(x => line.startsWith(x.l + ': '));
+                if (!f) { caseExtra.push(line); return; }
+                let v = line.slice(f.l.length + 2);
+                if (f.t === 'a') v = v.replace(/ \| /g, '\n');
+                caseSet(f.i, v);
+            });
+            CASE_GROUPS.forEach(g => { const d = document.getElementById('caseGrp_' + g.id); if (d) d.open = g.fields.some(f => caseGet(f.i)); });
+            caseBmi();
+            setTimeout(caseSyncGender, 0);
+        }
+        function caseCompose(free) {
+            free = free || '';
+            const box = document.getElementById('caseDetailsBox');
+            if (!box || !box.dataset.built) return free;
+            const lines = [];
+            CASE_FIELDS.forEach(f => { const v = caseGet(f.i); if (v) lines.push(f.l + ': ' + v.replace(/\s*\n\s*/g, ' | ')); });
+            const all = lines.concat(caseExtra).join('\n');
+            return all ? free + CASE_DELIM + all : free;
+        }
+        // ===== Doctor-only: export all patients to Excel-readable CSV (read-only, changes no data) =====
+        function csvCell(v) {
+            if (v === null || v === undefined) return '';
+            let t = String(v);
+            if (/^[=+\-@\t\r]/.test(t)) t = "'" + t;
+            return '"' + t.replace(/"/g, '""') + '"';
+        }
+        async function exportPatientsCSV(anonymous) {
+            if (!isDoctor) { await showAlert('কেবল ডাক্তৰে এই কাম কৰিব পাৰে।', 'অনুমতি নাই', '🔒'); return; }
+            const msg = anonymous
+                ? 'নাম, ফোন, ঠিকনা, জন্ম তাৰিখ আৰু Emergency Contact বাদ দি ফাইল বনোৱা হ’ব। (চিকিৎসাৰ লিখনিত ৰোগীৰ নাম লিখা থাকিলে সেয়া আঁতৰ নহ’ব — পঠোৱাৰ আগতে চাই লওক।) আগবাঢ়িবনে?'
+                : 'ফাইলত ৰোগীৰ নাম, ফোন, ঠিকনাকে ধৰি সকলো ব্যক্তিগত তথ্য থাকিব। ফাইলটো সুৰক্ষিত ঠাইত ৰাখিব, আনক নিদিব। আগবাঢ়িবনে?';
+            if (!await showConfirm(msg, anonymous ? 'নাম নথকা Export' : 'সম্পূৰ্ণ Export', '📊')) return;
+            const btns = document.querySelectorAll('.export-btn'); btns.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; });
+            try {
+                const rows = []; const size = 1000; let from = 0;
+                while (true) {
+                    const { data, error } = await supabaseClient.from('clinic_data').select('*').order('created_at', { ascending: true }).order('id', { ascending: true }).range(from, from + size - 1);
+                    if (error) { await showAlert('ডাটা আনিব পৰা নগ’ল: ' + error.message, 'ভুল', '❌'); return; }
+                    if (!data || !data.length) break;
+                    rows.push(...data);
+                    if (data.length < size) break;
+                    from += size;
+                }
+                if (!rows.length) { await showAlert('Export কৰিবলৈ কোনো ৰোগী নাই।', 'খালী', 'ℹ️'); return; }
+                const head = ['Serial', anonymous ? 'Patient Code' : 'Patient ID', 'Registered Date (IST)'];
+                if (!anonymous) head.push('Name', 'Phone', 'Address');
+                head.push('Age', 'Sex', anonymous ? 'Birth Year' : 'Date of Birth', 'Community', 'Weight (kg)', 'Height (cm)', 'BMI', 'BP', 'Chief Complaint', 'History (free text)');
+                CASE_FIELDS.forEach(f => head.push(f.l));
+                head.push('Medicine (Rx)');
+                const lines = [head.map(csvCell).join(',')];
+                rows.forEach((p, n) => {
+                    const sp = caseSplit(p.history); const cf = {};
+                    sp.block.split('\n').forEach(line => { const f = CASE_FIELDS.find(x => line.startsWith(x.l + ': ')); if (f) cf[f.l] = line.slice(f.l.length + 2).replace(/ \| /g, ' / '); });
+                    const w = parseFloat(p.weight), h = parseFloat(p.height);
+                    const bmi = (w > 0 && h > 0) ? (w / Math.pow(h / 100, 2)).toFixed(1) : '';
+                    const r = [n + 1, anonymous ? 'P' + String(n + 1).padStart(4, '0') : p.id, p.created_at ? istDateOf(p.created_at) : ''];
+                    if (!anonymous) r.push(p.name, p.phone, p.address);
+                    r.push(p.age, p.sex, anonymous ? (p.dob ? String(p.dob).slice(0, 4) : '') : dobFromISO(p.dob), p.community, p.weight, p.height, bmi, p.bp, p.chief_complaint, sp.free);
+                    CASE_FIELDS.forEach(f => r.push(anonymous && f.l === 'Emergency Contact' ? '' : (cf[f.l] || '')));
+                    r.push(p.medicine);
+                    lines.push(r.map(csvCell).join(','));
+                });
+                const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+                const url = URL.createObjectURL(blob); const a = document.createElement('a');
+                a.href = url; a.download = 'clinic_patients_' + (anonymous ? 'anonymous_' : 'full_') + istToday() + '.csv';
+                document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 5000);
+                await showAlert(rows.length + ' জন ৰোগীৰ ফাইল ডাউনলোড হৈছে। Excel ত খুলিব পাৰিব।', 'সফল ✅', '📊');
+            } catch (e) {
+                await showAlert('Export ব্যৰ্থ হ’ল: ' + (e && e.message ? e.message : e), 'ভুল', '❌');
+            } finally {
+                btns.forEach(b => { b.disabled = false; b.style.opacity = ''; });
+            }
+        }
         function jsArg(str) { return encodeURIComponent(str || '').replace(/'/g, '%27'); }
         function sanitizePhone(raw) { let p = raw.replace(/[\s\-()]/g, ''); if (p.startsWith('+91')) p = p.slice(3); else if (p.startsWith('91') && p.length === 12) p = p.slice(2); return p; }
         const SUPABASE_URL = 'https://jdjnbjslfkjfhggegtks.supabase.co';
@@ -423,7 +655,7 @@
         });
 
         async function checkRole(userEmail) { if (!userEmail) return; isDoctor = (userEmail.toLowerCase() === 'drhariswellfuture60@gmail.com'); const badge = document.getElementById('accessBadge'); if (badge) { badge.innerText = isDoctor ? 'Doctor (Full Access)' : 'Staff Mode (Restricted)'; badge.className = isDoctor ? 'text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider' : 'text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider'; } const a1 = document.getElementById('agentSection1'); const a2 = document.getElementById('agentSection2'); if (a1) a1.classList.toggle('hidden', !isDoctor); if (a2) a2.classList.toggle('hidden', !isDoctor); document.querySelectorAll('.stock-only').forEach(el => el.classList.toggle('hidden', !isDoctor)); }
-        function openAddPatientModal() { currentEditId = null; document.getElementById('modalTitle').innerHTML = '➕ নতুন ৰোগী'; document.getElementById('pName').value = ''; document.getElementById('pAgeSex').value = ''; document.getElementById('pBP').value = ''; document.getElementById('pPhone').value = ''; document.getElementById('pHistory').value = ''; document.getElementById('pMedicine').value = ''; document.getElementById('pFees').value = ''; document.getElementById('pDob').value = ''; document.getElementById('pWeight').value = ''; document.getElementById('pHeight').value = ''; document.getElementById('pAddress').value = ''; document.getElementById('pGender').value = ''; document.getElementById('pCommunity').value = ''; document.getElementById('pChiefComplaint').value = ''; document.getElementById('patientModal').classList.remove('hidden'); }
+        function openAddPatientModal() { currentEditId = null; document.getElementById('modalTitle').innerHTML = '➕ নতুন ৰোগী'; document.getElementById('pName').value = ''; document.getElementById('pAgeSex').value = ''; document.getElementById('pBP').value = ''; document.getElementById('pPhone').value = ''; caseLoad(''); document.getElementById('pMedicine').value = ''; document.getElementById('pFees').value = ''; document.getElementById('pDob').value = ''; document.getElementById('pWeight').value = ''; document.getElementById('pHeight').value = ''; document.getElementById('pAddress').value = ''; document.getElementById('pGender').value = ''; document.getElementById('pCommunity').value = ''; document.getElementById('pChiefComplaint').value = ''; document.getElementById('patientModal').classList.remove('hidden'); }
         function closePatientModal() { document.getElementById('patientModal').classList.add('hidden'); }
         const RZP_LINKS = {
             100: 'https://rzp.io/rzp/uZ0Yt4Z',
@@ -495,7 +727,7 @@
         async function loadBookings() { const { data, error } = await supabaseClient.from('clinic_bookings').select('*').order('created_at', { ascending: false }); if (error || !data) return; const container = document.getElementById('listBookings'); if (!container) return; if (data.length === 0) { container.innerHTML = '<p class="text-center text-gray-400 text-sm py-8">কোনো বুকিং নাই।</p>'; return; } const filterBar = `<div class="flex gap-2 mb-3 flex-wrap"><button onclick="filterBookings('all')" id="fb-all" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-slate-900 text-white transition">সকলো</button><button onclick="filterBookings('pending')" id="fb-pending" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-yellow-100 text-yellow-700 transition">⏳ Pending</button><button onclick="filterBookings('verified')" id="fb-verified" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-emerald-100 text-emerald-700 transition">✅ Verified</button><button onclick="filterBookings('rejected')" id="fb-rejected" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-red-100 text-red-600 transition">❌ Rejected</button></div>`; const cards = data.map(b => { const statusColor = b.status === 'verified' ? 'bg-emerald-100 text-emerald-700' : b.status === 'rejected' ? 'bg-red-100 text-red-600' : 'bg-yellow-100 text-yellow-700'; const statusLabel = b.status === 'verified' ? '✅ Verified' : b.status === 'rejected' ? '❌ Rejected' : '⏳ Pending'; const date = new Date(b.created_at).toLocaleDateString('en-IN'); return `<div class="booking-card p-4 border rounded-xl bg-white shadow-sm text-xs space-y-2" data-status="${b.status || 'pending'}"><div class="flex justify-between items-start gap-2"><div><h5 class="font-bold text-gray-900 text-sm">${escapeHTML(b.name)}</h5><p class="text-gray-500 mt-0.5">${escapeHTML(b.phone)} · ${date}</p></div><span class="px-2 py-1 rounded-full font-bold text-[10px] shrink-0 ${statusColor}">${statusLabel}</span></div><p class="text-emerald-700 font-mono font-bold bg-emerald-50 px-2 py-1 rounded-lg">Txn: ${escapeHTML(b.txn_id)}</p><p class="text-gray-600">${escapeHTML(b.problem || '')}</p><div class="flex gap-2 pt-1 border-t flex-wrap">${b.status !== 'verified' ? `<button onclick="updateBookingStatus('${b.id}', 'verified')" class="flex-1 bg-emerald-600 text-white py-2 rounded-lg font-bold text-[11px] hover:bg-emerald-700 transition min-w-[80px]">✅ Verify</button>` : ''}${b.status !== 'rejected' ? `<button onclick="updateBookingStatus('${b.id}', 'rejected')" class="flex-1 bg-red-500 text-white py-2 rounded-lg font-bold text-[11px] hover:bg-red-600 transition min-w-[80px]">❌ Reject</button>` : ''}${b.status === 'verified' ? `<button onclick="convertBookingToPatient('${b.id}')" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold text-[11px] hover:bg-blue-700 transition">➕ ক্লিনিকত ৰোগী হিচাপে যোগ কৰক</button>` : ''}</div></div>`; }).join(''); container.innerHTML = filterBar + `<div id="bookingCardList">${cards}</div>`; }
         function filterBookings(status) { const cards = document.querySelectorAll('.booking-card'); cards.forEach(card => { card.style.display = (status === 'all' || card.dataset.status === status) ? '' : 'none'; }); ['all','pending','verified','rejected'].forEach(s => { const btn = document.getElementById('fb-' + s); if (!btn) return; btn.className = s === status ? 'px-3 py-1.5 rounded-lg text-[11px] font-bold bg-slate-900 text-white transition' : 'px-3 py-1.5 rounded-lg text-[11px] font-bold bg-yellow-100 text-yellow-700 transition'; }); }
         async function updateBookingStatus(bookingId, newStatus) { const { error } = await supabaseClient.from('clinic_bookings').update({ status: newStatus }).eq('id', bookingId); if (error) { await showAlert('Status update কৰিব পৰা নগ\'ল।', 'ভুল', '❌'); } else { await showAlert(newStatus === 'verified' ? 'বুকিং Verify কৰা হৈছে! ✅' : 'বুকিং Reject কৰা হৈছে।', 'সফল', newStatus === 'verified' ? '✅' : '❌'); loadBookings(); } }
-        async function convertBookingToPatient(bookingId) { const { data: b, error } = await supabaseClient.from('clinic_bookings').select('*').eq('id', bookingId).single(); if (error || !b) { await showAlert('Booking তথ্য পোৱা নগ\'ল।', 'ভুল', '❌'); return; } currentEditId = null; document.getElementById('pName').value = b.name || ''; document.getElementById('pPhone').value = b.phone || ''; document.getElementById('pHistory').value = b.problem || ''; document.getElementById('pAgeSex').value = ''; document.getElementById('pBP').value = ''; document.getElementById('pMedicine').value = ''; document.getElementById('pFees').value = ''; document.getElementById('modalTitle').innerHTML = '➕ Booking ৰ পৰা নতুন ৰোগী'; document.getElementById('patientModal').classList.remove('hidden'); document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden')); document.getElementById('tab-home').classList.remove('hidden'); document.querySelectorAll('.tab-btn').forEach(btn => { btn.classList.remove('text-slate-900', 'border-b-2', 'border-slate-900'); btn.classList.add('text-gray-400'); }); const homeBtn = document.querySelector('[data-tab="home"]'); if (homeBtn) { homeBtn.classList.add('text-slate-900', 'border-b-2', 'border-slate-900'); homeBtn.classList.remove('text-gray-400'); } }
+        async function convertBookingToPatient(bookingId) { const { data: b, error } = await supabaseClient.from('clinic_bookings').select('*').eq('id', bookingId).single(); if (error || !b) { await showAlert('Booking তথ্য পোৱা নগ\'ল।', 'ভুল', '❌'); return; } currentEditId = null; document.getElementById('pName').value = b.name || ''; document.getElementById('pPhone').value = b.phone || ''; caseLoad(b.problem || ''); document.getElementById('pAgeSex').value = ''; document.getElementById('pBP').value = ''; document.getElementById('pMedicine').value = ''; document.getElementById('pFees').value = ''; document.getElementById('modalTitle').innerHTML = '➕ Booking ৰ পৰা নতুন ৰোগী'; document.getElementById('patientModal').classList.remove('hidden'); document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden')); document.getElementById('tab-home').classList.remove('hidden'); document.querySelectorAll('.tab-btn').forEach(btn => { btn.classList.remove('text-slate-900', 'border-b-2', 'border-slate-900'); btn.classList.add('text-gray-400'); }); const homeBtn = document.querySelector('[data-tab="home"]'); if (homeBtn) { homeBtn.classList.add('text-slate-900', 'border-b-2', 'border-slate-900'); homeBtn.classList.remove('text-gray-400'); } }
         let currentPage = 0;
 const PAGE_SIZE = 30;
 
@@ -776,7 +1008,7 @@ async function loadPatients(reset = true) {
     }
 }
         
-        function createPatientCard(p) { const card = document.createElement('div'); card.className = 'bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-3'; card.innerHTML = `<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2"><div><h4 class="text-base font-bold text-slate-900">${escapeHTML(p.name)} <span class="text-xs font-normal text-gray-500">(${escapeHTML(p.age || 'N/A')})</span></h4><p class="text-xs text-gray-600 mt-0.5">${escapeHTML(p.phone)} | 🩺 BP: ${escapeHTML(p.bp || 'N/A')}</p><p class=\"text-[10px] text-gray-400 mt-0.5\"><i class=\"fas fa-calendar-alt\"></i> ${p.created_at ? new Date(p.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : 'N/A'}</p>${(p.weight||p.height) ? `<p class=\"text-[10px] text-gray-400 mt-0.5\"><i class=\"fas fa-weight\"></i> ${p.weight ? p.weight+'kg' : 'N/A'} &nbsp;|&nbsp; <i class=\"fas fa-ruler-vertical\"></i> ${p.height ? formatHeight(p.height) : 'N/A'}</p>` : ''}<p class="text-xs text-gray-500 mt-1"><b>History:</b> ${escapeHTML(p.history || 'None')}</p><p class="text-xs text-gray-600 mt-1"><b>Rx:</b> ${escapeHTML((p.medicine || '').slice(0, 80))}</p></div></div>`; const actions = document.createElement('div'); actions.className = 'flex flex-wrap gap-1.5 border-t pt-2 mt-1 justify-end'; const btnPrint = document.createElement('button'); btnPrint.className = 'bg-gray-800 text-white px-2.5 py-2 rounded-lg text-xs font-bold'; btnPrint.innerHTML = '<i class="fas fa-print"></i>'; btnPrint.onclick = () => printPrescription(p); const btnWA = document.createElement('button'); btnWA.className = 'bg-green-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1'; btnWA.innerHTML = '<i class="fab fa-whatsapp"></i> Rx'; btnWA.onclick = () => sendWhatsAppRx(p); const btnReminder = document.createElement('button'); btnReminder.className = 'bg-orange-500 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1'; btnReminder.innerHTML = '<i class="fas fa-clock"></i> Reminder'; btnReminder.onclick = () => sendMedicineReminder(p); const btnHistory = document.createElement('button'); btnHistory.className = 'bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1'; btnHistory.innerHTML = '<i class="fas fa-history"></i> History'; btnHistory.onclick = () => showVisitHistory(p); const btnRevisit = document.createElement('button'); btnRevisit.className = 'bg-teal-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1'; btnRevisit.innerHTML = '<i class="fas fa-redo"></i> Revisit'; btnRevisit.onclick = () => openRevisitModal(p); const btnLab = document.createElement('button');
+        function createPatientCard(p) { const card = document.createElement('div'); card.className = 'bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-3'; card.innerHTML = `<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2"><div><h4 class="text-base font-bold text-slate-900">${escapeHTML(p.name)} <span class="text-xs font-normal text-gray-500">(${escapeHTML(p.age || 'N/A')})</span></h4><p class="text-xs text-gray-600 mt-0.5">${escapeHTML(p.phone)} | 🩺 BP: ${escapeHTML(p.bp || 'N/A')}</p><p class=\"text-[10px] text-gray-400 mt-0.5\"><i class=\"fas fa-calendar-alt\"></i> ${p.created_at ? new Date(p.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : 'N/A'}</p>${(p.weight||p.height) ? `<p class=\"text-[10px] text-gray-400 mt-0.5\"><i class=\"fas fa-weight\"></i> ${p.weight ? p.weight+'kg' : 'N/A'} &nbsp;|&nbsp; <i class=\"fas fa-ruler-vertical\"></i> ${p.height ? formatHeight(p.height) : 'N/A'}</p>` : ''}<p class="text-xs text-gray-500 mt-1"><b>History:</b> ${escapeHTML(caseFree(p.history) || 'None')}</p><p class="text-xs text-gray-600 mt-1"><b>Rx:</b> ${escapeHTML((p.medicine || '').slice(0, 80))}</p></div></div>`; const actions = document.createElement('div'); actions.className = 'flex flex-wrap gap-1.5 border-t pt-2 mt-1 justify-end'; const btnPrint = document.createElement('button'); btnPrint.className = 'bg-gray-800 text-white px-2.5 py-2 rounded-lg text-xs font-bold'; btnPrint.innerHTML = '<i class="fas fa-print"></i>'; btnPrint.onclick = () => printPrescription(p); const btnWA = document.createElement('button'); btnWA.className = 'bg-green-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1'; btnWA.innerHTML = '<i class="fab fa-whatsapp"></i> Rx'; btnWA.onclick = () => sendWhatsAppRx(p); const btnReminder = document.createElement('button'); btnReminder.className = 'bg-orange-500 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1'; btnReminder.innerHTML = '<i class="fas fa-clock"></i> Reminder'; btnReminder.onclick = () => sendMedicineReminder(p); const btnHistory = document.createElement('button'); btnHistory.className = 'bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1'; btnHistory.innerHTML = '<i class="fas fa-history"></i> History'; btnHistory.onclick = () => showVisitHistory(p); const btnRevisit = document.createElement('button'); btnRevisit.className = 'bg-teal-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1'; btnRevisit.innerHTML = '<i class="fas fa-redo"></i> Revisit'; btnRevisit.onclick = () => openRevisitModal(p); const btnLab = document.createElement('button');
             btnLab.className = 'bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1';
             btnLab.innerHTML = '<i class="fas fa-flask"></i> Lab';
             btnLab.onclick = () => openLabReportModal(p);
@@ -787,7 +1019,7 @@ async function loadPatients(reset = true) {
             actions.append(btnPrint, btnWA, btnReminder, btnHistory, btnRevisit, btnLab, btnPayHist); if (isDoctor) { const btnEdit = document.createElement('button'); btnEdit.className = 'bg-blue-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold'; btnEdit.innerHTML = '<i class="fas fa-edit"></i> এডিট'; btnEdit.onclick = () => editPatientRecord(p); const btnDelete = document.createElement('button'); btnDelete.className = 'bg-red-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold'; btnDelete.innerHTML = '<i class="fas fa-trash"></i> মচি পেলাওক'; btnDelete.onclick = () => deletePatientRecord(p.id); actions.append(btnEdit, btnDelete); } card.appendChild(actions); return card; }
         
         async function deletePatientRecord(id) { if (!id) { await showAlert("ভুল হৈছে: ৰোগীৰ ID পোৱা নগ'ল!", "ভুল", "❌"); return; } if (!await showConfirm('আপুনি সঁচাকৈয়ে এই ৰেকৰ্ডটো চিৰদিনৰ বাবে মচি পেলাব বিচাৰে নে?', 'নিশ্চিত কৰক', '🗑️')) return; const { error } = await supabaseClient.from('clinic_data').delete().eq('id', id); if (error) { await showAlert('ডাটাবেচে ডিলিট কৰিবলৈ দিয়া নাই: ' + error.message, 'ভুল', '❌'); } else { await Promise.all([supabaseClient.from('clinic_payments').delete().eq('patient_id', id), supabaseClient.from('clinic_visits').delete().eq('patient_id', id)]); await showAlert("ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হ'ল।", 'সফল ✅', '✅'); loadPatients(); loadExpenses(); loadReport(); } }
-        function editPatientRecord(p) { currentEditId = p.id; document.getElementById('modalTitle').innerHTML = '✏️ ৰোগীৰ তথ্য আপডেট কৰক'; document.getElementById('pName').value = p.name || ''; document.getElementById('pAgeSex').value = p.age || ''; document.getElementById('pBP').value = p.bp || ''; document.getElementById('pPhone').value = p.phone || ''; document.getElementById('pHistory').value = p.history || ''; document.getElementById('pMedicine').value = p.medicine || ''; document.getElementById('pFees').value = ''; document.getElementById('pDob').value = dobFromISO(p.dob); document.getElementById('pWeight').value = p.weight || ''; document.getElementById('pHeight').value = p.height || ''; document.getElementById('pAddress').value = p.address || ''; document.getElementById('pGender').value = p.sex || ''; document.getElementById('pCommunity').value = p.community || ''; document.getElementById('pChiefComplaint').value = p.chief_complaint || ''; document.getElementById('patientModal').classList.remove('hidden'); }
+        function editPatientRecord(p) { currentEditId = p.id; document.getElementById('modalTitle').innerHTML = '✏️ ৰোগীৰ তথ্য আপডেট কৰক'; document.getElementById('pName').value = p.name || ''; document.getElementById('pAgeSex').value = p.age || ''; document.getElementById('pBP').value = p.bp || ''; document.getElementById('pPhone').value = p.phone || ''; caseLoad(p.history || ''); document.getElementById('pMedicine').value = p.medicine || ''; document.getElementById('pFees').value = ''; document.getElementById('pDob').value = dobFromISO(p.dob); document.getElementById('pWeight').value = p.weight || ''; document.getElementById('pHeight').value = p.height || ''; document.getElementById('pAddress').value = p.address || ''; document.getElementById('pGender').value = p.sex || ''; document.getElementById('pCommunity').value = p.community || ''; document.getElementById('pChiefComplaint').value = p.chief_complaint || ''; document.getElementById('patientModal').classList.remove('hidden'); }
         
         async function savePatientRecord() {
             const name = document.getElementById('pName').value.trim();
@@ -812,7 +1044,7 @@ async function loadPatients(reset = true) {
                 chief_complaint: document.getElementById('pChiefComplaint').value,
                 bp: document.getElementById('pBP').value,
                 phone,
-                history: document.getElementById('pHistory').value,
+                history: caseCompose(document.getElementById('pHistory').value),
                 medicine: document.getElementById('pMedicine').value,
                 dob: dobISO,
                 weight: document.getElementById('pWeight').value || null,
@@ -912,7 +1144,7 @@ async function loadExpenses() {
             const printArea = document.getElementById('printArea');
             if (!printArea) return;
             const _rxW = (t, n) => (t || '').split('\n').map(l => l.trim()).filter(l => l).reduce((a, l) => a + Math.max(1, Math.ceil(l.length / n)), 0);
-            const _rxLong = (_rxW(p.medicine, 70) + 0.7 * _rxW(p.chief_complaint || p.history, 90)) > 14;
+            const _rxLong = (_rxW(p.medicine, 70) + 0.7 * _rxW(p.chief_complaint || caseFree(p.history), 90)) > 14;
             printArea.innerHTML = `<div class="rx-page${_rxLong ? ' rx-long' : ''}">
                 <div class="rx-header">
                     <div class="rx-clinic-left">
@@ -941,7 +1173,7 @@ async function loadExpenses() {
 
                 <p class="rx-label">Chief Complaint / ৰোগৰ বিৱৰণ</p>
                 <div class="rx-complaint-box">${
-  (p.chief_complaint || p.history || 'N/A')
+  (p.chief_complaint || caseFree(p.history) || 'N/A')
     .split('\n')
     .map(line => line.trim())
     .filter(line => line.length > 0)
