@@ -56,24 +56,6 @@
             .rx-page.rx-long .rx-watermark { position: static; margin-top: 4px; }
         }
     </style>
-
-<style id="drHarisPremiumEnhancements">
-    :root { color-scheme: light; --clinic-ink:#10243a; --clinic-teal:#087f8c; --clinic-mint:#e9f7f5; --clinic-line:#e3ebf0; }
-    body { background: radial-gradient(ellipse at 12% 0%, #e4f2f4 0, transparent 38%), linear-gradient(145deg,#f4f7fb 0%,#edf3f7 55%,#f8fafc 100%) !important; }
-    #mainPatientSection { border:1px solid rgba(255,255,255,.85) !important; box-shadow:0 24px 70px rgba(15,35,55,.13) !important; }
-    #appDashboard { background:linear-gradient(145deg,#f2f7fa 0%,#f7f9fc 100%) !important; }
-    #appDashboard > div:first-child { background:rgba(255,255,255,.92) !important; border-color:#dce7ed !important; box-shadow:0 8px 28px rgba(20,45,65,.08) !important; backdrop-filter:blur(14px); }
-    #appDashboard .tab-content > div, #appDashboard .bg-white.rounded-2xl, #appDashboard .bg-white.p-4 { border-color:var(--clinic-line) !important; box-shadow:0 5px 20px rgba(18,44,64,.045); }
-    #appDashboard button, #mainPatientSection button { transition:transform .16s ease, box-shadow .16s ease, filter .16s ease; }
-    #appDashboard button:active, #mainPatientSection button:active { transform:translateY(1px) scale(.99); }
-    input:focus, textarea:focus, select:focus { outline:none; border-color:#0c8791 !important; box-shadow:0 0 0 3px rgba(12,135,145,.12) !important; }
-    button:focus-visible, a:focus-visible { outline:3px solid rgba(8,127,140,.35); outline-offset:2px; }
-    #clinicBackupCard { border:1px solid #cfe3e8; background:linear-gradient(120deg,#fff 0%,#f0f9fa 100%); box-shadow:0 8px 24px rgba(13,75,90,.06); }
-    #clinicBackupCard .backup-mark { background:#d9f1ef; color:#087f8c; }
-    @media (max-width:640px) { #appDashboard > div:first-child { border-radius:0 0 16px 16px; } }
-    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; transition-duration:.01ms !important; } }
-</style>
-
 </head>
 <body class="bg-slate-100 text-gray-800 antialiased min-h-screen py-4 sm:py-8 px-2">
 
@@ -132,9 +114,9 @@
                 </div>
             </div>
             <div class="space-y-1.5">
-                <label class="text-[11px] font-bold text-slate-700 flex items-center gap-1"><i class="fas fa-receipt"></i> Razorpay Payment ID (পৰীক্ষাৰ বাবে) *</label>
+                <label class="text-[11px] font-bold text-red-600 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> Payment ID দিয়াটো বাধ্যতামূলক *</label>
                 <input type="text" id="bTxnId" placeholder="pay_XXXXXXXXXXXXXXXXXX" class="w-full p-3.5 border-2 border-slate-950 rounded-xl font-mono text-sm font-bold text-center tracking-widest bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 shadow-inner">
-                <p class="text-[10px] text-amber-700 flex items-start gap-1"><i class="fas fa-info-circle mt-0.5"></i> Payment ID-টো কেৱল booking request-ৰ সৈতে জমা হয়। ক্লিনিকৰ কৰ্মচাৰীয়ে Razorpay Dashboard-ত payment মিলাই চোৱাৰ পিছতহে booking নিশ্চিত হ’ব।</p>
+                <p class="text-[10px] text-blue-500 flex items-center gap-1"><i class="fas fa-info-circle"></i> Razorpay payment সম্পূৰ্ণ হোৱাৰ পিছত পোৱা Payment ID (pay_...) ইয়াত দিয়ক।</p>
             </div>
             <button id="btnSubmitBooking" class="w-full bg-emerald-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-emerald-700 text-xs uppercase transition tracking-wider">বুকিং নিশ্চিত কৰক (Confirm)</button>
         </div>
@@ -216,13 +198,6 @@
     <div id="appDashboard" class="hidden min-h-screen pb-24 bg-slate-50">
         <div class="bg-white border-b border-gray-200 px-4 sm:px-6 py-4 sticky top-0 z-50 shadow-sm flex justify-between items-center max-w-4xl mx-auto rounded-b-xl"><div><h2 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight">DR. HARIS CLINIC</h2><span id="accessBadge" class="text-[9px] sm:text-[10px] bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Access</span></div><button id="btnLogout" class="text-red-500 hover:text-red-700 text-xs font-bold uppercase tracking-wider transition flex items-center gap-1"><i class="fas fa-sign-out-alt"></i> লগ-আউট</button></div>
         <div class="p-3 sm:p-4 max-w-4xl mx-auto overflow-x-hidden">
-            <section id="clinicBackupCard" class="rounded-2xl p-4 mb-4 flex flex-col sm:flex-row sm:items-center gap-3">
-                <div class="flex items-center gap-3 flex-1 min-w-0">
-                    <div class="backup-mark w-11 h-11 rounded-xl flex items-center justify-center text-lg shrink-0"><i class="fas fa-shield-heart"></i></div>
-                    <div class="min-w-0"><p class="text-sm font-extrabold text-slate-800">ডাটা সুৰক্ষা আৰু Backup</p><p class="text-[11px] text-slate-500 leading-relaxed">ৰোগী, visit, payment, booking, medicine আৰু clinic records-ৰ JSON backup ডাউনলোড কৰক।</p></div>
-                </div>
-                <button type="button" onclick="exportClinicBackup()" class="shrink-0 bg-slate-900 hover:bg-slate-800 text-white px-4 py-3 rounded-xl text-xs font-bold shadow-md"><i class="fas fa-download mr-1.5"></i> Backup Download</button>
-            </section>
             <div id="tab-home" class="tab-content space-y-4"><div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100"><div class="relative"><input type="text" id="searchBox" placeholder="নাম বা মোবাইল নম্বৰেৰে ৰোগী সন্ধান কৰক..." class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm focus:outline-none focus:border-slate-500 shadow-inner"></div><button id="btnScrollToEntry" class="w-full mt-3 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl shadow transition text-center block text-sm"><i class="fas fa-user-plus mr-2"></i> নতুন ৰোগী যোগ কৰক</button></div><div id="birthdaySection" class="hidden bg-gradient-to-r from-pink-50 to-red-50 border border-pink-200 rounded-2xl p-4"><div class="flex items-center gap-2 mb-3"><span class="text-lg">🎂</span><p class="font-bold text-sm text-pink-800">আজিৰ জন্মদিন</p><span id="birthdayCount" class="bg-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full"></span></div><div id="birthdayList" class="space-y-2"></div></div><div id="upcomingBirthdaySection" class="hidden bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4"><div class="flex items-center gap-2 mb-3"><span class="text-lg">📅</span><p class="font-bold text-sm text-amber-800">এই সপ্তাহৰ জন্মদিন</p></div><div id="upcomingBirthdayList" class="space-y-2"></div></div><div id="listPatients" class="space-y-3"></div></div>
             <div id="tab-booking" class="tab-content hidden space-y-4"><h3 class="text-md font-bold text-slate-900 px-1">তাৰিখ ভিত্তিক অনলাইন বুকিং তালিকা</h3><div id="listBookings" class="space-y-3"></div></div>
             <div id="tab-report" class="tab-content hidden space-y-4"><div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between gap-3"><div class="flex items-center gap-2"><i class="fas fa-chart-bar text-slate-900"></i><h3 class="text-sm font-bold text-slate-900">Monthly Report</h3></div><div class="flex gap-2"><select id="reportYear" class="border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold bg-gray-50 focus:outline-none"></select><select id="reportMonth" class="border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold bg-gray-50 focus:outline-none"><option value="0">জানুৱাৰী</option><option value="1">ফেব্ৰুৱাৰী</option><option value="2">মাৰ্চ</option><option value="3">এপ্ৰিল</option><option value="4">মে</option><option value="5">জুন</option><option value="6">জুলাই</option><option value="7">আগষ্ট</option><option value="8">ছেপ্টেম্বৰ</option><option value="9">অক্টোবৰ</option><option value="10">নৱেম্বৰ</option><option value="11">ডিচেম্বৰ</option></select></div></div><div id="reportSummary" class="grid grid-cols-2 gap-3"></div><div id="reportFinance" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4"></div><div id="reportDaily" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto"></div><div class="grid grid-cols-2 gap-3"><button onclick="printReport()" class="bg-slate-900 text-white py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2"><i class="fas fa-print"></i> Print কৰক</button><button onclick="whatsappReport()" class="bg-green-600 text-white py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2"><i class="fab fa-whatsapp"></i> WhatsApp</button></div><button onclick="sendDailySummary()" class="w-full bg-teal-600 text-white py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 mt-1"><i class="fab fa-whatsapp"></i> 📊 আজিৰ দৈনিক সাৰাংশ পঠিয়াওক</button></div></div>
@@ -747,7 +722,7 @@
 }
         async function handleLogout() { await supabaseClient.auth.signOut(); const main = document.getElementById('mainPatientSection'); const dash = document.getElementById('appDashboard'); if (dash) dash.classList.add('hidden'); if (main) main.classList.remove('hidden'); safeGet('loginEmail').value = ''; safeGet('loginPassword').value = ''; isDoctor = false; const lp = document.getElementById('listPatients'); const lb = document.getElementById('listBookings'); if (lp) lp.innerHTML = ''; if (lb) lb.innerHTML = ''; }
         
-        async function submitBooking() { const name = safeGet('bName').value?.trim(); const rawPhone = safeGet('bPhone').value?.trim(); const phone = sanitizePhone(rawPhone); const txn_id = safeGet('bTxnId').value?.trim(); const problem = safeGet('bProblem').value?.trim(); if (!/^[A-Za-zÀ-ÿ\u0980-\u09FF\s.]{3,50}$/.test(name)) { await showAlert('সঠিক ৰোগীৰ নাম দিয়ক।', 'ভুল তথ্য', '⚠️'); return; } if (!/^[6-9]\d{9}$/.test(phone)) { await showAlert('সঠিক 10 ডিজিট নম্বৰ দিয়ক।', 'ভুল নম্বৰ', '📱'); return; } if (!problem || problem.length < 5) { await showAlert('স্বাস্থ্য সমস্যাটো সঠিককৈ লিখক।', 'প্ৰয়োজনীয়', '📋'); return; } if (!txn_id || !/^pay_[A-Za-z0-9]+$/.test(txn_id)) { await showAlert('Razorpay-ৰ সঠিক Payment ID দিয়ক (pay_...)।', 'ভুল ID', '🔢'); return; } const { data: existing } = await supabaseClient.from('clinic_bookings').select('id').eq('phone', phone).eq('txn_id', txn_id).maybeSingle(); if (existing) { await showAlert('এই ট্ৰাঞ্জেকচন আইডিৰে আগেয়ে বুকিং হৈছে।', 'ডুপ্লিকেট', '⚠️'); return; } const { error } = await supabaseClient.from('clinic_bookings').insert([{ name, phone, txn_id, problem: `[${selectedBookingType}] ${problem}` }]); if (error) { await showAlert('বুকিং ব্যৰ্থ হৈছে। পুনৰ চেষ্টা কৰক।', 'বুকিং ব্যৰ্থ', '❌'); } else { await showAlert('আপোনাৰ booking request গ্ৰহণ কৰা হৈছে। Payment-টো Razorpay Dashboard-ত পৰীক্ষা কৰাৰ পিছতহে booking নিশ্চিত কৰা হ’ব।', 'Request জমা হৈছে', '🕒'); window.open(`https://api.whatsapp.com/send?phone=91${phone}&text=${encodeURIComponent(`🏥 DR. HARIS CLINIC\n\nনমস্কাৰ ${name},\nআপোনাৰ ${selectedBookingType} booking request গ্ৰহণ কৰা হৈছে। Payment verification-ৰ পিছত clinic-ৰ পৰা confirmation দিয়া হ’ব।\nTxn ID: ${txn_id}`)}`, '_blank'); safeGet('bName').value = ''; safeGet('bPhone').value = ''; safeGet('bProblem').value = ''; safeGet('bTxnId').value = ''; document.getElementById('bookingStep2').classList.add('hidden'); document.getElementById('bookingStep1').classList.remove('hidden'); } }
+        async function submitBooking() { const name = safeGet('bName').value?.trim(); const rawPhone = safeGet('bPhone').value?.trim(); const phone = sanitizePhone(rawPhone); const txn_id = safeGet('bTxnId').value?.trim(); const problem = safeGet('bProblem').value?.trim(); if (!/^[A-Za-zÀ-ÿ\u0980-\u09FF\s.]{3,50}$/.test(name)) { await showAlert('সঠিক ৰোগীৰ নাম দিয়ক।', 'ভুল তথ্য', '⚠️'); return; } if (!/^[6-9]\d{9}$/.test(phone)) { await showAlert('সঠিক 10 ডিজিট নম্বৰ দিয়ক।', 'ভুল নম্বৰ', '📱'); return; } if (!problem || problem.length < 5) { await showAlert('স্বাস্থ্য সমস্যাটো সঠিককৈ লিখক।', 'প্ৰয়োজনীয়', '📋'); return; } if (!txn_id || txn_id.length < 8) { await showAlert('সঠিক Payment ID দিয়ক (pay_...)।', 'ভুল ID', '🔢'); return; } const { data: existing } = await supabaseClient.from('clinic_bookings').select('id').eq('phone', phone).eq('txn_id', txn_id).maybeSingle(); if (existing) { await showAlert('এই ট্ৰাঞ্জেকচন আইডিৰে আগেয়ে বুকিং হৈছে।', 'ডুপ্লিকেট', '⚠️'); return; } const { error } = await supabaseClient.from('clinic_bookings').insert([{ name, phone, txn_id, problem: `[${selectedBookingType}] ${problem}` }]); if (error) { await showAlert('বুকিং ব্যৰ্থ হৈছে। পুনৰ চেষ্টা কৰক।', 'বুকিং ব্যৰ্থ', '❌'); } else { await showAlert('সফল হৈছে! আপোনাৰ বুকিং গ্ৰহণ কৰা হৈছে।', 'বুকিং নিশ্চিত ✅', '🎉'); window.open(`https://api.whatsapp.com/send?phone=91${phone}&text=${encodeURIComponent(`🏥 DR. HARIS CLINIC\n\nনমস্কাৰ ${name},\nআপোনাৰ ${selectedBookingType} ৰ বুকিং পঞ্জীয়ন কৰা হৈছে।\nTxn ID: ${txn_id}`)}`, '_blank'); safeGet('bName').value = ''; safeGet('bPhone').value = ''; safeGet('bProblem').value = ''; safeGet('bTxnId').value = ''; document.getElementById('bookingStep2').classList.add('hidden'); document.getElementById('bookingStep1').classList.remove('hidden'); } }
         
         async function loadBookings() { const { data, error } = await supabaseClient.from('clinic_bookings').select('*').order('created_at', { ascending: false }); if (error || !data) return; const container = document.getElementById('listBookings'); if (!container) return; if (data.length === 0) { container.innerHTML = '<p class="text-center text-gray-400 text-sm py-8">কোনো বুকিং নাই।</p>'; return; } const filterBar = `<div class="flex gap-2 mb-3 flex-wrap"><button onclick="filterBookings('all')" id="fb-all" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-slate-900 text-white transition">সকলো</button><button onclick="filterBookings('pending')" id="fb-pending" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-yellow-100 text-yellow-700 transition">⏳ Pending</button><button onclick="filterBookings('verified')" id="fb-verified" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-emerald-100 text-emerald-700 transition">✅ Verified</button><button onclick="filterBookings('rejected')" id="fb-rejected" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-red-100 text-red-600 transition">❌ Rejected</button></div>`; const cards = data.map(b => { const statusColor = b.status === 'verified' ? 'bg-emerald-100 text-emerald-700' : b.status === 'rejected' ? 'bg-red-100 text-red-600' : 'bg-yellow-100 text-yellow-700'; const statusLabel = b.status === 'verified' ? '✅ Verified' : b.status === 'rejected' ? '❌ Rejected' : '⏳ Pending'; const date = new Date(b.created_at).toLocaleDateString('en-IN'); return `<div class="booking-card p-4 border rounded-xl bg-white shadow-sm text-xs space-y-2" data-status="${b.status || 'pending'}"><div class="flex justify-between items-start gap-2"><div><h5 class="font-bold text-gray-900 text-sm">${escapeHTML(b.name)}</h5><p class="text-gray-500 mt-0.5">${escapeHTML(b.phone)} · ${date}</p></div><span class="px-2 py-1 rounded-full font-bold text-[10px] shrink-0 ${statusColor}">${statusLabel}</span></div><p class="text-emerald-700 font-mono font-bold bg-emerald-50 px-2 py-1 rounded-lg">Txn: ${escapeHTML(b.txn_id)}</p><p class="text-gray-600">${escapeHTML(b.problem || '')}</p><div class="flex gap-2 pt-1 border-t flex-wrap">${b.status !== 'verified' ? `<button onclick="updateBookingStatus('${b.id}', 'verified')" class="flex-1 bg-emerald-600 text-white py-2 rounded-lg font-bold text-[11px] hover:bg-emerald-700 transition min-w-[80px]">✅ Verify</button>` : ''}${b.status !== 'rejected' ? `<button onclick="updateBookingStatus('${b.id}', 'rejected')" class="flex-1 bg-red-500 text-white py-2 rounded-lg font-bold text-[11px] hover:bg-red-600 transition min-w-[80px]">❌ Reject</button>` : ''}${b.status === 'verified' ? `<button onclick="convertBookingToPatient('${b.id}')" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold text-[11px] hover:bg-blue-700 transition">➕ ক্লিনিকত ৰোগী হিচাপে যোগ কৰক</button>` : ''}</div></div>`; }).join(''); container.innerHTML = filterBar + `<div id="bookingCardList">${cards}</div>`; }
         function filterBookings(status) { const cards = document.querySelectorAll('.booking-card'); cards.forEach(card => { card.style.display = (status === 'all' || card.dataset.status === status) ? '' : 'none'; }); ['all','pending','verified','rejected'].forEach(s => { const btn = document.getElementById('fb-' + s); if (!btn) return; btn.className = s === status ? 'px-3 py-1.5 rounded-lg text-[11px] font-bold bg-slate-900 text-white transition' : 'px-3 py-1.5 rounded-lg text-[11px] font-bold bg-yellow-100 text-yellow-700 transition'; }); }
@@ -1043,7 +1018,7 @@ async function loadPatients(reset = true) {
             btnPayHist.onclick = () => openPaymentHistory(p);
             actions.append(btnPrint, btnWA, btnReminder, btnHistory, btnRevisit, btnLab, btnPayHist); if (isDoctor) { const btnEdit = document.createElement('button'); btnEdit.className = 'bg-blue-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold'; btnEdit.innerHTML = '<i class="fas fa-edit"></i> এডিট'; btnEdit.onclick = () => editPatientRecord(p); const btnDelete = document.createElement('button'); btnDelete.className = 'bg-red-600 text-white px-2.5 py-2 rounded-lg text-xs font-bold'; btnDelete.innerHTML = '<i class="fas fa-trash"></i> মচি পেলাওক'; btnDelete.onclick = () => deletePatientRecord(p.id); actions.append(btnEdit, btnDelete); } card.appendChild(actions); return card; }
         
-        async function deletePatientRecord(id) { if (!id) { await showAlert("ভুল হৈছে: ৰোগীৰ ID পোৱা নগ'ল!", "ভুল", "❌"); return; } if (!await showConfirm('সাৱধান: এই ৰোগীৰ মূল তথ্যৰ লগতে সংযুক্ত payment আৰু visit history-ও মচি যাব। আগতে Backup লওক। তথাপিও স্থায়ীভাৱে মচিব বিচাৰেনে?', 'নিশ্চিত কৰক', '🗑️')) return; const { error } = await supabaseClient.from('clinic_data').delete().eq('id', id); if (error) { await showAlert('ডাটাবেচে ডিলিট কৰিবলৈ দিয়া নাই: ' + error.message, 'ভুল', '❌'); } else { await Promise.all([supabaseClient.from('clinic_payments').delete().eq('patient_id', id), supabaseClient.from('clinic_visits').delete().eq('patient_id', id)]); await showAlert("ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হ'ল।", 'সফল ✅', '✅'); loadPatients(); loadExpenses(); loadReport(); } }
+        async function deletePatientRecord(id) { if (!id) { await showAlert("ভুল হৈছে: ৰোগীৰ ID পোৱা নগ'ল!", "ভুল", "❌"); return; } if (!await showConfirm('আপুনি সঁচাকৈয়ে এই ৰেকৰ্ডটো চিৰদিনৰ বাবে মচি পেলাব বিচাৰে নে?', 'নিশ্চিত কৰক', '🗑️')) return; const { error } = await supabaseClient.from('clinic_data').delete().eq('id', id); if (error) { await showAlert('ডাটাবেচে ডিলিট কৰিবলৈ দিয়া নাই: ' + error.message, 'ভুল', '❌'); } else { await Promise.all([supabaseClient.from('clinic_payments').delete().eq('patient_id', id), supabaseClient.from('clinic_visits').delete().eq('patient_id', id)]); await showAlert("ৰেকৰ্ড সফলতাৰে মচি পেলোৱা হ'ল।", 'সফল ✅', '✅'); loadPatients(); loadExpenses(); loadReport(); } }
         function editPatientRecord(p) { currentEditId = p.id; document.getElementById('modalTitle').innerHTML = '✏️ ৰোগীৰ তথ্য আপডেট কৰক'; document.getElementById('pName').value = p.name || ''; document.getElementById('pAgeSex').value = p.age || ''; document.getElementById('pBP').value = p.bp || ''; document.getElementById('pPhone').value = p.phone || ''; caseLoad(p.history || ''); document.getElementById('pMedicine').value = p.medicine || ''; document.getElementById('pFees').value = ''; document.getElementById('pDob').value = dobFromISO(p.dob); document.getElementById('pWeight').value = p.weight || ''; document.getElementById('pHeight').value = p.height || ''; document.getElementById('pAddress').value = p.address || ''; document.getElementById('pGender').value = p.sex || ''; document.getElementById('pCommunity').value = p.community || ''; document.getElementById('pChiefComplaint').value = p.chief_complaint || ''; document.getElementById('patientModal').classList.remove('hidden'); }
         
         async function savePatientRecord() {
@@ -1864,59 +1839,6 @@ function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); bu
     if (!doctorNow()) { formulaCache = null; formulaError = ''; }
   };
 })();
-</script>
-
-
-<script id="drHarisBackupEnhancements">
-async function exportClinicBackup() {
-    if (typeof supabaseClient === 'undefined' || !supabaseClient) {
-        if (typeof showAlert === 'function') await showAlert('ডাটাবেচ সংযোগ উপলব্ধ নহয়।', 'Backup ব্যৰ্থ', '❌');
-        return;
-    }
-    if (typeof isDoctor !== 'undefined' && isDoctor !== true) {
-        if (typeof showAlert === 'function') await showAlert('সম্পূৰ্ণ clinic backup কেৱল Doctor login-ৰ বাবে উপলব্ধ।', 'অনুমতি নাই', '🔒');
-        return;
-    }
-    const tables = ['clinic_data','clinic_visits','clinic_payments','clinic_expenses','clinic_bookings','clinic_medicines','clinic_medicine_logs','physio_sessions','rx_templates','rx_code_formulas'];
-    const backup = { app:'Dr. Haris Clinic Management App', format_version:1, created_at:new Date().toISOString(), timezone:'Asia/Kolkata', tables:{}, warnings:[] };
-    const button = document.querySelector('#clinicBackupCard button');
-    const oldLabel = button ? button.innerHTML : '';
-    if (button) { button.disabled = true; button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1.5"></i> Backup চলিছে...'; }
-    try {
-        for (const table of tables) {
-            const rows = [];
-            let from = 0;
-            const batchSize = 500;
-            while (true) {
-                const { data, error } = await supabaseClient.from(table).select('*').range(from, from + batchSize - 1);
-                if (error) { backup.warnings.push({ table, message:error.message || 'Read failed' }); break; }
-                const page = data || [];
-                rows.push(...page);
-                if (page.length < batchSize) break;
-                from += batchSize;
-            }
-            backup.tables[table] = rows;
-        }
-        const payload = JSON.stringify(backup, null, 2);
-        const blob = new Blob([payload], {type:'application/json;charset=utf-8'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        const stamp = new Date().toISOString().replace(/[:.]/g,'-');
-        a.href = url; a.download = `dr-haris-clinic-backup-${stamp}.json`;
-        document.body.appendChild(a); a.click(); a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 30000);
-        const total = Object.values(backup.tables).reduce((n, rows) => n + rows.length, 0);
-        if (typeof showAlert === 'function') {
-            const warningText = backup.warnings.length ? ` ${backup.warnings.length}টা table-ৰ data পোৱা নগ'ল; warning-সহ ফাইলটো পৰীক্ষা কৰক।` : '';
-            await showAlert(`${total}টা record backup ফাইলত সংৰক্ষণ কৰা হৈছে। ফাইলটো clinic-ৰ অনুমোদিত সুৰক্ষিত স্থানত ৰাখিব।${warningText}`, backup.warnings.length ? 'Backup সম্পূৰ্ণ — Warning' : 'Backup সম্পূৰ্ণ', backup.warnings.length ? '⚠️' : '✅');
-        }
-    } catch (err) {
-        console.error('Clinic backup failed:', err);
-        if (typeof showAlert === 'function') await showAlert('Backup সম্পূৰ্ণ কৰিব পৰা নগ’ল। পুনৰ চেষ্টা কৰক।', 'Backup ব্যৰ্থ', '❌');
-    } finally {
-        if (button) { button.disabled = false; button.innerHTML = oldLabel; }
-    }
-}
 </script>
 
 </body>
