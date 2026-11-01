@@ -1300,14 +1300,61 @@ async function loadExpenses() {
         let _rxPatientData = null;
 
         function doPrintRx() {
-            // Mobile browser print dialog bondho hole page scroll ouplo-loi jai (New Patient button-r thai) -- scroll position save kori punor restore kora hoise.
-            // Preview modal bondho nokora hol: print CSS-te 'body > * { display:none }' diye eitu print-ot nadekhuwai.
-            const savedY = window.pageYOffset || document.documentElement.scrollTop || 0;
-            const restoreScroll = () => { window.scrollTo(0, savedY); };
-            const onAfter = () => { window.removeEventListener('afterprint', onAfter); restoreScroll(); setTimeout(restoreScroll, 150); setTimeout(restoreScroll, 500); };
-            window.addEventListener('afterprint', onAfter);
-            window.print();
-            setTimeout(restoreScroll, 600);
+            // iPhone/iPad: open a clean, standalone print page. The popup is opened
+            // synchronously from the user's tap so Safari is less likely to block it.
+            const preview = document.getElementById('rxPreviewContent');
+            const rxHtml = preview ? preview.innerHTML : '';
+            if (!rxHtml.trim()) {
+                alert('Prescription Preview পোৱা নগ’ল। পুনৰ Preview খুলি চেষ্টা কৰক।');
+                return;
+            }
+
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                // Popup blockers / in-app browsers may block the new tab.
+                alert('নতুন Print পৃষ্ঠা খোলাত বাধা দিছে। Safari-ত App-টো খুলি পুনৰ চেষ্টা কৰক।');
+                try { window.print(); } catch (e) { console.warn('Print fallback failed:', e); }
+                return;
+            }
+
+            const sourceStyles = Array.from(document.querySelectorAll('style'))
+                .map(style => style.textContent || '').join('\n');
+            const html = `<!DOCTYPE html>
+<html lang="as">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DR. HARIS CLINIC - Prescription</title>
+<style>
+${sourceStyles}
+html,body{margin:0;padding:0;background:#f1f5f9;color:#111;font-family:'Noto Sans Assamese',Arial,sans-serif}
+.print-toolbar{position:sticky;top:0;z-index:10;background:#0f172a;color:#fff;padding:12px 14px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;font:14px Arial,sans-serif}
+.print-toolbar button{border:0;border-radius:9px;padding:11px 16px;background:#0d9488;color:#fff;font-weight:700;font-size:14px}
+.print-help{width:100%;text-align:center;font-size:12px;line-height:1.5;color:#e2e8f0}
+#printArea{display:block;background:#fff;max-width:900px;margin:16px auto;padding:0;box-shadow:0 2px 12px rgba(0,0,0,.12)}
+.rx-page{padding:14mm 16mm 10mm;font-family:Georgia,'Noto Sans Assamese',serif;color:#111;box-sizing:border-box}
+@media print{
+  @page{margin:0;size:auto}
+  html,body{background:#fff!important;margin:0!important;padding:0!important}
+  body>*{display:none!important}
+  .print-toolbar{display:none!important}
+  #printArea{display:block!important;visibility:visible!important;position:static!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important;box-shadow:none!important}
+  #printArea,#printArea *{visibility:visible!important}
+  .rx-page{display:block!important;position:static!important;page-break-after:avoid}
+}
+</style>
+</head>
+<body onload="setTimeout(function(){try{window.focus();window.print()}catch(e){}},700)">
+<div class="print-toolbar">
+  <button type="button" onclick="window.print()">🖨️ Print / Save PDF</button>
+  <div class="print-help">iPhone: Print বুটাম টিপক। কাম নকৰিলে Safari-ৰ Share আইকন → Print বাছক → Preview-ত দুটা আঙুলিৰে ডাঙৰ কৰক → Share → Save to Files।</div>
+</div>
+<div id="printArea">${rxHtml}</div>
+</body></html>`;
+
+            printWindow.document.open();
+            printWindow.document.write(html);
+            printWindow.document.close();
         }
 
         async function doWhatsAppRxFromPreview() {
