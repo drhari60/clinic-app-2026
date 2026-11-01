@@ -8,8 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Poppins', sans-serif; overflow-x: hidden; }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Assamese:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Noto Sans Assamese', 'Poppins', sans-serif; overflow-x: hidden; }
         .premium-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
         .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
         #customAlertOverlay { position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:9999; display:flex; align-items:center; justify-content:center; padding:16px; }
@@ -72,6 +72,51 @@
     #clinicBackupCard .backup-mark { background:#d9f1ef; color:#087f8c; }
     @media (max-width:640px) { #appDashboard > div:first-child { border-radius:0 0 16px 16px; } }
     @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; transition-duration:.01ms !important; } }
+</style>
+
+
+<style id="drHarisAssamesePremiumPolish">
+  :root {
+    --clinic-navy:#12304a; --clinic-navy-deep:#0c2238; --clinic-teal:#087f8c;
+    --clinic-teal-soft:#e8f5f5; --clinic-border:#dce7ec; --clinic-muted:#607487;
+  }
+  html { -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+  body, button, input, textarea, select { font-family:'Noto Sans Assamese','Poppins',sans-serif !important; }
+  body { background:#f3f7fa !important; color:#243746; }
+  #mainPatientSection { background:#fff !important; border:1px solid var(--clinic-border) !important; box-shadow:0 14px 42px rgba(17,48,74,.10) !important; }
+  #mainPatientSection h2 { color:var(--clinic-navy-deep) !important; letter-spacing:-.025em; }
+  #mainPatientSection .bg-slate-900, #appDashboard .bg-slate-900 { background-color:var(--clinic-navy) !important; }
+  #mainPatientSection .text-slate-900, #appDashboard .text-slate-900 { color:var(--clinic-navy) !important; }
+  #mainPatientSection .border-slate-900 { border-color:var(--clinic-navy) !important; }
+  #mainPatientSection .bg-slate-50 { background-color:#f7fafc !important; }
+  #mainPatientSection .border-slate-200, #mainPatientSection .border-gray-200 { border-color:var(--clinic-border) !important; }
+  #appDashboard { background:#f3f7fa !important; }
+  #appDashboard > div:first-child { background:#fff !important; border-bottom:1px solid var(--clinic-border) !important; box-shadow:0 3px 14px rgba(17,48,74,.06) !important; }
+  #appDashboard .tab-content > div, #appDashboard .bg-white.rounded-2xl, #appDashboard .bg-white.p-4 { border-color:var(--clinic-border) !important; box-shadow:0 3px 14px rgba(17,48,74,.045); }
+  #mainPatientSection input, #mainPatientSection select, #mainPatientSection textarea,
+  #appDashboard input, #appDashboard select, #appDashboard textarea { min-height:42px; font-size:14px !important; }
+  #mainPatientSection button, #appDashboard button { min-height:38px; line-height:1.45; }
+  #mainPatientSection input::placeholder, #appDashboard input::placeholder { color:#718397; opacity:1; }
+  #mainPatientSection button:focus-visible, #appDashboard button:focus-visible,
+  #mainPatientSection a:focus-visible, #appDashboard a:focus-visible { outline:3px solid rgba(8,127,140,.35); outline-offset:2px; }
+  #bookingStep1, #bookingStep2 { border-color:var(--clinic-border) !important; background:#f8fbfc !important; }
+  #qrBadge { background:var(--clinic-navy) !important; }
+  #paymentQRCode { border:1px solid var(--clinic-border); border-radius:14px; padding:7px; background:#fff; }
+  #appDashboard .tab-btn { min-width:58px; }
+  #appDashboard .tab-btn.active, #appDashboard .tab-btn[aria-selected="true"] { color:var(--clinic-teal) !important; }
+  /* Tailwind's tiny utility labels were difficult to read on phones. Keep prescription print styling unchanged. */
+  @media screen and (max-width:640px) {
+    #mainPatientSection { padding:18px 15px !important; border-radius:22px !important; }
+    #mainPatientSection [class*="text-[9px]"], #mainPatientSection [class*="text-[10px]"],
+    #appDashboard [class*="text-[9px]"], #appDashboard [class*="text-[10px]"] { font-size:11px !important; }
+    #mainPatientSection [class*="text-[11px]"], #appDashboard [class*="text-[11px]"] { font-size:12px !important; }
+    #mainPatientSection input, #mainPatientSection select, #mainPatientSection textarea,
+    #appDashboard input, #appDashboard select, #appDashboard textarea { font-size:16px !important; }
+    #appDashboard .tab-btn { padding-left:7px !important; padding-right:7px !important; }
+  }
+  @media (prefers-reduced-motion:reduce) {
+    #mainPatientSection *, #appDashboard * { scroll-behavior:auto !important; transition-duration:.01ms !important; }
+  }
 </style>
 
 </head>
