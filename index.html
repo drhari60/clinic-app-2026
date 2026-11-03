@@ -1222,7 +1222,7 @@ async function loadExpenses() {
             const printArea = document.getElementById('printArea');
             if (!printArea) return;
             const _rxW = (t, n) => (t || '').split('\n').map(l => l.trim()).filter(l => l).reduce((a, l) => a + Math.max(1, Math.ceil(l.length / n)), 0);
-            const _rxLong = (_rxW(p.medicine, 70) + 0.7 * _rxW(p.chief_complaint || caseFree(p.history), 90)) > 14;
+            const _rxLong = (_rxW(p.medicine, 70) + 0.7 * _rxW(p.chief_complaint, 90)) > 14;
             printArea.innerHTML = `<div class="rx-page${_rxLong ? ' rx-long' : ''}">
                 <div class="rx-header">
                     <div class="rx-clinic-left">
@@ -1251,7 +1251,7 @@ async function loadExpenses() {
 
                 <p class="rx-label">Chief Complaint / ৰোগৰ বিৱৰণ</p>
                 <div class="rx-complaint-box">${
-  (p.chief_complaint || caseFree(p.history) || 'N/A')
+  ((p.chief_complaint || '').trim() || 'N/A')
     .split('\n')
     .map(line => line.trim())
     .filter(line => line.length > 0)
