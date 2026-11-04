@@ -2054,11 +2054,28 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
       var list = MEDS.filter(function (m) {
         return !q || m[0].toLowerCase().indexOf(q) !== -1 || (m[1] && m[1].toLowerCase().indexOf(q) !== -1) || m[3].toLowerCase().indexOf(q) !== -1;
       });
-      if (q) list.sort(function (a, b) {
+      var fuzzy = false;
+      if (q && !list.length) {
+        var nz = function (x) { return String(x || '').toLowerCase().replace(/ph/g, 'f').replace(/[^a-z0-9]/g, ''); };
+        // returns a score (lower = closer) or -1 if the letters do not appear in order
+        var sc = function (nd, hay) { var i = 0, first = -1, last = -1; for (var k = 0; k < hay.length && i < nd.length; k++) { if (hay.charAt(k) === nd.charAt(i)) { if (i === 0) first = k; last = k; i++; } } return i === nd.length ? ((first === 0 ? 0 : 100) + (last - first)) : -1; };
+        var nq = nz(q), scored = [];
+        if (nq.length >= 3) {
+          MEDS.forEach(function (m) {
+            var s1 = sc(nq, nz(m[0])), s2 = m[1] ? sc(nq, nz(m[1])) : -1;
+            var best = s1 < 0 ? s2 : (s2 < 0 ? s1 : Math.min(s1, s2));
+            if (best >= 0) scored.push([best, m]);
+          });
+          scored.sort(function (x, y) { return x[0] - y[0]; });
+          list = scored.slice(0, 8).map(function (x) { return x[1]; });
+          fuzzy = list.length > 0;
+        }
+      }
+      if (q && !fuzzy) list.sort(function (a, b) {
         var ap = a[0].toLowerCase().indexOf(q) === 0 ? 0 : 1, bp = b[0].toLowerCase().indexOf(q) === 0 ? 0 : 1;
         return ap - bp;
       });
-      var html = list.slice(0, 60).map(function (m) {
+      var html = list.map(function (m) {
         var i = MEDS.indexOf(m);
         return '<button type="button" data-i="' + i + '" class="w-full text-left px-3 py-2 mb-1 rounded-lg border border-gray-100 hover:bg-teal-50 text-sm">' +
           '<span class="font-semibold text-slate-800">' + esc(m[0]) + '</span>' +
@@ -2066,7 +2083,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
           ' <span class="float-right text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">' + esc(m[3]) + '</span></button>';
       }).join('');
       document.getElementById('medNameList').innerHTML = html || '<p class="text-sm text-gray-400 py-4 text-center">কোনো ঔষধ পোৱা নগ\'ল। নিজে Rx বাকচত লিখিব পাৰে।</p>';
-      document.getElementById('medNameCount').textContent = list.length > 60 ? ('প্ৰথম ৬০টা দেখুওৱা হৈছে (মুঠ ' + list.length + 'টা)। বিচাৰি সংকীৰ্ণ কৰক') : (list.length + 'টা ঔষধ');
+      document.getElementById('medNameCount').textContent = list.length + 'টা ঔষধ' + (q ? ' পোৱা গ\'ল' : '') + (fuzzy ? ' (প্ৰায় মিলে — বানান চাওক)' : '');
     }
     function close() {
       var m = document.getElementById('medNamePickerModal'); if (m) m.classList.add('hidden');
