@@ -235,6 +235,33 @@
             </div>
         </div>
 
+        <!-- Patient Feedback (new) -->
+        <div id="patientFeedbackCard" class="w-full bg-white rounded-2xl border border-slate-200 mt-4 shadow-sm overflow-hidden">
+            <button type="button" id="fbToggleBtn" class="w-full flex items-center justify-between px-4 py-3 bg-slate-50 text-left">
+                <span class="flex items-center gap-2 text-xs font-bold text-slate-700"><i class="fas fa-star text-yellow-500"></i> আপোনাৰ মতামত দিয়ক</span>
+                <i id="fbToggleIcon" class="fas fa-chevron-down text-[10px] text-slate-400"></i>
+            </button>
+            <div id="fbFormBox" class="hidden p-4 space-y-3">
+                <p class="text-[11px] text-slate-500 text-center">আমাৰ সেৱা কেনেকুৱা লাগিল?</p>
+                <div class="text-center">
+                    <div id="fbStarsOverall" class="fb-stars flex justify-center gap-1" data-key="overall" data-size="text-3xl"></div>
+                    <p class="text-[10px] text-slate-400 mt-1">১ – অতি বেয়া &nbsp;|&nbsp; ৫ – অতি ভাল</p>
+                </div>
+                <div class="space-y-1.5 bg-slate-50 rounded-xl p-3 border border-slate-100">
+                    <div class="flex items-center justify-between gap-2"><span class="text-[11px] text-slate-600">চিকিৎসকৰ ব্যৱহাৰ</span><div class="fb-stars flex gap-0.5" data-key="doctor" data-size="text-lg"></div></div>
+                    <div class="flex items-center justify-between gap-2"><span class="text-[11px] text-slate-600">চিকিৎসা সেৱাৰ মান</span><div class="fb-stars flex gap-0.5" data-key="quality" data-size="text-lg"></div></div>
+                    <div class="flex items-center justify-between gap-2"><span class="text-[11px] text-slate-600">অপেক্ষাৰ সময়</span><div class="fb-stars flex gap-0.5" data-key="wait" data-size="text-lg"></div></div>
+                    <div class="flex items-center justify-between gap-2"><span class="text-[11px] text-slate-600">ক্লিনিকৰ পৰিৱেশ</span><div class="fb-stars flex gap-0.5" data-key="env" data-size="text-lg"></div></div>
+                </div>
+                <textarea id="fbComment" maxlength="1000" placeholder="আপোনাৰ অভিজ্ঞতা বা পৰামৰ্শ লিখক..." class="w-full p-3 border border-gray-200 rounded-xl h-24 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 resize-none"></textarea>
+                <label class="flex items-center gap-2 text-[11px] text-slate-600"><input type="checkbox" id="fbAnon" checked> নাম নিদিয়াকৈ (বেনামী) মতামত দিম</label>
+                <input type="text" id="fbName" maxlength="50" placeholder="আপোনাৰ নাম" class="hidden w-full p-3 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900">
+                <label class="flex items-center gap-2 text-[11px] text-slate-600"><input type="checkbox" id="fbPublish"> মোৰ মতামত প্ৰকাশ কৰিবলৈ অনুমতি দিলোঁ</label>
+                <p class="text-[10px] text-slate-400 leading-relaxed">অনুগ্ৰহ কৰি ফোন নম্বৰ, ৰোগৰ বিৱৰণ বা ব্যক্তিগত চিকিৎসা তথ্য লিখিব নালাগে।</p>
+                <button type="button" id="fbSubmitBtn" class="w-full premium-gradient text-white font-bold py-3.5 rounded-xl shadow-lg text-xs uppercase tracking-wider">Feedback Submit কৰক</button>
+            </div>
+        </div>
+
         <!-- Clinic Location Map -->
         <div class="w-full bg-white rounded-2xl border border-slate-200 mt-4 overflow-hidden shadow-sm">
             <div class="flex items-center justify-between px-4 py-2.5 bg-slate-50 border-b border-slate-100">
@@ -323,6 +350,22 @@
   </div>
   <iframe id="agentFrame2" data-src="https://udify.app/chatbot/R8rIFep1K3KGPUbo" src="about:blank" style="width:100%;height:600px;opacity:0;transition:opacity 0.3s;" frameborder="0" allow="microphone" onload="this.style.opacity='1';document.getElementById('agentLoader2')?.remove();"></iframe>
 </div></div></div>
+            <div id="tab-feedback" class="tab-content hidden space-y-4">
+                <h3 class="text-md font-bold text-slate-900 px-1">ৰোগীৰ Feedback</h3>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm text-center"><p class="text-[10px] text-gray-400 font-bold">মুঠ</p><p id="fbStatTotal" class="text-xl font-extrabold text-slate-900">0</p></div>
+                    <div class="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm text-center"><p class="text-[10px] text-gray-400 font-bold">গড় Star</p><p id="fbStatAvg" class="text-xl font-extrabold text-yellow-500">–</p></div>
+                    <div class="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm text-center"><p class="text-[10px] text-gray-400 font-bold">নতুন</p><p id="fbStatNew" class="text-xl font-extrabold text-red-500">0</p></div>
+                </div>
+                <div id="fbDist" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm space-y-1.5"></div>
+                <div class="flex gap-2 flex-wrap">
+                    <button onclick="fbFilter('all')" id="fbf-all" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-slate-900 text-white">সকলো</button>
+                    <button onclick="fbFilter('new')" id="fbf-new" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-yellow-100 text-yellow-700">🆕 নতুন</button>
+                    <button onclick="fbFilter('low')" id="fbf-low" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-red-100 text-red-600">⚠️ ১-২ Star</button>
+                    <button onclick="fbFilter('comment')" id="fbf-comment" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-blue-100 text-blue-700">💬 লিখিত মতামত</button>
+                </div>
+                <div id="fbList" class="space-y-3"></div>
+            </div>
             <div id="tab-expenses" class="tab-content hidden space-y-4"><div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100"><h3 class="text-sm font-bold text-gray-900 mb-3 border-b pb-2 flex items-center gap-1.5"><i class="fas fa-plus-circle text-green-500"></i> নতুন আয় যোগ কৰক (Income Entry)</h3><p class="text-[10px] text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-3 flex items-start gap-1.5"><i class="fas fa-exclamation-triangle mt-0.5"></i><span>এই section টো কেৱল extra/miscellaneous আয়ৰ বাবে (যেনে: certificate fee, test fee)। নতুন ৰোগীৰ ভিজিট ফীজ পোনপটীয়াকৈ ৰোগী যোগ কৰোঁতে দিয়ক, নহ'লে duplicate আয় হ'ব।</span></p><div class="grid grid-cols-1 sm:grid-cols-3 gap-3"><input type="text" id="incomePatientName" placeholder="ৰোগীৰ নাম / বিৱৰণ" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner"><input type="number" id="incomeAmount" placeholder="আয়ৰ পৰিমাণ (₹)" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner"><button id="btnSaveIncome" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow transition text-sm">আয় সংৰক্ষণ কৰক</button></div></div><div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100"><h3 class="text-sm font-bold text-gray-900 mb-3 border-b pb-2 flex items-center gap-1.5"><i class="fas fa-plus-circle text-red-500"></i> নতুন দৈনিক খৰচৰ এণ্ট্ৰী</h3><div class="space-y-3"><select id="expCategory" class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm focus:outline-none"><option value="Salary">দৰমহা (Salary)</option><option value="Rent">ঘৰ ভাড়া (Rent)</option><option value="Electricity Bill">বিজুলীৰ বিল (Electricity Bill)</option><option value="Medicine Purchase">ঔষধ কিনা (Medicine Purchase)</option><option value="Miscellaneous Expenses">অন্যান্য খৰচ (Miscellaneous Expenses)</option></select><input type="number" id="expAmount" placeholder="টকাৰ পৰিমাণ (₹)" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner"><input type="text" id="expDesc" placeholder="বিৱৰণ (Description)" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none shadow-inner"><button id="btnSaveExpense" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow transition text-sm">খৰচ সংৰক্ষণ কৰক</button></div></div><div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm space-y-2"><h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider border-b pb-1.5 flex items-center gap-1"><i class="fas fa-chart-pie text-slate-700"></i> ক্লিনিকৰ আয়-ব্যয় প্ৰতিবেদন</h4><div class="flex gap-2 mb-1"><select id="expMonth" onchange="loadExpenses()" class="flex-1 p-2.5 border border-gray-200 rounded-xl bg-gray-50 text-sm font-medium focus:outline-none"></select><select id="expYear" onchange="loadExpenses()" class="w-28 p-2.5 border border-gray-200 rounded-xl bg-gray-50 text-sm font-medium focus:outline-none"></select></div><div id="expenseSummaryText" class="text-xs space-y-1.5 text-gray-700">হিচাপ লোড হৈ আছে...</div></div><div id="listExpenses" class="space-y-2"></div></div>
             <div id="tab-stock" class="tab-content hidden space-y-4">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
@@ -374,6 +417,7 @@
             <button data-tab="stock" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition"><i class="fas fa-pills text-base"></i>ষ্টক</button>
             <button data-tab="physio" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition"><i class="fas fa-running text-base"></i>ফিজিঅ'</button>
             <button data-tab="profile" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition"><i class="fas fa-user text-base"></i>প্ৰফাইল</button>
+            <button data-tab="feedback" class="tab-btn stock-only hidden flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition"><i class="fas fa-star text-base"></i>Feedback</button>
         </div>
     </div>
 
@@ -1486,7 +1530,7 @@ async function saveCurrentTemplate() {
   document.getElementById('templateSelectorModal').classList.add('hidden');
 }
 
-function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); buttons.forEach(btn => { btn.addEventListener('click', () => { const targetTab = btn.getAttribute('data-tab'); document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden')); if (targetTab === 'booking') loadBookings(); if (targetTab === 'expenses') loadExpenses(); if (targetTab === 'report') loadReport(); if (targetTab === 'home') loadPatients(); if (targetTab === 'stock') loadMedicines(); if (targetTab === 'physio') loadPhysioList(); if (targetTab === 'profile') { document.querySelectorAll('iframe[data-src]').forEach(iframe => { if (iframe.src === 'about:blank' && iframe.dataset.src) { iframe.src = iframe.dataset.src; } }); } document.getElementById(`tab-${targetTab}`)?.classList.remove('hidden'); buttons.forEach(b => { b.classList.remove('text-slate-900', 'border-b-2', 'border-slate-900'); b.classList.add('text-gray-400'); }); btn.classList.add('text-slate-900', 'border-b-2', 'border-slate-900'); btn.classList.remove('text-gray-400'); }); }); }
+function setupTabs() { const buttons = document.querySelectorAll('.tab-btn'); buttons.forEach(btn => { btn.addEventListener('click', () => { const targetTab = btn.getAttribute('data-tab'); document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden')); if (targetTab === 'booking') loadBookings(); if (targetTab === 'expenses') loadExpenses(); if (targetTab === 'report') loadReport(); if (targetTab === 'home') loadPatients(); if (targetTab === 'stock') loadMedicines(); if (targetTab === 'feedback') loadFeedback(); if (targetTab === 'physio') loadPhysioList(); if (targetTab === 'profile') { document.querySelectorAll('iframe[data-src]').forEach(iframe => { if (iframe.src === 'about:blank' && iframe.dataset.src) { iframe.src = iframe.dataset.src; } }); } document.getElementById(`tab-${targetTab}`)?.classList.remove('hidden'); buttons.forEach(b => { b.classList.remove('text-slate-900', 'border-b-2', 'border-slate-900'); b.classList.add('text-gray-400'); }); btn.classList.add('text-slate-900', 'border-b-2', 'border-slate-900'); btn.classList.remove('text-gray-400'); }); }); }
         
         async function loadReport() { const monthSelect = document.getElementById('reportMonth'); const yearSelect = document.getElementById('reportYear'); const selectedMonth = parseInt(monthSelect.value); const year = yearSelect ? parseInt(yearSelect.value) : new Date().getFullYear(); const monthStartDate = ymd(new Date(year, selectedMonth, 1)); const monthEndDate = ymd(new Date(year, selectedMonth + 1, 0)); const monthEndFull = monthEndDate + 'T23:59:59+05:30'; const [{ data: payments }, { data: expenses }, { data: patients }, { data: visits }] = await Promise.all([supabaseClient.from('clinic_payments').select('*').gte('visit_date', monthStartDate).lte('visit_date', monthEndDate), supabaseClient.from('clinic_expenses').select('*').gte('created_at', monthStartDate + 'T00:00:00+05:30').lte('created_at', monthEndFull), supabaseClient.from('clinic_data').select('*').gte('created_at', monthStartDate + 'T00:00:00+05:30').lte('created_at', monthEndDate + 'T23:59:59+05:30'), supabaseClient.from('clinic_visits').select('*').gte('visit_date', monthStartDate).lte('visit_date', monthEndDate)]); const totalIncome = (payments || []).reduce((s, p) => s + (parseFloat(p.fees) || 0), 0); const totalExpense = (expenses || []).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0); const netProfit = totalIncome - totalExpense; const totalNewPatients = (patients || []).length; const uniquePatientIds = new Set((visits || []).filter(v => v.patient_id).map(v => v.patient_id)); const totalUniqueVisitors = uniquePatientIds.size; const totalVisits = (visits || []).length; const summaryEl = document.getElementById('reportSummary'); if (summaryEl) { summaryEl.innerHTML = `<div class="bg-blue-50 p-3 rounded-xl text-center"><p class="text-[10px] text-blue-600 font-bold uppercase">নতুন ৰোগী</p><p class="text-2xl font-extrabold text-blue-700">${totalNewPatients}</p><p class="text-[10px] text-blue-400">জন (নতুন Registration)</p></div><div class="bg-indigo-50 p-3 rounded-xl text-center"><p class="text-[10px] text-indigo-600 font-bold uppercase">Unique ৰোগী</p><p class="text-2xl font-extrabold text-indigo-700">${totalUniqueVisitors}</p><p class="text-[10px] text-indigo-400">জন (revisit সহ)</p></div><div class="bg-orange-50 p-3 rounded-xl text-center"><p class="text-[10px] text-orange-600 font-bold uppercase">মুঠ Visit</p><p class="text-2xl font-extrabold text-orange-700">${totalVisits}</p><p class="text-[10px] text-orange-400">টা (সকলো Visit)</p></div><div class="bg-green-50 p-3 rounded-xl text-center"><p class="text-[10px] text-green-600 font-bold uppercase">মুঠ আয়</p><p class="text-2xl font-extrabold text-green-700">₹${totalIncome}</p></div><div class="bg-red-50 p-3 rounded-xl text-center"><p class="text-[10px] text-red-600 font-bold uppercase">মুঠ ব্যয়</p><p class="text-2xl font-extrabold text-red-700">₹${totalExpense}</p></div><div class="${netProfit >= 0 ? 'bg-purple-50' : 'bg-red-50'} p-3 rounded-xl text-center col-span-2"><p class="text-[10px] ${netProfit >= 0 ? 'text-purple-600' : 'text-red-600'} font-bold uppercase">নিট লাভ (আনুমানিক)</p><p class="text-2xl font-extrabold ${netProfit >= 0 ? 'text-purple-700' : 'text-red-700'}">₹${netProfit}</p></div>`; } const categories = {}; (expenses || []).forEach(e => { categories[e.category] = (categories[e.category] || 0) + parseFloat(e.amount || 0); }); const financeEl = document.getElementById('reportFinance'); if (financeEl) { financeEl.innerHTML = `<h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3 flex items-center gap-1"><i class="fas fa-chart-pie text-slate-700"></i> খৰচৰ বিৱৰণ</h4>${Object.keys(categories).length === 0 ? '<p class="text-xs text-gray-400 text-center py-2">এই মাহত কোনো খৰচ নাই</p>' : Object.entries(categories).map(([cat, amt]) => `<div class="flex justify-between items-center py-2 border-b border-gray-50 text-xs"><span class="font-medium text-gray-700">${escapeHTML(cat)}</span><span class="font-bold text-red-600">₹${amt}</span></div>`).join('')}<div class="flex justify-between items-center py-2 text-xs font-bold"><span class="text-slate-900">মুঠ খৰচ</span><span class="text-red-600">₹${totalExpense}</span></div>`; } const dailyIncomeMap = {}; (payments || []).forEach(p => { const date = p.visit_date || p.created_at.split('T')[0]; if (!dailyIncomeMap[date]) dailyIncomeMap[date] = 0; dailyIncomeMap[date] += parseFloat(p.fees || 0); }); const dailyPatSets = {}; const addPat = (date, id) => { if (!dailyPatSets[date]) dailyPatSets[date] = new Set(); dailyPatSets[date].add(id); }; (visits || []).forEach(v => addPat(v.visit_date, v.patient_id || ('v' + v.id))); (patients || []).forEach(p => addPat(istDateOf(p.created_at), p.id)); const dailyVisitMap = {}; Object.keys(dailyPatSets).forEach(d => { dailyVisitMap[d] = dailyPatSets[d].size; }); const dailyPatTotal = Object.values(dailyVisitMap).reduce((x, y) => x + y, 0); const allDates = new Set([...Object.keys(dailyIncomeMap), ...Object.keys(dailyVisitMap)]); const dailyMap = {}; allDates.forEach(date => { dailyMap[date] = { count: dailyVisitMap[date] || 0, income: dailyIncomeMap[date] || 0 }; }); const dailyRows = Object.entries(dailyMap).sort((a, b) => new Date(a[0]) - new Date(b[0])); const dailyEl = document.getElementById('reportDaily'); if (dailyEl) { dailyEl.innerHTML = `<div class="p-4 border-b border-gray-100"><h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1"><i class="fas fa-calendar-alt text-slate-700"></i> দৈনিক আয়ৰ তালিকা</h4></div>${dailyRows.length === 0 ? '<p class="text-xs text-gray-400 text-center py-4">এই মাহত কোনো তথ্য নাই</p>' : `<table class="w-full text-xs"><thead class="bg-slate-900 text-white"><tr><th class="px-4 py-2.5 text-left">তাৰিখ</th><th class="px-4 py-2.5 text-center">ৰোগী</th><th class="px-4 py-2.5 text-right text-green-300">আয় ₹</th></tr></thead><tbody>${dailyRows.map(([date, val]) => `<tr class="hover:bg-gray-50"><td class="px-4 py-2 text-gray-600">${date}</td><td class="px-4 py-2 text-center font-bold text-blue-600">${val.count} জন</td><td class="px-4 py-2 text-right font-bold text-green-600">₹${val.income}</td></tr>`).join('')}<tr class="bg-slate-900 text-white font-bold"><td class="px-4 py-2.5">মুঠ</td><td class="px-4 py-2.5 text-center">${dailyPatTotal} জন</td><td class="px-4 py-2.5 text-right text-green-300">₹${totalIncome}</td></tr></tbody></table>`}`; } }
         function printReport() { const monthNames = ['জানুৱাৰী','ফেব্ৰুৱাৰী','মাৰ্চ','এপ্ৰিল','মে','জুন','জুলাই','আগষ্ট','ছেপ্টেম্বৰ','অক্টোবৰ','নৱেম্বৰ','ডিচেম্বৰ']; const month = monthNames[parseInt(document.getElementById('reportMonth').value)]; const printYear = parseInt(document.getElementById('reportYear')?.value) || new Date().getFullYear(); const printArea = document.getElementById('printArea'); if (!printArea) return; printArea.innerHTML = `<div style="font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto;"><div style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 15px;"><h1 style="font-size: 20px; margin: 0;">DR. HARIS CLINIC</h1><p style="font-size: 12px; color: #555; margin: 3px 0;">Homoeopathic & Physiotherapy Center</p><p style="font-size: 14px; font-weight: bold; margin-top: 8px;">📊 ${month} ${printYear} - Monthly Report</p></div>${document.getElementById('reportSummary').innerHTML}${document.getElementById('reportFinance').innerHTML}${document.getElementById('reportDaily').innerHTML}</div>`; window.print(); }
@@ -2126,6 +2170,163 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
       if (m) { insert(m[0], m[3]); b.classList.add('bg-teal-50'); }
     });
   } catch (err) { console.error('medicine picker init failed', err); }
+})();
+</script>
+<script id="patientFeedbackModule">
+(function () {
+  const TABLE = 'clinic_feedback';
+  const state = { overall: 0, doctor: 0, quality: 0, wait: 0, env: 0 };
+  let fbData = [];
+  let fbCurrentFilter = 'all';
+
+  function paintStars(box) {
+    const key = box.dataset.key, val = state[key] || 0;
+    box.querySelectorAll('button').forEach((b, i) => {
+      b.textContent = i < val ? '★' : '☆';
+      b.className = (box.dataset.size || 'text-2xl') + ' leading-none ' + (i < val ? 'text-yellow-500' : 'text-gray-300');
+    });
+  }
+  function initStars() {
+    document.querySelectorAll('#patientFeedbackCard .fb-stars').forEach(box => {
+      box.innerHTML = '';
+      for (let i = 1; i <= 5; i++) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.setAttribute('aria-label', i + ' star');
+        b.addEventListener('click', () => { state[box.dataset.key] = (state[box.dataset.key] === i && box.dataset.key !== 'overall') ? 0 : i; paintStars(box); });
+        box.appendChild(b);
+      }
+      paintStars(box);
+    });
+  }
+  function resetForm() {
+    Object.keys(state).forEach(k => state[k] = 0);
+    document.querySelectorAll('#patientFeedbackCard .fb-stars').forEach(paintStars);
+    document.getElementById('fbComment').value = '';
+    document.getElementById('fbName').value = '';
+    document.getElementById('fbAnon').checked = true;
+    document.getElementById('fbName').classList.add('hidden');
+    document.getElementById('fbPublish').checked = false;
+  }
+
+  async function submitFeedback() {
+    if (!state.overall) { await showAlert('অনুগ্ৰহ কৰি ১ ৰ পৰা ৫ Star ৰ ভিতৰত এটা Rating দিয়ক।', 'Rating লাগিব', '⭐'); return; }
+    try { const last = parseInt(localStorage.getItem('fbLastSubmit') || '0', 10); if (Date.now() - last < 60000) { await showAlert('অলপ পিছত পুনৰ চেষ্টা কৰক।', 'অপেক্ষা কৰক', '⏳'); return; } } catch (e) {}
+    const anon = document.getElementById('fbAnon').checked;
+    const name = anon ? null : (document.getElementById('fbName').value || '').trim().slice(0, 50) || null;
+    const comment = (document.getElementById('fbComment').value || '').trim().slice(0, 1000) || null;
+    const row = {
+      rating: state.overall,
+      doctor_rating: state.doctor || null,
+      quality_rating: state.quality || null,
+      wait_rating: state.wait || null,
+      env_rating: state.env || null,
+      comment: comment,
+      name: name,
+      is_anonymous: anon || !name,
+      allow_publish: document.getElementById('fbPublish').checked
+    };
+    const btn = document.getElementById('fbSubmitBtn');
+    btn.disabled = true;
+    const { error } = await supabaseClient.from(TABLE).insert([row]);
+    btn.disabled = false;
+    if (error) { console.error('feedback insert error', error); await showAlert('Feedback পঠিয়াব পৰা নগ\'ল। পুনৰ চেষ্টা কৰক।', 'ব্যৰ্থ', '❌'); return; }
+    try { localStorage.setItem('fbLastSubmit', String(Date.now())); } catch (e) {}
+    resetForm();
+    document.getElementById('fbFormBox').classList.add('hidden');
+    document.getElementById('fbToggleIcon').className = 'fas fa-chevron-down text-[10px] text-slate-400';
+    await showAlert('আপোনাৰ মূল্যৱান মতামতৰ বাবে ধন্যবাদ।', 'ধন্যবাদ', '🙏');
+  }
+
+  // ---------- Dashboard ----------
+  const starsText = n => '★'.repeat(n || 0) + '☆'.repeat(5 - (n || 0));
+  function renderFeedback() {
+    const total = fbData.length;
+    document.getElementById('fbStatTotal').textContent = total;
+    document.getElementById('fbStatNew').textContent = fbData.filter(f => f.status === 'new').length;
+    const avg = total ? (fbData.reduce((a, f) => a + f.rating, 0) / total) : 0;
+    document.getElementById('fbStatAvg').textContent = total ? avg.toFixed(1) : '–';
+    let dist = '';
+    for (let s = 5; s >= 1; s--) {
+      const c = fbData.filter(f => f.rating === s).length;
+      const pct = total ? Math.round((c / total) * 100) : 0;
+      dist += `<div class="flex items-center gap-2 text-[11px]"><span class="w-10 text-gray-500 font-bold">${s} ★</span><div class="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden"><div class="bg-yellow-400 h-2" style="width:${pct}%"></div></div><span class="w-8 text-right text-gray-500">${c}</span></div>`;
+    }
+    document.getElementById('fbDist').innerHTML = dist;
+
+    let list = fbData;
+    if (fbCurrentFilter === 'new') list = list.filter(f => f.status === 'new');
+    else if (fbCurrentFilter === 'low') list = list.filter(f => f.rating <= 2);
+    else if (fbCurrentFilter === 'comment') list = list.filter(f => f.comment);
+
+    const box = document.getElementById('fbList');
+    if (!list.length) { box.innerHTML = '<p class="text-center text-gray-400 text-sm py-8">কোনো Feedback নাই।</p>'; return; }
+    const stLabel = { new: '🆕 নতুন', seen: '👁️ চোৱা হ\'ল', replied: '✅ উত্তৰ দিয়া হ\'ল' };
+    const stColor = { new: 'bg-yellow-100 text-yellow-700', seen: 'bg-blue-100 text-blue-700', replied: 'bg-emerald-100 text-emerald-700' };
+    box.innerHTML = list.map(f => {
+      const id = escapeHTML(String(f.id));
+      const date = new Date(f.created_at).toLocaleDateString('en-IN');
+      const who = f.is_anonymous || !f.name ? 'বেনামী' : escapeHTML(f.name);
+      const subs = [['চিকিৎসক', f.doctor_rating], ['সেৱা', f.quality_rating], ['অপেক্ষা', f.wait_rating], ['পৰিৱেশ', f.env_rating]]
+        .filter(x => x[1]).map(x => `<span class="bg-slate-50 border border-slate-100 rounded-md px-1.5 py-0.5">${x[0]}: ${x[1]}★</span>`).join(' ');
+      const st = f.status || 'new';
+      return `<div class="p-4 border rounded-xl bg-white shadow-sm text-xs space-y-2">
+        <div class="flex justify-between items-start gap-2"><div><p class="text-yellow-500 text-base leading-none">${starsText(f.rating)}</p><p class="text-gray-500 mt-1">${who} · ${date}${f.allow_publish ? ' · <span class="text-emerald-600 font-bold">প্ৰকাশৰ অনুমতি আছে</span>' : ''}</p></div><span class="px-2 py-1 rounded-full font-bold text-[10px] shrink-0 ${stColor[st] || stColor.new}">${stLabel[st] || stLabel.new}</span></div>
+        ${subs ? `<div class="flex gap-1 flex-wrap text-[10px] text-gray-600">${subs}</div>` : ''}
+        ${f.comment ? `<p class="text-gray-700 whitespace-pre-wrap">${escapeHTML(f.comment)}</p>` : '<p class="text-gray-400 italic">লিখিত মতামত নাই</p>'}
+        <textarea id="fbNote-${id}" placeholder="আপোনাৰ নিজৰ টোকা / উত্তৰ..." class="w-full p-2 border rounded-lg h-14 text-xs resize-none">${escapeHTML(f.admin_note || '')}</textarea>
+        <div class="flex gap-2 flex-wrap pt-1 border-t">
+          <button onclick="fbSaveNote('${id}')" class="flex-1 bg-slate-900 text-white py-2 rounded-lg font-bold text-[11px] min-w-[80px]">💾 টোকা সংৰক্ষণ</button>
+          ${st !== 'seen' ? `<button onclick="fbSetStatus('${id}','seen')" class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold text-[11px] min-w-[80px]">👁️ চোৱা হ'ল</button>` : ''}
+          ${st !== 'replied' ? `<button onclick="fbSetStatus('${id}','replied')" class="flex-1 bg-emerald-600 text-white py-2 rounded-lg font-bold text-[11px] min-w-[80px]">✅ উত্তৰ দিয়া হ'ল</button>` : ''}
+          <button onclick="fbDelete('${id}')" class="bg-red-500 text-white px-3 py-2 rounded-lg font-bold text-[11px]">🗑️</button>
+        </div></div>`;
+    }).join('');
+  }
+
+  window.loadFeedback = async function () {
+    const { data, error } = await supabaseClient.from(TABLE).select('*').order('created_at', { ascending: false }).limit(500);
+    if (error) { console.error('feedback load error', error); document.getElementById('fbList').innerHTML = '<p class="text-center text-red-500 text-sm py-8">Feedback লোড কৰিব পৰা নগ\'ল। (Supabase table বা policy পৰীক্ষা কৰক)</p>'; return; }
+    fbData = data || [];
+    renderFeedback();
+  };
+  window.fbFilter = function (key) {
+    fbCurrentFilter = key;
+    ['all', 'new', 'low', 'comment'].forEach(k => { const b = document.getElementById('fbf-' + k); if (b) b.classList.toggle('ring-2', k === key); if (b) b.classList.toggle('ring-slate-900', k === key); });
+    renderFeedback();
+  };
+  window.fbSetStatus = async function (id, status) {
+    const { error } = await supabaseClient.from(TABLE).update({ status }).eq('id', id);
+    if (error) { await showAlert('Status update কৰিব পৰা নগ\'ল।', 'ভুল', '❌'); return; }
+    loadFeedback();
+  };
+  window.fbSaveNote = async function (id) {
+    const el = document.getElementById('fbNote-' + id);
+    const note = (el ? el.value : '').trim().slice(0, 1000) || null;
+    const { error } = await supabaseClient.from(TABLE).update({ admin_note: note }).eq('id', id);
+    if (error) { await showAlert('টোকা সংৰক্ষণ কৰিব পৰা নগ\'ল।', 'ভুল', '❌'); return; }
+    await showAlert('টোকা সংৰক্ষণ কৰা হ\'ল।', 'সফল', '✅');
+  };
+  window.fbDelete = async function (id) {
+    if (!await showConfirm('এই Feedback স্থায়ীভাৱে মচিব বিচাৰেনে?', 'নিশ্চিত কৰক', '🗑️')) return;
+    const { error } = await supabaseClient.from(TABLE).delete().eq('id', id);
+    if (error) { await showAlert('মচিব পৰা নগ\'ল।', 'ভুল', '❌'); return; }
+    loadFeedback();
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    initStars();
+    const tg = document.getElementById('fbToggleBtn');
+    if (tg) tg.addEventListener('click', () => {
+      const f = document.getElementById('fbFormBox');
+      const open = f.classList.toggle('hidden') === false;
+      document.getElementById('fbToggleIcon').className = 'fas ' + (open ? 'fa-chevron-up' : 'fa-chevron-down') + ' text-[10px] text-slate-400';
+    });
+    const anon = document.getElementById('fbAnon');
+    if (anon) anon.addEventListener('change', () => document.getElementById('fbName').classList.toggle('hidden', anon.checked));
+    const sb = document.getElementById('fbSubmitBtn');
+    if (sb) sb.addEventListener('click', submitFeedback);
+  });
 })();
 </script>
 </body>
