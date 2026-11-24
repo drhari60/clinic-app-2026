@@ -127,6 +127,13 @@
   }
 </style>
 
+<style id="navFitFix">
+@media (max-width: 640px) {
+  div.fixed.bottom-0:has(> .tab-btn) { padding-left: 2px !important; padding-right: 2px !important; }
+  div.fixed.bottom-0 > .tab-btn { flex: 1 1 0% !important; min-width: 0 !important; padding-left: 1px !important; padding-right: 1px !important; font-size: 9px !important; white-space: nowrap; letter-spacing: -0.2px; }
+  div.fixed.bottom-0 > .tab-btn i { font-size: 15px !important; }
+}
+</style>
 </head>
 <body class="bg-slate-100 text-gray-800 antialiased min-h-screen py-4 sm:py-8 px-2">
 
@@ -417,7 +424,7 @@
             <button data-tab="stock" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition"><i class="fas fa-pills text-base"></i>ষ্টক</button>
             <button data-tab="physio" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition"><i class="fas fa-running text-base"></i>ফিজিঅ'</button>
             <button data-tab="profile" class="tab-btn flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition"><i class="fas fa-user text-base"></i>প্ৰফাইল</button>
-            <button data-tab="feedback" class="tab-btn stock-only hidden flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition"><i class="fas fa-star text-base"></i>Feedback</button>
+            <button data-tab="feedback" class="tab-btn stock-only hidden flex flex-col items-center gap-1 text-gray-400 px-3 py-1 text-xs font-bold transition"><i class="fas fa-star text-base"></i>মতামত</button>
         </div>
     </div>
 
